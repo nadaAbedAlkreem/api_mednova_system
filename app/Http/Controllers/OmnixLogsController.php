@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderNotification;
-use App\Http\Requests\StoreOrderNotificationRequest;
-use App\Http\Requests\UpdateOrderNotificationRequest;
+use App\Models\OmnixLogs;
+use App\Http\Requests\StoreOmnixLogsRequest;
+use App\Http\Requests\UpdateOmnixLogsRequest;
 
-class OrderNotificationController extends Controller
+class OmnixLogsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class OrderNotificationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreOrderNotificationRequest $request)
+    public function store(StoreOmnixLogsRequest $request)
     {
         //
     }
@@ -35,7 +35,7 @@ class OrderNotificationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(OrderNotification $orderNotification)
+    public function show(OmnixLogs $omnixLogs)
     {
         //
     }
@@ -43,7 +43,7 @@ class OrderNotificationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(OrderNotification $orderNotification)
+    public function edit(OmnixLogs $omnixLogs)
     {
         //
     }
@@ -51,7 +51,7 @@ class OrderNotificationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateOrderNotificationRequest $request, OrderNotification $orderNotification)
+    public function update(UpdateOmnixLogsRequest $request, OmnixLogs $omnixLogs)
     {
         //
     }
@@ -59,7 +59,7 @@ class OrderNotificationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(OrderNotification $orderNotification)
+    public function destroy(OmnixLogs $omnixLogs)
     {
         //
     }

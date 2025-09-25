@@ -140,6 +140,26 @@
 
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="menu-accordion gap-px ps-7">
+                            <div class="menu-item" data-menu-item-toggle="accordion" data-menu-item-trigger="click">
+                                <div class="menu-link py-2 px-2.5 rounded-md border border-transparent !menu-item-here:bg-transparent">
+                                     <span class="menu-title text-2sm text-gray-800 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                                      notification
+                                     </span>
+                                </div>
+                                <div class="menu-accordion gap-px ps-2.5">
+                                    <div class="menu-item">
+                                        <a class="menu-link py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="{{route('admin.dashboard.notification')}}">
+                                           <span class="menu-title text-2sm text-gray-800 menu-item-active:font-medium menu-item-active:text-gray-900 menu-link-hover:text-pgray-900">
+                                            view
+                                           </span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
 
                         </div>
                     </div>

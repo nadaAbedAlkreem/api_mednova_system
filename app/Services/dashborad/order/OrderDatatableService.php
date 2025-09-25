@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\dashborad\order;
 
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables;

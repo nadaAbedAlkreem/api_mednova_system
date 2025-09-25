@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Dashborad\Auth;
+namespace App\Http\Controllers\Dashboard\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Services\AdminAuthService;
+use App\Services\Auth\AdminAuthService;
 use App\Traits\ResponseTrait;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -31,7 +30,7 @@ class LoginController extends Controller
           try {
               $credentials = $request->only('email', 'password');
               $this->authService->login($credentials);
-               return $this->successResponse('LOGGED_IN_SUCCESSFULLY', [], 200, app()->getLocale());
+              return $this->successResponse('LOGGED_IN_SUCCESSFULLY', [], 200, app()->getLocale());
           } catch (\Exception $e) {
               return $this->errorResponse('ERROR_OCCURRED', ['error' => $e->getMessage()], 500, app()->getLocale());
           }

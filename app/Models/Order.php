@@ -18,5 +18,8 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-
+    public function omnixUser()
+    {
+        return $this->hasMany(OmnixLog::class);
+    }
 }

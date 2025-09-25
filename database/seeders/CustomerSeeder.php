@@ -16,11 +16,13 @@ class CustomerSeeder extends Seeder
     {
         DB::table('customers')->insert(
             [
+                'first_name' => 'cut',
+                'last_name' => 'cut',
                 'name' => 'cut',
                 'email' => 'customer@gmail.com',
+                'gender' => 'male',
                 'phone' => '0598188846',
                 'password' => Hash::make('123456789'), // Ensure password is hashed
-
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

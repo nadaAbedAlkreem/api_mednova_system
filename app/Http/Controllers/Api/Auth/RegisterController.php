@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App;
+use App\Events\CustomerRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
@@ -25,6 +26,7 @@ class RegisterController extends Controller
     {
         try {
             $user = $this->customerService->register($request->getData());
+            event(new CustomerRegistered($user['user']));
             return $this->successResponse('CREATE_USER_SUCCESSFULLY',
                [
                    'access_token' => $user['access_token'],

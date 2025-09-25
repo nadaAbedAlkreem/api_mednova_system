@@ -13,17 +13,14 @@ return new class extends Migration
     {
         Schema::create('order_notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')
-            ->constrained('orders')
-            ->onDelete('cascade');
             $table->enum('channel' , ['sms', 'email', 'whatsapp', 'push']);
             $table->string('message');
             $table->enum('send_type' ,['relative' , 'absolute']);
-            $table->integer('send_after_minutes')->nullable();
-            $table->date('send_at')->nullable();
-            $table->enum('trigger_event',['order_created','order_pending', 'order_accepted', 'order_rejected', 'manual']);
+            $table->integer('send_after_minutes')->nullable(); // relative
+            $table->dateTime('send_at')->nullable(); // absolute
+            $table->enum('trigger_event',['register_created','order_created','order_pending', 'order_accepted', 'order_rejected', 'manual'])->nullable(); // relative
             $table->enum('status', ['pending', 'sent', 'failed'])->default('pending');
-            $table->date('sent_at')->nullable();
+            $table->dateTime('sent_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

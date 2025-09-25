@@ -2,15 +2,15 @@
 
 namespace App\Providers;
 
-use App\Repositories\Eloquent\FriendsRepository;
-use App\Repositories\Eloquent\NotificationRepository;
-use App\Repositories\INotificationRepositories;
+use App\Repositories\Eloquent\OmnixLogRepository;
+use App\Repositories\Eloquent\OmnixWebhookRepository;
+use App\Repositories\Eloquent\OmnixWhatsAppNotificationRepository;
+use App\Repositories\IOmnixLogRepositories;
+use App\Repositories\IOmnixNotificationRepositories;
+use App\Repositories\IOmnixWebhookRepositories;
+use App\Services\Omnix\NotificationManager;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Eloquent\CustomerRepository;
-use App\Repositories\IUserRepository;
-use App\Repositories\IFriendsRepositories;
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -20,7 +20,13 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register()
     {
-         foreach($this->getModels() as $model){
+
+
+        $this->app->bind(IOmnixLogRepositories::class, OmnixLogRepository::class);
+        $this->app->bind(IOmnixNotificationRepositories::class, OmnixWhatsAppNotificationRepository::class);
+        $this->app->bind(IOmnixWebhookRepositories::class, OmnixWebhookRepository::class);
+
+        foreach($this->getModels() as $model){
               $this->app->bind(
                  "App\Repositories\I{$model}Repositories",
                  "App\Repositories\Eloquent\\{$model}Repository");

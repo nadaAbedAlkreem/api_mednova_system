@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
-use App\Services\AdminAuthService;
-use App\Services\CustomerAuthService;
+use App\Services\Auth\CustomerAuthService;
 use App\Traits\ResponseTrait;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller

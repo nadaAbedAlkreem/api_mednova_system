@@ -2,9 +2,8 @@
 
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Dashborad\OrderController;
+use App\Http\Controllers\Dashboard\order\OrderController;
 use Illuminate\Support\Facades\Route;
-
 
 
 Route::prefix('auth')->group(function ()

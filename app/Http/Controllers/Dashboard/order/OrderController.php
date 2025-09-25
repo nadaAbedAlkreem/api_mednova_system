@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dashborad;
+namespace App\Http\Controllers\Dashboard\order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Repositories\IOrderRepositories;
-use App\Services\OrderDatatableService;
+use App\Services\dashborad\order\OrderDatatableService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Throwable;
