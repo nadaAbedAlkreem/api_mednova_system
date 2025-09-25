@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use App\Repositories\Eloquent\OmnixLogRepository;
+use App\Repositories\Eloquent\OmnixSubscribeRepository;
 use App\Repositories\Eloquent\OmnixWebhookRepository;
 use App\Repositories\Eloquent\OmnixWhatsAppNotificationRepository;
-use App\Repositories\IOmnixLogRepositories;
 use App\Repositories\IOmnixNotificationRepositories;
+use App\Repositories\IOmnixSubscribeRepositories;
 use App\Repositories\IOmnixWebhookRepositories;
-use App\Services\Omnix\NotificationManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 class RepositoryServiceProvider extends ServiceProvider
@@ -22,7 +21,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
 
 
-        $this->app->bind(IOmnixLogRepositories::class, OmnixLogRepository::class);
+        $this->app->bind(IOmnixSubscribeRepositories::class, OmnixSubscribeRepository::class);
         $this->app->bind(IOmnixNotificationRepositories::class, OmnixWhatsAppNotificationRepository::class);
         $this->app->bind(IOmnixWebhookRepositories::class, OmnixWebhookRepository::class);
 

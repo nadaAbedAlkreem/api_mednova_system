@@ -3,14 +3,12 @@
 namespace App\Repositories\Eloquent;
 
 
-use App\Models\OmnixLog;
-use App\Repositories\IOmnixLogRepositories;
+use App\Repositories\IOmnixSubscribeRepositories;
 use Exception;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 
-class OmnixLogRepository  implements  IOmnixLogRepositories
+class OmnixSubscribeRepository  implements  IOmnixSubscribeRepositories
 {
     protected string $baseUrl;
     protected string $accessToken;
@@ -33,21 +31,12 @@ class OmnixLogRepository  implements  IOmnixLogRepositories
                 ->json();
 
             if (!empty($response['data']['user_ns'])) {
-                Log::info("Omnix: تم الاشتراك بنجاح", [
-                    'customer_id' => $customer->id,
-                    'user_ns' => $response['data']['user_ns']
-                ]);
                 return $response['data']['user_ns'];
             }
 
-            Log::warning("Omnix: الاشتراك فشل بدون خطأ", ['customer_id' => $customer->id]);
             return null;
 
         } catch (Exception $e) {
-            Log::error("Omnix: خطأ أثناء الاشتراك", [
-                'customer_id' => $customer->id,
-                'error' => $e->getMessage()
-            ]);
             return null;
         }
     }

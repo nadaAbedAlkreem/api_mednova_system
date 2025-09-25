@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Repositories\IOmnixLogRepositories;
+use App\Repositories\IOmnixSubscribeRepositories;
 use App\Repositories\IOmnixWebhookRepositories;
 use App\Services\Omnix\NotificationManager;
 use App\Services\Omnix\OmnixLogService;
@@ -28,19 +29,18 @@ class ProcessCustomerRegistrationJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(IOmnixLogRepositories $omnixLogRepositories,
+    public function handle(IOmnixSubscribeRepositories $omnixSubscribeRepositories,
                            NotificationManager $notificationManager,
                            OmnixLogService $log ,
                            IOmnixWebhookRepositories $webhookRepo
     ): void {
         try {
             if (!$this->customer->omnix_user_id) {
-                $omnixUserId = $omnixLogRepositories->subscribeCustomer( $this->customer);
+                $omnixUserId = $omnixSubscribeRepositories->subscribeCustomer($this->customer->toArray());
                 $this->customer->update(['omnix_user_id' => $omnixUserId]);
             }
             $response = $notificationManager->send('whatsapp' ,$this->customer, "مرحبًا {$this->customer->first_name} في نظامنا 🎉");
             $log->record($this->customer, null , 'user_registered', 'success', $response);
-
             try {
                 $webhooks = $webhookRepo->getInboundWebhooks();
                 $log->record($this->customer, null, 'get_inbound_webhooks', 'success', $webhooks);

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-interface IOmnixLogRepositories
+interface IOmnixSubscribeRepositories
 {
      public function subscribeCustomer($customer): ?string;
 

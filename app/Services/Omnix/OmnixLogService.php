@@ -13,7 +13,7 @@ class OmnixLogService
     {
         OmnixLog::create([
             'customer_id' => $customer->id,
-            'order_id' => $order->id,
+            'order_id' => $order?->id,
             'event'       => $event,
             'status'      => $status,
             'response'    => is_string($response) ? $response : json_encode($response),
