@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('program_details', function (Blueprint $table) {
+        Schema::create('customer_course_progress', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('program_id')->constrained('programs')->onDelete('cascade');
-            $table->string('title_ar');
-            $table->string('title_en')->nullable();
-            $table->text('content_ar')->nullable();
-            $table->text('content_en')->nullable();
-            $table->string('approx_duration')->nullable();
-            $table->integer('order')->default(0);
+            $table->integer('videos_completed')->default(0);
+            $table->integer('current_video')->default(0);
+            $table->integer('current_time')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('program_details');
+        Schema::dropIfExists('customer_course_progress');
     }
 };
