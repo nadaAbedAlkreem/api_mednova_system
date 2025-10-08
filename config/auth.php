@@ -43,7 +43,7 @@ return [
 
         'api' => [
             'driver' => 'sanctum',
-            'provider' => 'customers',
+            'provider' => 'users',
             'hash' => false,
         ],
 
@@ -73,9 +73,9 @@ return [
             'model' => env('AUTH_MODEL', App\Models\Admin::class),
         ],
 
-         'customers' => [
+         'users' => [
              'driver' => 'eloquent',
-             'model' => env('AUTH_MODEL', App\Models\Customer::class),
+             'model' => env('AUTH_MODEL', App\Models\User::class),
          ],
 
     ],

@@ -8,22 +8,21 @@ use Exception;
 class CustomerService
 {
 
-    protected $customerRepository;
+    protected ICustomerRepositories $customerRepository;
 
     public function __construct(ICustomerRepositories $customerRepository)
     {
-        $this->customerRepository = $customerRepository; // Inject the repository
+        $this->customerRepository = $customerRepository;
     }
 
-    public function register($data)
+    public function register($data): array
     {
         try {
             $customer = $this->customerRepository->create($data);
             $customerToken =  $customer->createToken('API Token')->plainTextToken;
             return   [
-                'access_token' =>  $customerToken ,
-                'token_type' => 'Bearer',
-                'user' => $customer
+                'access_token' =>  'Bearer '.$customerToken ,
+                'customer' => $customer
             ] ;
         } catch (\Exception $e) {
              throw new \Exception($e->getMessage());

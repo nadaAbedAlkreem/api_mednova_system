@@ -13,15 +13,23 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->enum('gender' , ['male' , 'female']);
-            $table->string('omnix_user_id')->nullable()->unique();
+            $table->string('full_name');
+            $table->string('email');
+            $table->string('phone');
+            $table->enum('gender' , ['Male' , 'Female'])->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->date('birth_date')->nullable();
+            $table->string('image')->nullable();
+            $table->string('provider')->nullable();
+            $table->string('provider_id')->nullable();
+            $table->string('fcm_token')->nullable();
+            $table->boolean('is_online')->default(false);
+            $table->timestamp('last_active_at')->nullable();
+            $table->boolean('is_banned')->default(false);
+            $table->enum('type_account' , ['therapist' ,'rehabilitation_center' , 'patient']);
+            $table->enum('status' , ['active' , 'not_active'])->default('not_active');
+            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -15,14 +15,14 @@ trait ResponseTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    public function successResponse($messageCode,  $data = [], $statusCode = 200  , $lang = 'ar')
+    public function successResponse($messageCode,  $data = [], $statusCode = 200  , $lang = 'ar'): \Illuminate\Http\JsonResponse
     {
-        $message = Messages::getMessage($messageCode   , $lang);
+//        $message = Messages::getMessage($messageCode   , $lang);
         $status = HttpStatus::getHttpStatus($statusCode);
 
         return response()->json([
             'success' => true,
-            'message' => $message,
+            'message' => $messageCode,
             'data' => $data,
             'status' => $status
         ], $statusCode);
@@ -37,12 +37,12 @@ trait ResponseTrait
      */
     public function errorResponse($messageCode  ,   $data = [], $statusCode = 400 , $lang = 'ar')
     {
-        $message = Messages::getMessage($messageCode , $lang);
+//        $message = Messages::getMessage($messageCode , $lang);
         $status = HttpStatus::getHttpStatus($statusCode);
 
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => $messageCode,
             'data' => $data,
             'status' => $status
         ], $statusCode);

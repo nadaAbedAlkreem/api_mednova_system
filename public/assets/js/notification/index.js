@@ -19,13 +19,9 @@ $(document).ready(function() {
         },
         columns: [
             {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-            {data: 'channel', name: 'channel'},
-            {data: 'message', name: 'message'},
-            {data: 'send_type', name: 'send_type'},
-            {data: 'send_after_minutes', name: 'send_after_minutes'},
-            {data: 'send_at', name: 'send_at'},
-            {data: 'trigger_event', name: 'trigger_event'},
-            {data: 'action', name: 'action', searchable: false},
+            {data: 'customer', name: 'customer'},
+            {data: 'order', name: 'order'},
+            {data: 'response', name: 'response'},
         ],
 
         order: [[2, 'asc']], // ترتيب حسب الاسم

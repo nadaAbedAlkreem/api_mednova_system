@@ -13,21 +13,59 @@ class Customer extends Authenticatable
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasApiTokens,HasFactory, softDeletes;
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'name',
+        'full_name',
         'email',
-        'phone',
-        'gender',
-        'omnix_user_id',
         'password',
+        'gender' ,
+        'phone' ,
+        'birth_date' ,
+        'image' ,
+        'provider' ,
+        'provider_id' ,
+        'fcm_token' ,
+        'is_online' ,
+        'last_active_at' ,
+        'is_banned' ,
+        'type_account',
     ];
-    public function orders()
+    protected static function boot()
     {
-        return $this->hasMany(Order::class);
+        parent::boot();
+
+        static::deleting(function ($customer) {
+            $customer->location()->each(function ($location) {
+                $location->delete();
+            });
+
+            $customer->therapist()->each(function ($therapist) {
+                $therapist->delete();
+            });
+            $customer->rehabilitationCenter()->each(function ($rehabilitationCenter) {
+                $rehabilitationCenter->delete();
+            });
+            $customer->patient()->each(function ($patient) {
+                $patient->delete();
+            });
+        });
     }
-    public function omnixUser()
+    public function therapist(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-         return $this->hasMany(OmnixLog::class);
+        return $this->hasOne(Therapist::class);
     }
+    public function rehabilitationCenter(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(RehabilitationCenter::class);
+    }
+    public function patient(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Patient::class);
+    }
+
+    public function location(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Location::class);
+    }
+
+
+
 }

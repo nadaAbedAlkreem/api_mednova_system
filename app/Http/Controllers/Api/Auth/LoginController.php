@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Requests\api\auth\LoginUserRequest;
+use App\Http\Resources\CustomerResource;
 use App\Services\Auth\CustomerAuthService;
 use App\Traits\ResponseTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -18,35 +20,26 @@ class LoginController extends Controller
         $this->authService = $authService;
     }
 
-    public function index()
-    {
-    return view('auth.login');
-    }
 
-
-    public function login(LoginRequest $request)
+    public function login(LoginUserRequest $request): JsonResponse
     {
           try {
               $credentials = $request->only('email', 'password');
               $token = $this->authService->login($credentials);
                return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
                    [
-                   'access_token' => $token,
-                   'token_type' => 'Bearer',
-                   'user' => new UserResource(Auth::guard('api')->user()),
+                   'access_token' =>'Bearer ' . $token,
+                   'user' => new CustomerResource(Auth::guard('api')->user()),
                ], 202,app()->getLocale());
           } catch (\Exception $e) {
-              return $this->errorResponse('ERROR_OCCURRED', ['error' => $e->getMessage()], 500, app()->getLocale());
+              return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
           }
     }
 
 
-    public function logout()
+    public function logout(Request $request): JsonResponse
     {
-        Auth::guard('admin')->logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-        return redirect()->route('admin.login')->with('success', 'You have been logged out.');
-
+        $request->user()->currentAccessToken()->delete();
+        return $this->successResponse(__('messages.LOGGED_OUT_SUCCESSFULLY') ,[] ,200, app()->getLocale());
     }
 }

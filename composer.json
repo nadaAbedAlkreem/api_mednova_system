@@ -8,9 +8,11 @@
     "require": {
         "php": "^8.2",
         "dedoc/scramble": "^0.12.34",
+        "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
+        "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "yajra/laravel-datatables-oracle": "^12.4"
     },

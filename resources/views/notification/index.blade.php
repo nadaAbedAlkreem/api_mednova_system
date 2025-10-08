@@ -72,7 +72,7 @@
                                      <th class="min-w-[300px]">
                                        <span class="sort asc">
                                         <span class="sort-label font-normal text-gray-700">
-                                       channel
+                                       customer
                                         </span>
                                         <span class="sort-icon">
                                         </span>
@@ -81,7 +81,7 @@
                                      <th class="min-w-[180px]">
                                        <span class="sort">
                                         <span class="sort-label font-normal text-gray-700">
-                                         message
+                                         order
                                         </span>
                                         <span class="sort-icon">
                                         </span>
@@ -90,40 +90,11 @@
                                      <th class="min-w-[180px]">
                                        <span class="sort">
                                         <span class="sort-label font-normal text-gray-700">
-                                         send type
+                                         response
                                         </span>
                                         <span class="sort-icon">
                                         </span>
                                        </span>
-                                     </th>
-                                     <th class="min-w-[180px]">
-                                       <span class="sort">
-                                        <span class="sort-label font-normal text-gray-700">
-                                         send after minutes
-                                        </span>
-                                        <span class="sort-icon">
-                                        </span>
-                                       </span>
-                                     </th>
-                                     <th class="min-w-[180px]">
-                                       <span class="sort">
-                                        <span class="sort-label font-normal text-gray-700">
-                                         send at
-                                        </span>
-                                        <span class="sort-icon">
-                                        </span>
-                                       </span>
-                                     </th>
-                                     <th class="min-w-[180px]">
-                                       <span class="sort">
-                                        <span class="sort-label font-normal text-gray-700">
-                                         trigger event
-                                        </span>
-                                        <span class="sort-icon">
-                                        </span>
-                                       </span>
-                                     </th>
-                                     <th class="w-[60px]">
                                      </th>
                                  </tr>
                                  </thead>

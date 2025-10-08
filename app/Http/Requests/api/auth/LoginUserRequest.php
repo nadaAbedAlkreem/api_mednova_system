@@ -48,26 +48,13 @@ class LoginUserRequest extends FormRequest
     public function messages()
     {
         return [
+            'email.required' => __('validation.required', ['attribute' => __('validation.attributes.email')]),
+            'email.string' => __('validation.string', ['attribute' => __('validation.attributes.email')]),
+            'email.email' => __('validation.email', ['attribute' => __('validation.attributes.email')]),
 
-            'name.required' => 'الاسم مطلوب.',
-            'name.string' => 'يجب أن يكون الاسم نصًا.',
-            'name.max' => 'يجب ألا يتجاوز الاسم 255 حرفًا.',
-
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.string' => 'يجب أن يكون البريد الإلكتروني نصًا.',
-            'email.email' => 'يجب إدخال بريد إلكتروني صالح.',
-            'email.max' => 'يجب ألا يتجاوز البريد الإلكتروني 255 حرفًا.',
-            'email.unique' => 'البريد الإلكتروني مستخدم بالفعل.',
-
-            'phone.required' => 'الرقم التواصل مطلوب.',
-            'phone.string' => 'يجب أن يكون الرقم التواصل نصًا.',
-            'phone.unique' => 'الرقم التواصل مستخدم بالفعل.',
-
-            'password.required' => 'كلمة المرور مطلوبة.',
-            'password.string' => 'يجب أن تكون كلمة المرور نصًا.',
-            'password.min' => 'يجب ألا تقل كلمة المرور عن 8 أحرف.',
-            'password.confirmed' => 'تأكيد كلمة المرور غير مطابق.',
-            'phone.regex' => 'رقم الجوال يجب أن يبدأ بـ 970 ويتكون من 12 رقمًا.',
+            'password.required' => __('validation.required', ['attribute' => __('validation.attributes.password')]),
+            'password.string' => __('validation.string', ['attribute' => __('validation.attributes.password')]),
+            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 8]),
 
         ];
     }

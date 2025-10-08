@@ -33,7 +33,7 @@ class Authenticate
 
          if ($request->expectsJson() || $request->is('api/*')) {
              return $this->errorResponse(
-                 'UNAUTHORISED',
+                 __('messages.UNAUTHORISED'),
                  [],
                  401,
                  app()->getLocale()
