@@ -4,8 +4,16 @@ use App\Http\Controllers\Api\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
-use App\Http\Controllers\Api\user\LocationController;
-use App\Http\Controllers\Api\user\PatientController;
+use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
+use App\Http\Controllers\Api\program\ProgramController;
+use App\Http\Controllers\Api\program\ProgramReviewRequestsController;
+use App\Http\Controllers\Api\program\ProgramVideosController;
+use App\Http\Controllers\Api\User\CustomerController;
+use App\Http\Controllers\Api\User\LocationController;
+use App\Http\Controllers\Api\User\MedicalSpecialtieController;
+use App\Http\Controllers\Api\User\PatientController;
+use App\Http\Controllers\Api\User\RehabilitationCenterController;
+use App\Http\Controllers\Api\User\TherapistController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -21,10 +29,80 @@ Route::prefix('auth')->group(function ()
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
+
+    Route::prefix('customer')->group(function ()
+    {
+        Route::get('/{id}', [CustomerController::class, 'getById']);
+        Route::get('/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
+    });
     Route::prefix('patient')->group(function ()
     {
         Route::post('/store', [PatientController::class, 'store']);
+        Route::post('/update', [PatientController::class, 'update']);
 
+    });
+    Route::prefix('medical-specialties')->group(function ()
+    {
+     Route::get('', [MedicalSpecialtieController::class, 'getAll']);
+     Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']);
+    });
+
+    Route::prefix('therapist')->group(function ()
+    {
+        Route::get('/', [TherapistController::class, 'get']);
+        Route::post('/store', [TherapistController::class, 'store']);
+        Route::post('/update', [TherapistController::class, 'update']);
+
+    });
+    Route::prefix('consultation-request')->group(function ()
+    {
+        Route::get('/get-status-request', [ConsultationChatRequestController::class, 'getStatusRequest']);
+        Route::post('/store', [ConsultationChatRequestController::class, 'store']);
+        Route::post('/update-status-request', [ConsultationChatRequestController::class, 'updateStatusRequest']);
+
+    });
+
+    Route::prefix('programs')->group(function () {
+        // برامج
+        Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
+        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
+        Route::post('/', [ProgramController::class, 'store']);    //done store program
+        Route::get('{id}', [ProgramController::class, 'show']);  // view select one program done
+        Route::post('program/update', [ProgramController::class, 'update']); //done update one program
+        Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
+        Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
+
+    });
+
+//        // إجراءات خاصة بالبرنامج
+//        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+//
+//        // فيديوهات البرنامج
+        Route::prefix('/videos')->group(function () {
+            Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+            Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+            Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+//            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
+        });
+//
+// // طلبات المراجعة
+        Route::prefix('{program}/review-requests')->group(function () {
+//            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
+            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
+        });
+//    });
+//
+//// إدارة طلبات المراجعة من منظور المشرف
+//    Route::prefix('review-requests')->group(function () {
+//        Route::get('/', [ProgramReviewRequestController::class, 'all']);           // قائمة كل طلبات المراجعة
+//        Route::patch('{request}', [ProgramReviewRequestController::class, 'update']); // الموافقة أو الرفض
+//    });
+
+    Route::prefix('center')->group(function ()
+    {
+        Route::post('/store', [RehabilitationCenterController::class, 'store']);
+        Route::post('/update', [RehabilitationCenterController::class, 'update']);
+        Route::post('/update-schedule', [RehabilitationCenterController::class, 'updateSchedule']);
     });
     Route::prefix('location')->group(function ()
     {

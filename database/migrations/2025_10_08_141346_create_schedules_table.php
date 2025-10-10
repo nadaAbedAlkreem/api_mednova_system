@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->morphs('schedulable'); // مختص أو مركز
-            $table->enum('day_of_week', ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday']);
+            $table->json('day_of_week');
             $table->time('start_time_morning')->nullable();
             $table->time('end_time_morning')->nullable();
             $table->boolean('is_have_evening_time')->nullable();

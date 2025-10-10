@@ -8,11 +8,15 @@ use Illuminate\Support\Str;
 
 class UploadService
 {
-    public function upload(UploadedFile $file, string $path = 'uploads', ?string $disk = 'public'): string
+    public function upload(UploadedFile $file, string $path = 'uploads', ?string $disk = 'public', ?string $subFolder = null): string
     {
+         if ($subFolder) {
+            $path = rtrim($path, '/') . '/' . trim($subFolder, '/');
+        }
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         return $file->storeAs($path, $filename, $disk);
     }
+
 
     public function delete(?string $filePath, ?string $disk = 'public'): void
     {

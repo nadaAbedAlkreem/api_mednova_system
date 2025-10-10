@@ -9,7 +9,9 @@ interface BaseRepositoryInterface
 
     public function CreateMulti(array $data);
 
-    public function update(array $data, $id);
+    public function update(array $data, $id); //updateAndReturn
+    public function updateAndReturn(array $data, int $id);
+
 
     public function getAll($orderBy);
 

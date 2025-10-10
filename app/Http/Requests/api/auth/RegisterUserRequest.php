@@ -29,8 +29,8 @@ class RegisterUserRequest extends FormRequest
     {
         return [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,NULL,id,deleted_at,NULL',
-            'phone' => ['required', 'string', 'unique:users,phone,NULL,id,deleted_at,NULL', 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
+            'email' => 'required|string|email|max:255|unique:customers,email,NULL,id,deleted_at,NULL',
+            'phone' => ['required', 'string', 'unique:customers,phone,NULL,id,deleted_at,NULL', 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
             'password' => ['required', 'string', 'min:8' ,'confirmed'],
             'type_account' => ['required', 'string' , 'in:therapist,rehabilitation_center,patient'],
         ];
@@ -52,9 +52,9 @@ class RegisterUserRequest extends FormRequest
     {
         return [
 
-            'name.required' => __('validation.required', ['attribute' => __('validation.attributes.name')]),
-            'name.string' => __('validation.string', ['attribute' => __('validation.attributes.name')]),
-            'name.max' => __('validation.max.string', ['attribute' => __('validation.attributes.name'), 'max' => 255]),
+            'full_name.required' => __('validation.required', ['attribute' => __('validation.attributes.full_name')]),
+            'full_name.string' => __('validation.string', ['attribute' => __('validation.attributes.full_name')]),
+            'full_name.max' => __('validation.max.string', ['attribute' => __('validation.attributes.full_name'), 'max' => 255]),
 
             'email.required' => __('validation.required', ['attribute' => __('validation.attributes.email')]),
             'email.string' => __('validation.string', ['attribute' => __('validation.attributes.email')]),

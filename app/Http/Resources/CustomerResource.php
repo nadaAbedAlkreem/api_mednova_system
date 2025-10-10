@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\MedicalSpecialtie;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,8 +27,10 @@ class CustomerResource extends JsonResource
                 'gender' => $this->gender,
                 'patient_details' => new PatientResource($this->whenLoaded('patient')),
                 'location_details' => new LocationResource($this->whenLoaded('location')),
-//                'therapist_details' => new PatientResource($this->whenLoaded('therapist')),
-//                'center_details' => new PatientResource($this->whenLoaded('rehabilitationCenter'))
+                'therapist_details' => new TherapistResource($this->whenLoaded('therapist')),
+                'center_details' => new CenterResource($this->whenLoaded('rehabilitationCenter')),
+                'medicalSpecialties' => MedicalSpecialtyResource::collection($this->whenLoaded('medicalSpecialties')),
+                'schedules' =>  ScheduleResource::collection($this->whenLoaded('schedules'))
 
              ] ;
     }

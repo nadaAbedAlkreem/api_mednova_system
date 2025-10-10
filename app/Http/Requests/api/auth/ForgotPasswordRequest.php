@@ -48,7 +48,7 @@ class ForgotPasswordRequest extends FormRequest
             'message' =>__('messages.ERROR_OCCURRED'),
             'data' => $formattedErrors,
             'status' => 'Internal Server Error'
-        ], 500));
+        ], 422));
     }
 
 }

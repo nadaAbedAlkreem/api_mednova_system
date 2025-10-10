@@ -26,7 +26,7 @@ class LoginController extends Controller
           try {
               $credentials = $request->only('email', 'password');
               $token = $this->authService->login($credentials);
-               return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
+              return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
                    [
                    'access_token' =>'Bearer ' . $token,
                    'user' => new CustomerResource(Auth::guard('api')->user()),

@@ -25,7 +25,7 @@ class LoginUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|string|email',
+            'email' => 'required|string|email|exists:customers,email',
             'password' =>
                 'required',
             'string',
@@ -42,7 +42,7 @@ class LoginUserRequest extends FormRequest
             'message' => __('messages.ERROR_OCCURRED'),
             'data' => $formattedErrors,
             'status' => 'Internal Server Error'
-        ], 500));
+        ], 422));
     }
 
     public function messages()

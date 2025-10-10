@@ -10,23 +10,27 @@ class RehabilitationCenter extends Model
 {
     /** @use HasFactory<\Database\Factories\RehabilitationCenterFactory> */
     use HasFactory , softDeletes;
-    protected $table = 'rehabilitation_center';
+    protected $table = 'rehabilitation_centers';
     protected $fillable = [
         'customer_id',
-        'experience_years' ,
-        'medical_specialty' ,
-        'university_name' ,
-        'countries_certified' ,
-        'graduation_year' ,
-        'certificate_file' ,
+        'year_establishment' ,
         'license_number' ,
         'license_authority' ,
-        'bio' ,
         'license_file' ,
+        'bio',
+        'has_commercial_registration' ,
+        'commercial_registration_number',
+        'commercial_registration_file' ,
+        'commercial_registration_authority' ,
+
     ];
 
     public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+    public function schedules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Schedule::class, 'schedulable');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\api;
 
+use App\Models\Customer;
 use App\Models\User;
 use App\Repositories\ICustomerRepositories;
 use Exception;
@@ -29,7 +30,6 @@ class CustomerService
         }
 
     }
-
 
 
 

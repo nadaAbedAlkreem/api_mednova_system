@@ -13,8 +13,8 @@ class Therapist extends Model
 
     protected $fillable = [
         'customer_id',
+        'medical_specialties_id',
         'experience_years' ,
-        'medical_specialty' ,
         'university_name' ,
         'countries_certified' ,
         'graduation_year' ,
@@ -23,10 +23,20 @@ class Therapist extends Model
         'license_authority' ,
         'bio' ,
         'license_file' ,
+
     ];
 
     public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+    public function specialty()
+    {
+        return $this->belongsTo(MedicalSpecialtie::class, 'medical_specialties_id');
+    }
+
+    public function schedules()
+    {
+        return $this->morphMany(Schedule::class, 'schedulable');
     }
 }

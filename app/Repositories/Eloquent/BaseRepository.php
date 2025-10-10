@@ -102,6 +102,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         return $this->model->select($selectColumns)->get();
     }
+    public function updateAndReturn(array $data, int $id)
+    {
+        $item = $this->model->findOrFail($id);
+        $item->update($data);
+        return $item; // إعادة العنصر بعد التحديث
+    }
 
 
     public function getAllActive($orderBy = ['column' => 'id', 'dir' => 'DESC'])
@@ -308,6 +314,19 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function paginateWith(array $data, $orderBy = ['column' => 'id', 'dir' => 'DESC'], $limit = 10)
     {
         return $this->model->with($data)->orderBy($orderBy['column'], $orderBy['dir'])->paginate($limit);
+    }
+    public function paginateInWhereWith(array $data, array $with = [], $orderBy = ['column' => 'id', 'dir' => 'DESC'], $limit = 10)
+    {
+        $query = $this->model->with($with);
+        foreach ($data as $column => $value) {
+            if (is_array($value)) {
+                 $query->whereIn($column, $value);
+            } else {
+                 $query->where($column, $value);
+            }
+        }
+        return $query->orderBy($orderBy['column'], $orderBy['dir'])
+            ->paginate($limit);
     }
 
 

@@ -64,10 +64,10 @@ class StorePatientRequest extends FormRequest
             'message' => __('messages.ERROR_OCCURRED'),
             'data' => $formattedErrors,
             'status' => 'Internal Server Error'
-        ], 500));
+        ], 422));
     }
-     public function messages()
-    {
+     public function messages(): array
+     {
 
         return [
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
@@ -102,8 +102,8 @@ class StorePatientRequest extends FormRequest
         $uploadService = new UploadService();
         $data= $this::validated();
         if ($this->hasFile('image')) {
-            $path = $uploadService->upload($this->file('image'), 'patient_profile_images');
-            $data['image'] =  asset('storage/' . $path);;
+            $path = $uploadService->upload($this->file('image'), 'patient_profile_images', 'public', 'patientProfile');
+            $data['image'] =  asset('storage/' . $path);
         }
         return $data;
     }

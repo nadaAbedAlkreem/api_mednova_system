@@ -44,7 +44,7 @@ class UpdateLocationRequest extends FormRequest
             'message' => __('messages.ERROR_OCCURRED'),
             'data' => $formattedErrors,
             'status' => 'Internal Server Error'
-        ], 500));
+        ], 422));
     }
 
     public function messages(): array

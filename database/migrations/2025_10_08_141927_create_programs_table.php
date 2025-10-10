@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
-            $table->morphs('provider'); // مختص أو مركز
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->string('title_ar');
             $table->string('title_en')->nullable();
             $table->text('description_ar')->nullable();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('cover_image')->nullable();
             $table->decimal('price',10,2)->default(0);
             $table->enum('status',['draft','published','archived'])->default('draft');
-            $table->boolean('is_free')->default(false);
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

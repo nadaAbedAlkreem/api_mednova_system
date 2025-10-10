@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('consultation_video_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-            $table->morphs('consultable'); // مختص أو مركز
+            $table->morphs('consultable', 'consultable_idx');
             $table->enum('status',['pending','approved','rejected','active','completed','cancelled'])->default('pending');
             $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('set null');
             $table->integer('duration_minutes')->default(15);
