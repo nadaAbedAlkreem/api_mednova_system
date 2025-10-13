@@ -16,44 +16,44 @@ class MedicalSpecialtieSeeder extends Seeder
 
         $specialties = [
             [
-                'name_ar' => 'طب الأسنان',
-                'name_en' => 'Dentistry',
-                'description' => 'تشخيص وعلاج أمراض الفم والأسنان واللثة.',
+                'name_ar' => 'العلاج الطبيعي',
+                'name_en' => 'Physiotherapy',
+                'description' => 'تشخيص وعلاج المشاكل الحركية وتحسين الأداء البدني.',
             ],
             [
-                'name_ar' => 'طب العيون',
-                'name_en' => 'Ophthalmology',
-                'description' => 'تشخيص وعلاج أمراض العيون والإبصار.',
+                'name_ar' => 'العلاج الوظيفي',
+                'name_en' => 'Occupational Therapy',
+                'description' => 'مساعدة المرضى على أداء الأنشطة اليومية وتحسين مهاراتهم الوظيفية.',
             ],
             [
-                'name_ar' => 'طب الأطفال',
-                'name_en' => 'Pediatrics',
-                'description' => 'رعاية الأطفال ونموهم وتشخيص أمراضهم.',
+                'name_ar' => 'العلاج العصبي',
+                'name_en' => 'Neurorehabilitation',
+                'description' => 'إعادة تأهيل المصابين بالاضطرابات العصبية وتحسين الوظائف العصبية.',
             ],
             [
-                'name_ar' => 'طب النساء والتوليد',
-                'name_en' => 'Obstetrics and Gynecology',
-                'description' => 'متابعة الحمل والولادة وعلاج أمراض النساء.',
+                'name_ar' => 'علاج أمراض الشيخوخة وإعادة تأهيل كبار السن',
+                'name_en' => 'Geriatric Rehabilitation',
+                'description' => 'تحسين جودة الحياة للمسنين وإعادة تأهيلهم بعد الأمراض أو الإصابات.',
             ],
             [
-                'name_ar' => 'طب الباطنية',
-                'name_en' => 'Internal Medicine',
-                'description' => 'تشخيص وعلاج الأمراض الباطنية للكبار.',
+                'name_ar' => 'تأهيل الأطفال',
+                'name_en' => 'Pediatric Rehabilitation',
+                'description' => 'تقديم الدعم العلاجي للأطفال لتحسين النمو والقدرات الحركية والعقلية.',
             ],
             [
-                'name_ar' => 'طب الجلدية',
-                'name_en' => 'Dermatology',
-                'description' => 'تشخيص وعلاج أمراض الجلد والشعر والأظافر.',
+                'name_ar' => 'العلاج بالذكاء الاصطناعي والتحليل الحركي',
+                'name_en' => 'AI-Assisted Motion Analysis',
+                'description' => 'استخدام التكنولوجيا الحديثة لتحليل الحركة وتقديم برامج علاجية دقيقة.',
             ],
             [
-                'name_ar' => 'طب الأنف والأذن والحنجرة',
-                'name_en' => 'Otolaryngology (ENT)',
-                'description' => 'تشخيص وعلاج أمراض الأنف والأذن والحنجرة.',
+                'name_ar' => 'علاج النطق واللغة',
+                'name_en' => 'Speech & Cognitive Rehabilitation',
+                'description' => 'تحسين مهارات النطق واللغة والوظائف المعرفية للمرضى.',
             ],
             [
-                'name_ar' => 'جراحة عامة',
-                'name_en' => 'General Surgery',
-                'description' => 'تشخيص وعلاج الحالات التي تتطلب تدخلًا جراحيًا.',
+                'name_ar' => 'العلاج النفسي الداعم',
+                'name_en' => 'Psychological Support Therapy',
+                'description' => 'تقديم الدعم النفسي والعلاجي لتحسين الحالة النفسية للمريض.',
             ],
         ];
 

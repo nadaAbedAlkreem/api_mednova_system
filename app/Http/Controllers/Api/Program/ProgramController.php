@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\program;
+namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\program\StoreProgramRequest;
@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Program;
 use App\Repositories\IProgramRepositories;
 use App\Traits\ResponseTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use function Symfony\Component\Translation\t;
 
 class ProgramController extends Controller
@@ -28,7 +29,7 @@ class ProgramController extends Controller
     public function getAll(): \Illuminate\Http\JsonResponse
     {
         try {
-            $programs = $this->programRepositories->getWhereWith(['customer'],['is_approved'=>1]);
+            $programs = $this->programRepositories->getWhereWith(['creator'],['is_approved'=>1]);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
 
         }catch (\Exception $e){
@@ -75,12 +76,12 @@ class ProgramController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProgramVideosRequest $request): \Illuminate\Http\JsonResponse
+    public function store(StoreProgramRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
             $program = $this->programRepositories->create($request->getData());
-            $program->load('customer');
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ProgramResource($program), 201);
+            $program->load('creator');
+             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ProgramResource($program), 201);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
@@ -92,6 +93,10 @@ class ProgramController extends Controller
     public function show($programId): \Illuminate\Http\JsonResponse
     {
         try {
+            $program = $this->programRepositories->findOne($programId);
+            if (!$program) {
+                return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
+            }
             $programDetails = $this->programRepositories->findWith($programId ,['videos']);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($programDetails), 201);
 
@@ -117,8 +122,7 @@ class ProgramController extends Controller
     {
         try {
             $program = $this->programRepositories->update($request->getData(), $request['program_id']);
-            $program->load('customer');
-            return $this->successResponse(__('messages.UPDATE_SUCCESS'), new ProgramResource($program), 201);
+            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
@@ -130,8 +134,10 @@ class ProgramController extends Controller
     public function destroy($id): \Illuminate\Http\JsonResponse
     {
         try {
-             $this->programRepositories->delete($id);
+            $this->programRepositories->delete($id);
             return $this->successResponse(__('messages.DELETE_SUCCESS'), [], 202);
+        } catch (ModelNotFoundException $e) {
+                return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\api\program;
 
+use App\Models\Admin;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -35,21 +36,23 @@ class StoreProgramRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:customers,id',  // يجب أن يكون موجودًا في جدول العملاء
+            'creator_id' => 'required|exists:admins,id',  // يجب أن يكون موجودًا في جدول العملاء
             'title_ar' => 'required|string|max:255',         // العنوان العربي مطلوب
 //            'title_en' => 'nullable|string|max:255',         // العنوان الانجليزي اختياري
             'description_ar' => 'nullable|string',
 //            'description_en' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240', // اختياري، حجم أقصى 10MB
             'price' => 'nullable|numeric|min:0',
+            'is_approved' => 'boolean',
+            'status' => '',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
-            'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
+            'creator_id.required' => __('validation.required', ['attribute' => __('validation.attributes.creator_id')]),
+            'creator_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.creator_id')]),
 
             'title_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.title_ar')]),
             'title_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.title_ar')]),
@@ -77,6 +80,13 @@ class StoreProgramRequest extends FormRequest
             $path = $uploadService->upload($this->file('cover_image'), 'program_images', 'public', 'programs');
             $data['cover_image'] =  asset('storage/' . $path);
         }
+        if($this['creator_id'])
+        {
+            $data['creator_type'] = Admin::class;
+        }
+        $data['status'] = $data['status'] ?? 'draft';
+        $data['is_approved'] = $data['is_approved'] ?? false;
+
         return $data;
     }
 

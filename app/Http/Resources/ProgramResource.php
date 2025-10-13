@@ -18,7 +18,8 @@ class ProgramResource extends JsonResource
         return
             [
                 'id' => $this->id ,
-                'service_provider' => new CustomerResource($this->whenLoaded('customer')),
+//                'service_provider' => new CustomerResource($this->whenLoaded('customer')),
+                'creator' => new AdminResource($this->whenLoaded('creator')),
                 'title' => $this->title_ar ,
                 'description' => $this->description_ar ,
                 'cover_image' => $this->cover_image ,

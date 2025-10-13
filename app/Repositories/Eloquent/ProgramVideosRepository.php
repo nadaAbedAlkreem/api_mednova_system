@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Program;
+use App\Models\ProgramVideos;
 use App\Repositories\IProgramRepositories;
 use App\Repositories\IProgramVideosRepositories;
 
@@ -11,7 +12,7 @@ class ProgramVideosRepository  extends BaseRepository implements IProgramVideosR
 {
     public function __construct()
     {
-        $this->model = new Program();
+        $this->model = new programVideos();
     }
 
 }

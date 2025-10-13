@@ -12,7 +12,8 @@ class Program extends Model
     use HasFactory ,SoftDeletes;
     protected $table = 'programs';
     protected $fillable = [
-        'customer_id',
+        'creator_id',
+        'creator_type',
         'title_ar',
         'title_en',
         'description_ar',
@@ -22,6 +23,11 @@ class Program extends Model
         'status',
         'is_approved'
     ];
+
+    protected $casts = [
+        'price' => 'float',
+    ];
+
 
     protected static function boot()
     {
@@ -39,9 +45,10 @@ class Program extends Model
             });
         });
     }
-    public function customer()
+
+    public function creator()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->morphTo();
     }
 
     public function videos()

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\program;
+namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\program\StoreProgramVideosRequest;
@@ -11,6 +11,7 @@ use App\Models\Program;
 use App\Models\ProgramVideos;
 use App\Repositories\IProgramVideosRepositories;
 use App\Traits\ResponseTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class ProgramVideosController extends Controller
@@ -84,7 +85,7 @@ class ProgramVideosController extends Controller
     {
         try {
             $video =$this->programVideosRepositories->update($request->getData() , $request['video_id']);
-            return $this->successResponse(__('messages.UPDATE_SUCCESS'), new VideoResource($video), 201,);
+            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201,);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
@@ -99,7 +100,10 @@ class ProgramVideosController extends Controller
         try {
             $this->programVideosRepositories->delete($videoId);
             return $this->successResponse(__('messages.DELETE_SUCCESS'), [], 202,);
-        } catch (\Exception $exception) {
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse(__('messages.VIDEO_NOT_FOUND'), [], 404);
+        }
+        catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }

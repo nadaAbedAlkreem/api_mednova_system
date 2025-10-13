@@ -38,8 +38,10 @@ class StoreProgramVideosRequest extends FormRequest
             'program_id' => 'required|exists:programs,id',  // يجب أن يكون موجودًا في جدول العملاء
             'videos' => 'nullable|array',
             'videos.*.title_ar' => 'required|string|max:255',
-            'videos.*.title_en' => 'nullable|string|max:255',
-            'videos.*.video_file' => 'required|file|mimes:mp4,mov,avi|max:512000', // أقصى 500MB
+//            'videos.*.title_en' => 'nullable|string|max:255',
+            'videos.*.description_ar' => 'required|string|max:255',
+//            'videos.*.description_en' => 'nullable|string|max:255',
+            'videos.*.video_path' => 'required|file|mimes:mp4,mov,avi|max:512000', // أقصى 500MB
             'videos.*.duration_minute' => 'nullable|integer|min:0',
             'videos.*.order' => 'nullable|integer|min:0',
             'videos.*.is_preview' => 'nullable|boolean',
@@ -81,14 +83,14 @@ class StoreProgramVideosRequest extends FormRequest
         $data= $this::validated();
         if (isset($data['videos']) && is_array($data['videos'])) {
             foreach ($data['videos'] as $index => $video) {
-                if ($this->hasFile("videos.$index.video_file")) {
+                if ($this->hasFile("videos.$index.video_path")) {
                     $path = $uploadService->upload(
-                        $this->file("videos.$index.video_file"),
+                        $this->file("videos.$index.video_path"),
                         'program_video',
                         'public',
                         'videos'
                     );
-                    $data['videos'][$index]['video_file'] = asset('storage/' . $path);
+                    $data['videos'][$index]['video_path'] = asset('storage/' . $path);
                 }
             }
         }

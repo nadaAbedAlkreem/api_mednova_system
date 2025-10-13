@@ -17,4 +17,8 @@ class Admin extends Authenticatable
         'email',
         'password',
     ];
+    public function programs()
+    {
+        return $this->morphMany(Program::class, 'creator');
+    }
 }

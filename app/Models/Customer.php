@@ -88,7 +88,7 @@ class Customer extends Authenticatable
 
     public function programs()
     {
-        return $this->belongsToMany(Program::class)->withTimestamps();
+        return $this->morphMany(Program::class, 'creator');
     }
     public function therapist(): \Illuminate\Database\Eloquent\Relations\HasOne
     {

@@ -218,6 +218,14 @@ return [
         'price'=> 'سعر',
         'program_id' =>'برنامج',
         'requested_by'=>'مرسل الطلب',
+        'creator_id'=>'منشئ' ,
+        'video_path'=>'رابط الفيديو',
+        'duration_minute'=>'مدة الدقيقة' ,
+        'order'=>'الترتيب',
+        'is_preview'=>'معاينة' ,
+        'is_free'=>'خالية',
+        'video_id' => 'معرف الفيديو',
+
 
      ],
 ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\program;
+namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProgramReviewRequestsRequest;

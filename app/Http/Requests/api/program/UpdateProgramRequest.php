@@ -23,7 +23,7 @@ class UpdateProgramRequest extends FormRequest
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         $errors = $validator->errors()->all();
-        $formattedErrors = ['error' => $errors[0]] ;
+        $formattedErrors = ['error' => $errors[0]];
         throw new \Illuminate\Validation\ValidationException($validator, response()->json([
             'success' => false,
             'message' => __('messages.ERROR_OCCURRED'),

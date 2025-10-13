@@ -445,5 +445,9 @@ return [
     'ACCEPTED_REQUEST'=> 'تم قبول طلب الاستشارة ',
     'CANCEL_REQUEST'=> 'تم إلغاء طلب الاستشارة ',
     'NOT_APPROVED'=>'لم يتم اعتماد برنامجك بعد ',
-    'SUCCESS_PUBLISHED'=>'تم  نشر برنامجك بنجاح '
+    'SUCCESS_PUBLISHED'=>'تم  نشر برنامجك بنجاح ',
+    'PROGRAM_NOT_FOUND'=>'لم يتم العثور على البرنامج',
+    'VIDEO_NOT_FOUND'=>'لم يتم العثور على الفيديو'
+
+
 ];

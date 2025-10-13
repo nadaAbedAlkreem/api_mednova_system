@@ -5,9 +5,9 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
-use App\Http\Controllers\Api\program\ProgramController;
-use App\Http\Controllers\Api\program\ProgramReviewRequestsController;
-use App\Http\Controllers\Api\program\ProgramVideosController;
+use App\Http\Controllers\Api\Program\ProgramController;
+use App\Http\Controllers\Api\Program\ProgramReviewRequestsController;
+use App\Http\Controllers\Api\Program\ProgramVideosController;
 use App\Http\Controllers\Api\User\CustomerController;
 use App\Http\Controllers\Api\User\LocationController;
 use App\Http\Controllers\Api\User\MedicalSpecialtieController;
@@ -65,10 +65,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('programs')->group(function () {
         // برامج
         Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
-        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
-        Route::post('/', [ProgramController::class, 'store']);    //done store program
-        Route::get('program/{id}', [ProgramController::class, 'show']);  // view select one program done
-        Route::post('program/update', [ProgramController::class, 'update']); //done update one program
+//        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
+        Route::post('/', [ProgramController::class, 'store']);
+        Route::get('{id}', [ProgramController::class, 'show']);
+        Route::post('program/update', [ProgramController::class, 'update']);
         Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
         Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
 
