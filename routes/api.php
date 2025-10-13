@@ -67,7 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
         Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
         Route::post('/', [ProgramController::class, 'store']);    //done store program
-        Route::get('{id}', [ProgramController::class, 'show']);  // view select one program done
+        Route::get('program/{id}', [ProgramController::class, 'show']);  // view select one program done
         Route::post('program/update', [ProgramController::class, 'update']); //done update one program
         Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
         Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
@@ -79,9 +79,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //
 //        // فيديوهات البرنامج
         Route::prefix('/videos')->group(function () {
-            Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+            Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
             Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
-            Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+            Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
 //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
         });
 //
