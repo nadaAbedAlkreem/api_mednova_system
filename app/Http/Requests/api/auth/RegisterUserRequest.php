@@ -49,15 +49,19 @@ class RegisterUserRequest extends FormRequest
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = $validator->errors()->all();
-        $formattedErrors = ['error' => $errors[0]] ;
+        $errors = $validator->errors()->messages();
+        $formattedErrors = [];
+        foreach ($errors as $field => $messages) {
+            $formattedErrors[$field] = $messages[0];
+        }
         throw new \Illuminate\Validation\ValidationException($validator, response()->json([
             'success' => false,
             'message' => __('messages.ERROR_OCCURRED'),
             'data' => $formattedErrors,
-            'status' => 'Internal Server Error'
-        ], 500));
+            'status' => 422
+        ], 422));
     }
+
     public function messages()
     {
         return [

@@ -58,7 +58,10 @@ class StorePatientRequest extends FormRequest
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         $errors = $validator->errors()->all();
-        $formattedErrors = ['error' => $errors[0]] ;
+        $formattedErrors = [];
+        foreach ($errors as $field => $messages) {
+            $formattedErrors[$field] = $messages[0];
+        }
         throw new \Illuminate\Validation\ValidationException($validator, response()->json([
             'success' => false,
             'message' => __('messages.ERROR_OCCURRED'),
