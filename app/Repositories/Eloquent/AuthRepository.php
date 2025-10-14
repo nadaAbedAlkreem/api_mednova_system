@@ -6,6 +6,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Customer;
 use App\Repositories\IAuthRepositories;
 use App\Traits\ResponseTrait;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,10 +23,12 @@ abstract class AuthRepository  extends BaseRepository implements IAuthRepositori
             }
          }
         if ($this->guard === 'api') {
-             $user = Customer::where('email', $credentials['email'])->first();
-            if (!$user || !Hash::check($credentials['password'], $user->password)) {
-                return false;
+            $user = Customer::where('email', $credentials['email'])->first();
+            if (!Hash::check($credentials['password'], $user->password)) {
+                throw new Exception(__('messages.invalid_credentials'));
+
             }
+
             Auth::guard($this->guard)->setUser($user);
         }
              return $this->afterLogin(Auth::guard($this->guard)->user());

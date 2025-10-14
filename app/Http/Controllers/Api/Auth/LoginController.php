@@ -23,7 +23,7 @@ class LoginController extends Controller
 
     public function login(LoginUserRequest $request): JsonResponse
     {
-          try {
+           try {
               $credentials = $request->only('email', 'password');
               $token = $this->authService->login($credentials);
               return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
