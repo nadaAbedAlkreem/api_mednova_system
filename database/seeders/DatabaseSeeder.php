@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
            AdminSeeder::class,
-//           MedicalSpecialtieSeeder::class,
+           MedicalSpecialtieSeeder::class,
         ]);
 
     }
