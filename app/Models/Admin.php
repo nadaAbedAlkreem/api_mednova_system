@@ -21,4 +21,9 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(Program::class, 'creator');
     }
+    public function notifications()
+    {
+        return $this->morphMany(\App\Models\Notifications::class, 'notifiable');
+    }
+
 }

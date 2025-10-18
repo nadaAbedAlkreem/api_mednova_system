@@ -5,12 +5,13 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
+use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Program\ProgramController;
-use App\Http\Controllers\Api\Program\ProgramReviewRequestsController;
 use App\Http\Controllers\Api\Program\ProgramVideosController;
 use App\Http\Controllers\Api\User\CustomerController;
 use App\Http\Controllers\Api\User\LocationController;
 use App\Http\Controllers\Api\User\MedicalSpecialtieController;
+use App\Http\Controllers\Api\User\NotificationsController;
 use App\Http\Controllers\Api\User\PatientController;
 use App\Http\Controllers\Api\User\RehabilitationCenterController;
 use App\Http\Controllers\Api\User\TherapistController;
@@ -63,7 +64,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::prefix('programs')->group(function () {
-        // برامج
         Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
 //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
         Route::post('/', [ProgramController::class, 'store']);
@@ -74,10 +74,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
-//        // إجراءات خاصة بالبرنامج
 //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
 //
-//        // فيديوهات البرنامج
         Route::prefix('/videos')->group(function () {
             Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
             Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
@@ -85,10 +83,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
         });
 //
-// // طلبات المراجعة
         Route::prefix('{program}/review-requests')->group(function () {
 //            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
-            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
+//            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
         });
 //    });
 //
@@ -97,6 +94,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //        Route::get('/', [ProgramReviewRequestController::class, 'all']);           // قائمة كل طلبات المراجعة
 //        Route::patch('{request}', [ProgramReviewRequestController::class, 'update']); // الموافقة أو الرفض
 //    });
+    Route::prefix('notification')->group(function ()
+    {
+        Route::get('/', [NotificationsController::class, 'getNotificationsForCurrentUser']);
+    });
+    Route::prefix('messages')->group(function ()
+    {
+        Route::get('messengers/current-user', [MessageController::class, 'getMessengers']);
+        Route::get('{receiverId}', [MessageController::class, 'fetchMessages']);
+        Route::post('sent', [MessageController::class, 'sendMessage']);
+        Route::get('mark-as-read/{senderId}', [MessageController::class, 'markAsRead']);
+    });
 
     Route::prefix('center')->group(function ()
     {

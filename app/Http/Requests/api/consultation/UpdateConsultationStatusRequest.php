@@ -52,8 +52,10 @@ class UpdateConsultationStatusRequest extends FormRequest
                 {
                     $validator->errors()->add('status', __('نعتذر منك لا يمكنك ألأن لغي طلب تم اعتماده .'));
                 }
-
-
+                if(($record->status == 'cancelled') && $this->status == 'accepted' )
+                {
+                    $validator->errors()->add('status', __('نعتذر منك لا يمكنك ألأن اعتماد طلب تم لغيه .'));
+                }
             }
         });
     }
@@ -75,7 +77,7 @@ class UpdateConsultationStatusRequest extends FormRequest
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = $validator->errors()->all();
+        $errors = $validator->errors()->messages();
         $formattedErrors = [];
         foreach ($errors as $field => $messages) {
             $formattedErrors[$field] = $messages[0];
@@ -91,8 +93,8 @@ class UpdateConsultationStatusRequest extends FormRequest
     {
 
         return [
-            'id.required' => __('validation.required', ['attribute' => __('validation.attributes.id')]),
-            'id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.id')]),
+            'id.required' => __('validation.required', ['attribute' => __('validation.attributes.id_con')]),
+            'id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.id_con')]),
             'status.required' => __('validation.required', ['attribute' => __('validation.attributes.status')]),
             'status.in' => __('validation.in', ['attribute' => __('validation.attributes.status')]),
             'action_by.required' => __('validation.required', ['attribute' => __('validation.attributes.action_by')]),

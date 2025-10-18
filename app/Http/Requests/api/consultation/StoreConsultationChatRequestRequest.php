@@ -38,10 +38,11 @@ class StoreConsultationChatRequestRequest extends FormRequest
             $patient = \App\Models\Customer::find($this->patient_id);
             $consultant = \App\Models\Customer::find($this->consultant_id);
             if ($patient && $patient->type_account !== 'patient') {
-                $validator->errors()->add('patient_id', __('معرف المريض المحدد لا ينتمي إلى حساب مريض.'));
+                $validator->errors()->add('patient_id',  __('messages.patient_account'));
             }
             if ($consultant && $consultant->type_account !== $this->consultant_type) {
-                $validator->errors()->add('consultant_id', __('معرف المستشار المحدد لا يتطابق مع نوع المستشار.'));
+
+                $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
             $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
                 ->where('consultant_id', $this->consultant_id)
@@ -49,7 +50,8 @@ class StoreConsultationChatRequestRequest extends FormRequest
                 ->exists();
 
             if ($exists) {
-                $validator->errors()->add('duplicate_request', __('لقد قمت بإرسال هذا الطلب مسبقًا، يرجى انتظار القبول.'));
+
+                $validator->errors()->add('duplicate_request', __('messages.duplicate_request'));
             }
         });
     }
@@ -57,11 +59,13 @@ class StoreConsultationChatRequestRequest extends FormRequest
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = $validator->errors()->all();
+        $errors = $validator->errors()->messages();
         $formattedErrors = [];
+
         foreach ($errors as $field => $messages) {
             $formattedErrors[$field] = $messages[0];
         }
+
         throw new \Illuminate\Validation\ValidationException($validator, response()->json([
             'success' => false,
             'message' => __('messages.ERROR_OCCURRED'),
@@ -80,5 +84,13 @@ class StoreConsultationChatRequestRequest extends FormRequest
             'consultant_type.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_type')]),
             'consultant_type.in' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_type')]),
         ];
+    }
+    public function getData()
+    {
+        $data= $this::validated();
+        $data['status'] =   $data['status'] ?? 'pending';
+        return $data;
+
+
     }
 }

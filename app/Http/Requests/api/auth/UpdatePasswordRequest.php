@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Auth;
+namespace App\Http\Requests\api\auth;
 
 use Exception;
 use Illuminate\Foundation\Http\FormRequest;
@@ -40,7 +40,7 @@ class UpdatePasswordRequest extends FormRequest
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = $validator->errors()->all();
+        $errors = $validator->errors()->messages();
         $formattedErrors = [];
         foreach ($errors as $field => $messages) {
             $formattedErrors[$field] = $messages[0];

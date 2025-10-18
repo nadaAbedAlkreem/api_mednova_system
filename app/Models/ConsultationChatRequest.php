@@ -33,4 +33,16 @@ class ConsultationChatRequest extends Model
      {
         return $this->belongsTo(Customer::class, 'consultant_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'chat_request_id');
+    }
+    public function unreadMessages()
+    {
+        return $this->hasMany(Message::class, 'chat_request_id')
+            ->where('is_read', false);
+    }
+
+
 }

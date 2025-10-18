@@ -79,8 +79,25 @@ class Customer extends Authenticatable
             $customer->programs()->each(function ($programs) {
                 $programs->delete();
             });
+
+            $customer->notifications()->each(function ($notifications) {
+                $notifications->delete();
+            });
         });
     }
+    public function senderMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+    public function receiverMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+    public function notifications()
+    {
+        return $this->morphMany(\App\Models\Notification::class, 'notifiable');
+    }
+
     public function medicalSpecialties()
     {
         return $this->belongsToMany(MedicalSpecialtie::class, 'rehabilitation_specialist_specialty', 'customer_id', 'specialty_id')->withTimestamps();

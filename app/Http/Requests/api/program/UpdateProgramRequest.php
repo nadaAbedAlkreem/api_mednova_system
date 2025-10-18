@@ -22,7 +22,7 @@ class UpdateProgramRequest extends FormRequest
      */
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        $errors = $validator->errors()->all();
+        $errors = $validator->errors()->messages();
         $formattedErrors = [];
         foreach ($errors as $field => $messages) {
             $formattedErrors[$field] = $messages[0];

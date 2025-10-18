@@ -8,14 +8,10 @@ return [
         'max' => 'لا يمكن أن يتجاوز حجم الصورة 2048 كيلوبايت.',
     ],
 
-    'TOO_MANY_ATTEMPTS'=>'محاولات كثيرة جدًا',
-    "INVALID_TOKEN"=>'رمز أو مستخدم غير صالح.' ,
-    "VALID_TOKEN"=>'رمز أو مستخدم  صالح.' ,
-    'TOKEN_EXPIRED'=> 'انتهت صلاحية الكود. حاول مرة أخرى لاحقًا.' ,
+
     'correct_answer_media.required' => 'وسائط تحديد الاجابة الصحيحة مطلوب' ,
     'wrong_answer_media.required' =>'وسائط تحديد الاجابة الخاطئة مطلوب' ,
 
-    'you_not_approved' => 'لم تتم الموافقة عليك',
 
     // رسائل المالك (admin)
     'name.required' => 'الاسم مطلوب.',
@@ -24,8 +20,7 @@ return [
     'format_code' => 'يجب أن تكون القيمة بتنسيق + متبوعة برقم واحد أو أكثر (على سبيل المثال، "+2"، "+970").' ,
     'Not_IS_EMPTY' => 'لا يجب ان تكون القيمة فارغة ',
     'NO_IDS_PROVIDED' => 'لا يوجد معرفات متوفرة ' ,
-    "VALID_TOKEN"=>' التوكن مرخص ' ,
-    'you_not_approved' => 'لم تتم الموافقة عليك',
+
     'INVALID_LEVEL'=> 'مستوى غير صالح',
     'EXPIRED_TIME'=> 'انتهى وقت الانتظار حاول مرة اخرى ' ,
     'NO_GAMES' => 'لم يتم العثور على ألعاب لهذا المستخدم',
@@ -34,7 +29,6 @@ return [
     'TRAFFICKER_SUCCESSFULLY' => 'تم إكمال عملية التتبع. ',
     'NOTIFICATION_SENT_SUCCESSFULLY'=> 'تم ارسال الاشعار بنجاح ' ,
     'GAME_END' =>'لقد تم الانتهاء من اللعبة.' ,
-    'TOO_MANY_ATTEMPTS'=>'محاولات كثيرة جدًاحاول مرة اخرى بعد مرور دقيقة ',
     'FINANCIA_GET_SUCCESSFULLY' => 'تمت عملية الحصول على بيانات المالية',
     'DATA_RETRIEVED_SUCCESSFULLY' => ' . تم استرجاع البيانات بنجاح',
     'DATA_RETRIEVED_FAILD' => ' . فشل في استرجاع البيانات ',
@@ -153,9 +147,9 @@ return [
     'ORDER_DETAILS_RETRIEVED' => 'تم استرداد تفاصيل الطلب' ,
     'USER_NOT_FOUND' => 'لم يتم العثور على المستخدم ' ,
     'USER_DELETE_SUCCESS' => ' تم حذف حساب المستخدم بنجاح ' ,
+    'SEND' => 'تم ارسال الرسالة ',
 
     'NOTAUTHORIZED' =>  'غير مصرح لك  يجب عليك تسجيل دخول اولا ',
-
     // Order Status
     'PENDING' => 'تم إنشاء طلبك بنجاح',
     'ACCEPTED' => 'تم قبول طلبك من قبل الموزع:',
@@ -329,14 +323,13 @@ return [
     'id.exists' => 'الفئة المحددة ليست فئة أساسية صالحة.',
     'id.required' => 'حقل المعرف  مطلوب.',
     'id.integer' => 'يجب ان يكون المعرف رقما ',
-    'ERROR_OCCURRED' => 'حدث خطأ ' ,
     'id_not_found' => 'حدث خطأ:عنصر  غير موجود  ' ,
     'friend_request_exists' =>'لقد قمت بارسال طلب الصداقة مسبقا!' ,
     'invalid_credentials' => 'كلمة المرور او الايميل غير صالحين ' ,
     'title.required' => 'حقل عنوان مطلوب.',
     'title.string' => 'يجب أن يكون الاسم نصًا.',
     'title.max' => 'لا يمكن أن يتجاوز طول الاسم 255 حرفًا.',
-
+   'new_consultation_notify'=> 'تم استلام طلب استشارة جديد',
     'description.required' => 'حقل تفاصيل مطلوب.',
     'description.string' => 'يجب أن يكون تفاصيل نصًا.',
 
@@ -442,6 +435,8 @@ return [
     ],
 
     'consultant_account'=>'معرف المستشار المحدد لا يتطابق مع نوع المستشار.',
+    'patient_account'=>'معرف المريض المحدد لا يتطابق مع نوع المريض.',
+    'duplicate_request'=>'لقد قمت بإرسال هذا الطلب مسبقًا، يرجى انتظار القبول.',
     'ACCEPTED_REQUEST'=> 'تم قبول طلب الاستشارة ',
     'CANCEL_REQUEST'=> 'تم إلغاء طلب الاستشارة ',
     'NOT_APPROVED'=>'لم يتم اعتماد برنامجك بعد ',
