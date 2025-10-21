@@ -112,7 +112,7 @@ class StorePatientRequest extends FormRequest
             } else {
                 throw new \Exception(__('messages.ERROR_OCCURRED') . $absolutePath);
             }
-            $data['image'] =  asset('storage/' . $path);
+            $data['image'] =  asset('public/storage/' . $path);
         }
         return $data;
     }
