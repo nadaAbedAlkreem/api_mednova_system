@@ -108,7 +108,7 @@ class StorePatientRequest extends FormRequest
             $path = $uploadService->upload($this->file('image'), 'patient_profile_images', 'public', 'patientProfile');
             $absolutePath = storage_path('app/public/' . $path);
             if (file_exists($absolutePath)) {
-                chmod($absolutePath, 0775);
+                chmod($absolutePath,  0644);
             } else {
                 throw new \Exception(__('messages.ERROR_OCCURRED') . $absolutePath);
             }
