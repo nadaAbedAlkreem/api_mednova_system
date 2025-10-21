@@ -4,30 +4,33 @@ namespace App\Http\Controllers\Api\Consultation;
 
 use App\Events\ConsultationRequested;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\checkConsultationStatusRequest;
+
 use App\Http\Requests\api\consultation\StoreConsultationChatRequestRequest;
+use App\Http\Requests\api\consultation\updateChattingRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Requests\UpdateConsultationChatRequestRequest;
 use App\Http\Resources\ConsultationChatRequestResource;
-use App\Http\Resources\CustomerResource;
 use App\Models\ConsultationChatRequest;
 use App\Models\Customer;
-use App\Models\Notifications;
 use App\Repositories\IConsultationChatRequestRepositories;
+use App\Services\api\ConsultationStatusService;
 use App\Traits\ResponseTrait;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ConsultationChatRequestController extends Controller
 {
     use ResponseTrait;
+    protected ConsultationStatusService $statusService;
 
     protected IConsultationChatRequestRepositories $consultationChatRequestRepositories;
 
-    public function __construct(IConsultationChatRequestRepositories $consultationChatRequestRepositories)
+    public function __construct(IConsultationChatRequestRepositories $consultationChatRequestRepositories ,ConsultationStatusService $statusService)
     {
         $this->consultationChatRequestRepositories = $consultationChatRequestRepositories;
+        $this->statusService = $statusService;
+
     }
 
     /**
@@ -54,7 +57,8 @@ class ConsultationChatRequestController extends Controller
         try {
              $consultation = $this->consultationChatRequestRepositories->create($request->getData());
              $consultation->load(['patient','consultant']);
-             event(new ConsultationRequested($consultation , __('messages.new_consultation_notify') , 'created'));
+             $message = __('messages.new_consultation_notify', ['name' => $consultation->patient->full_name]);
+             event(new ConsultationRequested($consultation , $message, 'requested'));
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationChatRequestResource($consultation), 201,);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
@@ -81,21 +85,49 @@ class ConsultationChatRequestController extends Controller
     public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $consultation = $this->consultationChatRequestRepositories->updateAndReturn($request->getData(), $request['id']);
-            $message = '' ;
-            if($request->status === 'accepted')
-            {
-              $message = __('messages.ACCEPTED_REQUEST');
-              event(new ConsultationRequested($consultation , $message , 'accepted'));
-            }else {
-              $message = __('messages.CANCEL_REQUEST');
-              event(new ConsultationRequested($consultation , $message , 'cancelled'));
-            }
+            $consultation = $this->consultationChatRequestRepositories->updateAndReturn(
+                $request->getData(),
+                $request['id']
+            );
+            $message = $this->statusService->handleStatusChange(
+                $consultation,
+                $request->status,
+                $request->action_by
+            );
+
             return $this->successResponse($message, [], 200);
         } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
+                'error' => $exception->getMessage()
+            ], 500);
         }
     }
+
+    public function updateChatting(updateChattingRequest $request): \Illuminate\Http\JsonResponse
+    {
+        try{
+           $consultation = $this->consultationChatRequestRepositories->findOne($request['chat_request_id']);
+           if($consultation->status == 'accepted' )
+           {
+               $consultation->status = 'active';
+               $consultation->started_at  = now();
+           }
+            foreach (['first_patient_message_at', 'first_consultant_message_at', 'patient_message_count', 'consultant_message_count'] as $field) {
+                if ($request->filled($field)) {
+                    $consultation->$field = $request->$field;
+                }
+            }
+            $consultation->save();
+
+            return $this->successResponse(__('messages.UPDATE_CHATTING_INFO'));
+        }catch (Exception $exception){
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()]);
+        }
+    }
+
+
+
+
 
     /**
      * Update the specified resource in storage.

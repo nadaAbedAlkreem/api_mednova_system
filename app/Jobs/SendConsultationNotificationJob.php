@@ -24,7 +24,7 @@ class SendConsultationNotificationJob implements ShouldQueue
     public $backoff = [10, 30, 60, 120];
     public function __construct(ConsultationChatRequest $consultation , $message  , $eventType ,$notification)
     {
-        $this->consultation = $consultation->load(['patient','consultant']);
+        $this->consultation = $consultation;
         $this->message = $message;
         $this->eventType = $eventType;
         $this->notification = $notification;

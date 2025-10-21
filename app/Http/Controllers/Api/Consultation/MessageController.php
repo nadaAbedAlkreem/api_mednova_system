@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Consultation;
 
 use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\api\consultation\StoreActiveChatting;
 use App\Http\Requests\api\consultation\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\ConsultationChatRequestResource;
@@ -98,6 +99,7 @@ class MessageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(StoreMessageRequest $request)
     {
         //

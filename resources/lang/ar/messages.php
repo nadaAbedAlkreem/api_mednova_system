@@ -150,6 +150,7 @@ return [
     'SEND' => 'تم ارسال الرسالة ',
 
     'NOTAUTHORIZED' =>  'غير مصرح لك  يجب عليك تسجيل دخول اولا ',
+    'UPDATE_CHATTING_INFO' =>  'تم تحديث بيانات الجلسة بنجاح' ,
     // Order Status
     'PENDING' => 'تم إنشاء طلبك بنجاح',
     'ACCEPTED' => 'تم قبول طلبك من قبل الموزع:',
@@ -329,7 +330,7 @@ return [
     'title.required' => 'حقل عنوان مطلوب.',
     'title.string' => 'يجب أن يكون الاسم نصًا.',
     'title.max' => 'لا يمكن أن يتجاوز طول الاسم 255 حرفًا.',
-   'new_consultation_notify'=> 'تم استلام طلب استشارة جديد',
+    'new_consultation_notify' => 'تم استلام طلب استشارة جديد من المريض :name',
     'description.required' => 'حقل تفاصيل مطلوب.',
     'description.string' => 'يجب أن يكون تفاصيل نصًا.',
 
@@ -437,12 +438,15 @@ return [
     'consultant_account'=>'معرف المستشار المحدد لا يتطابق مع نوع المستشار.',
     'patient_account'=>'معرف المريض المحدد لا يتطابق مع نوع المريض.',
     'duplicate_request'=>'لقد قمت بإرسال هذا الطلب مسبقًا، يرجى انتظار القبول.',
-    'ACCEPTED_REQUEST'=> 'تم قبول طلب الاستشارة ',
-    'CANCEL_REQUEST'=> 'تم إلغاء طلب الاستشارة ',
+    'ACCEPTED_REQUEST'=> ' تم قبول طلب الاستشارة من قبل المستشار  :name',
+    'CANCEL_REQUEST_PATIENT' => 'تم إلغاء طلب الاستشارة من قبل المريض :name',
+    'CANCEL_REQUEST' => 'تم إلغاء طلب الاستشارة   ',
+    'CANCEL_REQUEST_CONSULTANT' => 'تم إلغاء طلب الاستشارة من قبل الدكتور :name',
     'NOT_APPROVED'=>'لم يتم اعتماد برنامجك بعد ',
     'SUCCESS_PUBLISHED'=>'تم  نشر برنامجك بنجاح ',
     'PROGRAM_NOT_FOUND'=>'لم يتم العثور على البرنامج',
-    'VIDEO_NOT_FOUND'=>'لم يتم العثور على الفيديو'
+    'VIDEO_NOT_FOUND'=>'لم يتم العثور على الفيديو',
+    'SESSION_COMPLETED_BOTH' => 'تم اكتمال جلسة الاستشارة بين :patient و :consultant بنجاح، شكرًا لتفاعلكم.',
 
 
 ];

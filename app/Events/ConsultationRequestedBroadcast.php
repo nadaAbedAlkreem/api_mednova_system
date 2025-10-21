@@ -29,43 +29,28 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
     }
 
 
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
         try {
             $this->notification->update(['status' => 'sent']);
             $this->notification->save();
-            if ($this->eventType === 'created') {
-                Log::info(' for created', [
-                    'consultant' =>$this->consultation->consultant_id,
-                ]);
+            if ($this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
                 return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
-
             }
-            if ($this->eventType === 'accepted') {
+            if ($this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
                 Log::info(' for cancelled', [
                     'consultant' =>$this->consultation->consultant_id,
                 ]);
                 return new PrivateChannel('patient.' . $this->consultation->patient_id);
-
             }
 
-            if($this->eventType === 'cancelled' )
+            if($this->eventType === 'cancelled_by_system'  || $this->eventType === 'completed' || $this->eventType === 'reminder_for_all')
             {
-                if( $this->consultation->action_by == 'patient')
-                {
-                    Log::info(' for cancelled', [
-                        'consultant' =>$this->consultation->consultant_id,
-                    ]);
-                    return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
 
-                }else if( $this->consultation->action_by == 'consultable')
-                {
-                    Log::info(' for cancelled', [
-                        'consultant' =>$this->consultation->consultant_id,
-                    ]);
-                    return new PrivateChannel('patient.' . $this->consultation->patient_id);
-
-                }
+                return [
+                    new PrivateChannel('consultant.' . $this->consultation->consultant_id),
+                    new PrivateChannel('patient.' . $this->consultation->patient_id),
+                ];
             }
 
             return  throw new \Exception("Unknown eventType: " . $this->eventType);

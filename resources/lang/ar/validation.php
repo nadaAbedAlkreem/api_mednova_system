@@ -230,6 +230,11 @@ return [
         'sender_id' => 'معرف المرسل' ,
         'message' => 'الرسالة' ,
         'chat_request_id' => 'معرف المحادثة' ,
+        'first_consultant_message_at'=> 'توقيت اول رد من قبل المستشار ' ,
+        'first_patient_message_at'=>'توقيت اول رد من قبل المختص ' ,
+        'patient_message_count' => 'عدد رسائل  المريض في جلسة ',
+        'consultant_message_count' => 'عدد رسائل المستشار في جلسة'
+
 
 
 

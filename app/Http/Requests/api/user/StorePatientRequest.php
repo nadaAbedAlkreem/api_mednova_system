@@ -106,6 +106,12 @@ class StorePatientRequest extends FormRequest
         $data= $this::validated();
         if ($this->hasFile('image')) {
             $path = $uploadService->upload($this->file('image'), 'patient_profile_images', 'public', 'patientProfile');
+            $absolutePath = storage_path($path);
+            if (file_exists($absolutePath)) {
+                chmod($absolutePath, 0775);
+            } else {
+                throw new \Exception(__('messages.ERROR_OCCURRED') . $absolutePath);
+            }
             $data['image'] =  asset('storage/' . $path);
         }
         return $data;

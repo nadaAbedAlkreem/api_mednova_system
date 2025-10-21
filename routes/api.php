@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/get-status-request', [ConsultationChatRequestController::class, 'getStatusRequest']);
         Route::post('/store', [ConsultationChatRequestController::class, 'store']);
         Route::post('/update-status-request', [ConsultationChatRequestController::class, 'updateStatusRequest']);
+        Route::post('update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
 
     });
 

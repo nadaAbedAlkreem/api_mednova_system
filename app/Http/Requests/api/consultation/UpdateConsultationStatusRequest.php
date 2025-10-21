@@ -36,6 +36,11 @@ class UpdateConsultationStatusRequest extends FormRequest
             $record = ConsultationChatRequest::find($this->id);
 
             if ($record) {
+                if ($record->patient_message_count > 0 && $record->consultant_message_count > 0) {
+                     if ($this->status == 'cancelled') {
+                         $validator->errors()->add('status', __('لا يمكنك لغي جلسة ألأن .'));
+                    }
+                }
                 if ($record->status === $this->status) {
                     if($this->status == 'accepted')
                     {
@@ -47,10 +52,6 @@ class UpdateConsultationStatusRequest extends FormRequest
                         $validator->errors()->add('status', __('تم إلغاء الطلب مسبقًا.'));
                     }
 
-                }
-                if(($record->status == 'accepted'|| $record->status ==  'active' || $record->status ==  'completed') && $this->status == 'cancelled' )
-                {
-                    $validator->errors()->add('status', __('نعتذر منك لا يمكنك ألأن لغي طلب تم اعتماده .'));
                 }
                 if(($record->status == 'cancelled') && $this->status == 'accepted' )
                 {

@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Log;
 */
 
 Broadcast::channel('consultant.{consultantId}', function ($user, $consultantId) {
-    Log::info('Broadcasting consultation user', [
-        'consultation' => $user->id
-    ]);
     return (int) $user->id === (int) $consultantId;
 });
 Broadcast::channel('patient.{patientId}', function ($user, $patientId) {
