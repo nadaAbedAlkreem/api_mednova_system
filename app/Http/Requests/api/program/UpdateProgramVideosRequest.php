@@ -84,7 +84,7 @@ class UpdateProgramVideosRequest extends FormRequest
                  if ($this->hasFile("video_path")) {
                     $path = $uploadService->upload(
                         $this->file("video_path"), 'program_video', 'public', 'videos');
-                    $data['video_path'] = asset('storage/' . $path);
+                    $data['video_path'] = asset('public/storage/' . $path);
             }
         }
         return $data;

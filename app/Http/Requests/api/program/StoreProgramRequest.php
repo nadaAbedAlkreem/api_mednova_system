@@ -81,7 +81,7 @@ class StoreProgramRequest extends FormRequest
         $data= $this::validated();
         if ($this->hasFile('cover_image')) {
             $path = $uploadService->upload($this->file('cover_image'), 'program_images', 'public', 'programs');
-            $data['cover_image'] =  asset('storage/' . $path);
+            $data['cover_image'] =  asset('public/storage/' . $path);
         }
         if($this['creator_id'])
         {
