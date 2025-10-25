@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Api\Consultation;
 
-use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\StoreActiveChatting;
 use App\Http\Requests\api\consultation\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
-use App\Http\Resources\ConsultationChatRequestResource;
-use App\Http\Resources\CustomerResource;
-use App\Http\Resources\MessageResource;
-use App\Http\Resources\MessengersResource;
+use App\Http\Resources\Api\Consultation\MessageResource;
+use App\Http\Resources\Api\Consultation\MessengersResource;
 use App\Jobs\BroadcastMessageJob;
 use App\Models\ConsultationChatRequest;
 use App\Models\Customer;

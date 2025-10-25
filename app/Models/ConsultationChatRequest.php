@@ -25,6 +25,10 @@ class ConsultationChatRequest extends Model
         'action_by' ,
         'action_reason'
     ];
+    protected $casts = [
+        'started_at' => 'datetime',
+        'ended_at' => 'datetime',
+    ];
 
     // المريض
     public function patient(): \Illuminate\Database\Eloquent\Relations\BelongsTo

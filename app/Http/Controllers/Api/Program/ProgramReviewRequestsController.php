@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Program;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProgramReviewRequestsRequest;
 use App\Http\Requests\UpdateProgramReviewRequestsRequest;
-use App\Http\Resources\ProgramReviewResource;
+use App\Http\Resources\Api\Program\ProgramReviewResource;
 use App\Models\ProgramReviewRequests;
 use App\Repositories\IProgramReviewRequestsRepositories;
 use App\Traits\ResponseTrait;

@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Api\Consultation;
 
 use App\Events\ConsultationRequested;
 use App\Http\Controllers\Controller;
-
 use App\Http\Requests\api\consultation\StoreConsultationChatRequestRequest;
 use App\Http\Requests\api\consultation\updateChattingRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Requests\UpdateConsultationChatRequestRequest;
-use App\Http\Resources\ConsultationChatRequestResource;
+use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
 use App\Models\ConsultationChatRequest;
 use App\Models\Customer;
 use App\Repositories\IConsultationChatRequestRepositories;
@@ -17,7 +16,6 @@ use App\Services\api\ConsultationStatusService;
 use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ConsultationChatRequestController extends Controller
 {
@@ -106,19 +104,7 @@ class ConsultationChatRequestController extends Controller
     public function updateChatting(updateChattingRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
-           $consultation = $this->consultationChatRequestRepositories->findOne($request['chat_request_id']);
-           if($consultation->status == 'accepted' )
-           {
-               $consultation->status = 'active';
-               $consultation->started_at  = now();
-           }
-            foreach (['first_patient_message_at', 'first_consultant_message_at', 'patient_message_count', 'consultant_message_count'] as $field) {
-                if ($request->filled($field)) {
-                    $consultation->$field = $request->$field;
-                }
-            }
-            $consultation->save();
-
+           $consultation = $this->consultationChatRequestRepositories->update($request->getData(), $request['chat_request_id']);
             return $this->successResponse(__('messages.UPDATE_CHATTING_INFO'));
         }catch (Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()]);

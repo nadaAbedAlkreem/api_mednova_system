@@ -6,15 +6,18 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
+use App\Http\Controllers\Api\Consultation\ScheduleController;
 use App\Http\Controllers\Api\Program\ProgramController;
+use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
 use App\Http\Controllers\Api\Program\ProgramVideosController;
-use App\Http\Controllers\Api\User\CustomerController;
-use App\Http\Controllers\Api\User\LocationController;
-use App\Http\Controllers\Api\User\MedicalSpecialtieController;
-use App\Http\Controllers\Api\User\NotificationsController;
-use App\Http\Controllers\Api\User\PatientController;
-use App\Http\Controllers\Api\User\RehabilitationCenterController;
-use App\Http\Controllers\Api\User\TherapistController;
+use App\Http\Controllers\Api\Customer\CustomerController;
+use App\Http\Controllers\Api\Customer\LocationController;
+use App\Http\Controllers\Api\Customer\MedicalSpecialtieController;
+use App\Http\Controllers\Api\Customer\NotificationsController;
+use App\Http\Controllers\Api\Customer\PatientController;
+use App\Http\Controllers\Api\Customer\RatingController;
+use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
+use App\Http\Controllers\Api\Customer\TherapistController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -45,7 +48,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('medical-specialties')->group(function ()
     {
      Route::get('', [MedicalSpecialtieController::class, 'getAll']);
-     Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']);
+     Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
     });
 
     Route::prefix('therapist')->group(function ()
@@ -64,7 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
-    Route::prefix('programs')->group(function () {
+        Route::prefix('programs')->group(function () {
         Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
 //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
         Route::post('/', [ProgramController::class, 'store']);
@@ -72,6 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('program/update', [ProgramController::class, 'update']);
         Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
         Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
+        Route::get('show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
 
     });
 
@@ -111,11 +115,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
     {
         Route::post('/store', [RehabilitationCenterController::class, 'store']);
         Route::post('/update', [RehabilitationCenterController::class, 'update']);
-        Route::post('/update-schedule', [RehabilitationCenterController::class, 'updateSchedule']);
+    });
+
+    Route::prefix('schedule')->group(function ()
+    {
+        Route::post('store', [ScheduleController::class, 'store']);
+        Route::post('/update', [ScheduleController::class, 'update']);
+
     });
     Route::prefix('location')->group(function ()
     {
         Route::post('store', [LocationController::class, 'store']);
         Route::post('update', [LocationController::class, 'update']);
     });
+
+
+    Route::prefix('rating')->group(function ()
+    {
+        Route::get('', [RatingController::class, 'getTopRatedServiceProvider']);
+        Route::post('store', [RatingController::class, 'store']);
+
+    });
+
+
+
 });

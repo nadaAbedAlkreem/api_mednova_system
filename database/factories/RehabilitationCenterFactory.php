@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,14 @@ class RehabilitationCenterFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'customer_id' => Customer::factory(),
+            'year_establishment' => $this->faker->year(),
+            'license_number' => strtoupper($this->faker->bothify('LCN-####')),
+            'license_authority' => $this->faker->company(),
+            'has_commercial_registration' => $this->faker->boolean(),
+            'commercial_registration_number' => strtoupper($this->faker->bothify('CRN-####')),
+            'commercial_registration_authority' => $this->faker->company(),
+            'bio' => $this->faker->paragraph(),
         ];
     }
 }

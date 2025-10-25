@@ -14,15 +14,13 @@ class RehabilitationCenterService
     protected ICustomerRepositories $customerRepositories;
     protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
     protected ITherapistRepositories $therapistRepositories;
-    protected IScheduleRepositories $scheduleRepositories;
 
 
-    public function __construct(IScheduleRepositories $scheduleRepositories ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    public function __construct(ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
         $this->therapistRepositories = $therapistRepositories;
-        $this->scheduleRepositories = $scheduleRepositories;
     }
 
     public function store(array $data, int $customerId, array $specialtyIds)
@@ -38,12 +36,9 @@ class RehabilitationCenterService
             }
 
             // إنشاء بيانات مركز التأهيل
-            $center = $this->rehabilitationCenterRepositories->create($data['center']->toArray());
+           $this->rehabilitationCenterRepositories->create($data['center']->toArray());
 
-            // إنشاء الجداول الزمنية لكل يوم
-            $schedules = [];
-            $scheduleData = $data['schedule']->toArray();
-           $this->scheduleRepositories->create($scheduleData);
+
 
             return $customer->load([
                 'rehabilitationCenter',

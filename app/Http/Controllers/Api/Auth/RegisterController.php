@@ -6,7 +6,7 @@ use App;
 use App\Events\CustomerRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\auth\RegisterUserRequest;
-use App\Http\Resources\CustomerResource;
+use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Services\api\CustomerService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;

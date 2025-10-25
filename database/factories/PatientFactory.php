@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,9 @@ class PatientFactory extends Factory
     public function definition(): array
     {
         return [
-            //
-        ];
+              'customer_id' => Customer::factory(),
+              'emergency_phone' => $this->faker->phoneNumber(),
+              'relationship' => $this->faker->randomElement(['Father', 'Mother', 'Brother', 'Sister', 'Friend']),
+                ];
     }
 }

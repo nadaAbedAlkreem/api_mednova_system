@@ -14,146 +14,135 @@ class UpdateConsultationStatus extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
+        $now = now();
 
-        $acceptedConsultations = ConsultationChatRequest::where('status', 'accepted')
-            ->whereNotNull('updated_at')
-            ->get();
-        Log::info('reminder', [
-             '$acceptedConsultations' => $acceptedConsultations,
-        ]);
+//        // معالجة الجلسات المقبولة
+        $this->processConsultations('pending', 'created_at', $now, function ($consultation, $hoursSince) {
+            return $consultation->patient_message_count == 0 && $consultation->consultant_message_count == 0;
+        });
 
-        foreach ($acceptedConsultations as $consultation) {
-            $hoursSinceAccepted = $consultation->updated_at->diffInSeconds($now);
-            $noMessages = $consultation->patient_message_count == 0 && $consultation->consultant_message_count == 0;
-            Log::info('reminder', [
-                '$acceptedConsultations' => 'for',
-            ]);
-            Log::info('reminder', [
-                '$hoursSinceAccepted' => $hoursSinceAccepted,
-            ]);
+        // معالجة الجلسات المقبولة
+        $this->processConsultations('accepted', 'updated_at', $now, function ($consultation, $hoursSince) {
+            return $consultation->patient_message_count == 0 && $consultation->consultant_message_count == 0;
+        });
 
-            if ($noMessages) {
-                if ($hoursSinceAccepted >= 24 && $consultation->last_reminder_level < 3) {
-                    $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
-                    $consultation->last_reminder_level = 3;
-                    $consultation->last_reminder_sent_at = now();
-                    Log::info('reminder', [
-                        '$acceptedConsultations' => 3,
-                    ]);
-                } elseif ($hoursSinceAccepted >= 12 && $consultation->last_reminder_level < 2) {
-                    $this->sendReminder($consultation, $hoursSinceAccepted);
-                    $consultation->last_reminder_level = 2;
-                    $consultation->last_reminder_sent_at = now();
-                    Log::info('reminder', [
-                        '$acceptedConsultations' => 2,
-                    ]);
-                } elseif ($hoursSinceAccepted >= 6 && $consultation->last_reminder_level < 1) {
-                    $this->sendReminder($consultation, $hoursSinceAccepted);
-                    $consultation->last_reminder_level = 1;
-                    $consultation->last_reminder_sent_at = now();
-                    Log::info('reminder', [
-                        '$acceptedConsultations' => 1,
-                    ]);
-                }
-                Log::info('reminder', [
-                    '$acceptedConsultations' => $acceptedConsultations,
-                ]);
-                $consultation->save();
-            }
-        }
-
-        /**
-         */
-//        $activeConsultations = ConsultationChatRequest::where('status', 'active')
-//            ->whereNotNull('started_at')
-//            ->get();
-//
-//        foreach ($activeConsultations as $consultation) {
-//            $hoursSinceStarted = $consultation->started_at->diffInHours($now);
-//            $totalMessages = $consultation->patient_message_count + $consultation->consultant_message_count;
-//
-//            if ($consultation->patient_message_count == 0 || $consultation->consultant_message_count == 0) {
-//                if ($hoursSinceAccepted >= 24 && $consultation->last_reminder_level < 3) {
-//                    $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
-//                    $consultation->last_reminder_level = 3;
-//                    $consultation->last_reminder_sent_at = now();
-//                } elseif ($hoursSinceAccepted >= 12 && $consultation->last_reminder_level < 2) {
-//                    $this->sendReminder($consultation, $hoursSinceAccepted);
-//                    $consultation->last_reminder_level = 2;
-//                    $consultation->last_reminder_sent_at = now();
-//                } elseif ($hoursSinceAccepted >= 6 && $consultation->last_reminder_level < 1) {
-//                    $this->sendReminder($consultation, $hoursSinceAccepted);
-//                    $consultation->last_reminder_level = 1;
-//                    $consultation->last_reminder_sent_at = now();
-//                }
-//
-//            } else {
-//                if ($hoursSinceStarted >= 24) {
-//                    if ($totalMessages == 0) {
-//                        $this->cancelConsultation($consultation, 'Insufficient interaction');
-//                    } else {
-//                        $this->completeConsultation($consultation);
-//                    }
-//                }
-//            }
-//        }
+        // معالجة الجلسات النشطة
+        $this->processConsultations('active', 'started_at', $now, function ($consultation, $hoursSince) {
+            return ($consultation->patient_message_count + $consultation->consultant_message_count) <= 1;
+        });
 
         $this->info('Consultation statuses and notifications processed successfully.');
     }
 
+    /**
+     * منطق معالجة نوع من الجلسات (مقبولة أو نشطة)
+     */
+    private function processConsultations(string $status, string $timeField, Carbon $now, callable $shouldRemind)
+    {
+        $consultations = ConsultationChatRequest::where('status', $status)
+            ->whereNotNull($timeField)
+            ->whereNull('ended_at')
+            ->get();
+
+        foreach ($consultations as $consultation) {
+            $timeValue = $consultation->$timeField;
+            if (!($timeValue instanceof Carbon)) {
+                $timeValue = Carbon::parse($timeValue);
+            }
+
+            $secondsSince = $timeValue->diffInSeconds($now);
+            $noMessages = $shouldRemind($consultation, $secondsSince);
+
+            if ($noMessages) {
+                $this->handleReminders($consultation, $secondsSince, $status);
+            } else {
+                // لو كانت الجلسة active فقط، يتم إنهاؤها بعد مرور فترة طويلة
+                if ($status === 'active' && $secondsSince >= 70) {
+                    $this->completeConsultation($consultation);
+                }
+            }
+
+            $consultation->save();
+        }
+    }
+
+    /**
+     * منطق إرسال التذكيرات أو الإلغاء
+     */
+    private function handleReminders($consultation, int $secondsSince, string $status)
+    {
+        $levels = [
+            1 => 12, // بعد 6 ساعة
+            2 => 20, // بعد 12 ساعة
+            3 => 50, // بعد 24 ساعة
+        ];
+
+        foreach ($levels as $level => $limit) {
+            if ($secondsSince >= $limit && $consultation->last_reminder_level < $level) {
+                if ($level === 3) {
+                    $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
+                } else {
+                    $this->sendReminder($consultation, $limit);
+                }
+
+                $consultation->last_reminder_level = $level;
+                $consultation->last_reminder_sent_at = now();
+                break;
+            }
+        }
+    }
 
     private function cancelConsultation($consultation, $reason)
     {
+        $consultation->update([
+            'status' => 'cancelled',
+            'ended_at' => now(),
+            'action_by' => 'system',
+            'action_reason' => $reason,
+        ]);
+
         $consultantName = $consultation->consultant->full_name ?? 'المختص';
         $patientName = $consultation->patient->full_name ?? 'المريض';
-
-        // نص السبب
-        $message = "تم إلغاء جلسة الاستشارة بين المختص {$consultantName} والمريض {$patientName} من قبل المنصة لعدم وجود نشاط بينهم خلال فترة 24 ساعة.";
-
-        $consultation->status = 'cancelled';
-        $consultation->ended_at = now();
-        $consultation->action_by = 'system';
-        $consultation->action_reason = $reason;
-        $consultation->save();
+        $message = "تم إلغاء جلسة الاستشارة بين {$consultantName} و {$patientName} لعدم وجود نشاط خلال 24 ساعة.";
 
         event(new \App\Events\ConsultationRequested(
             $consultation,
             $message,
             'cancelled_by_system'
         ));
+        $consultation->delete();
     }
-
 
     private function completeConsultation($consultation)
     {
-        $consultation->status = 'completed';
-        $consultation->ended_at = now();
-        $consultation->save();
-        $message = __('messages.SESSION_COMPLETED_BOTH', ['patient' => $consultation->patient->full_name  , 'consultant' => $consultation->consultant->full_name  ]);
+        $consultation->update([
+            'status' => 'completed',
+            'ended_at' => now(),
+        ]);
+
+        $message = __('messages.SESSION_COMPLETED_BOTH', [
+            'patient' => $consultation->patient->full_name,
+            'consultant' => $consultation->consultant->full_name,
+        ]);
+
         event(new \App\Events\ConsultationRequested(
-            $consultation, $message,'completed'
+            $consultation,
+            $message,
+            'completed'
         ));
     }
 
-
-    private function sendReminder($consultation, int $hoursSinceAccepted)
+    private function sendReminder($consultation, int $hours)
     {
         $patientName = $consultation->patient->full_name ?? 'المريض';
         $consultantName = $consultation->consultant->full_name ?? 'المختص';
 
-        if ($hoursSinceAccepted >= 12 && $hoursSinceAccepted < 24) {
-            $message = "تنبيه بعد 12 ساعة: مرحبًا $patientName و $consultantName يوجد جلسة معتمدة بينكما. يرجى التفاعل معها قبل مرور 24 ساعة. ";
-        } elseif ($hoursSinceAccepted >= 6 && $hoursSinceAccepted < 12) {
-            $message = "تنبيه بعد 6 ساعات: مرحبًا $patientName و $consultantName يوجد جلسة معتمدة بينكما. يرجى التفاعل معها قبل مرور 24 ساعة.";
-        } else {
-            $message = "مرحبًا $patientName و $consultantName يوجد جلسة معتمدة بينكما. يرجى التفاعل معها قبل مرور 24 ساعة. ";
-        }
+        $message = "تنبيه بعد {$hours} ساعة: مرحبًا {$patientName} و {$consultantName}، يوجد جلسة معتمدة بينكما. يرجى التفاعل معها.";
+
         event(new \App\Events\ConsultationRequested(
             $consultation,
             $message,
             'reminder_for_all'
         ));
     }
-
 }

@@ -233,7 +233,14 @@ return [
         'first_consultant_message_at'=> 'توقيت اول رد من قبل المستشار ' ,
         'first_patient_message_at'=>'توقيت اول رد من قبل المختص ' ,
         'patient_message_count' => 'عدد رسائل  المريض في جلسة ',
-        'consultant_message_count' => 'عدد رسائل المستشار في جلسة'
+        'consultant_message_count' => 'عدد رسائل المستشار في جلسة' ,
+        'reviewer_id' => 'معرّف المقيّم',
+        'schedule_id'=>'معرف المعاد' ,
+        'reviewee_id' => 'معرّف المُقيَّم',
+        'reviewee_type' => 'نوع المُقيَّم',
+        'rating' => 'التقييم',
+        'comment' => 'التعليق',
+        'type_time'=> 'نوع الموعد' ,
 
 
 

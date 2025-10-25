@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->morphs('schedulable'); // مختص أو مركز
+            $table->foreignId('consultant_id')->constrained('customers')->onDelete('cascade');
+            $table->enum('consultant_type', ['therapist','rehabilitation_center']);
             $table->json('day_of_week');
             $table->time('start_time_morning')->nullable();
             $table->time('end_time_morning')->nullable();

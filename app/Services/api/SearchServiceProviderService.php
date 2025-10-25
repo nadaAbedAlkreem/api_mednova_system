@@ -11,9 +11,10 @@ class SearchServiceProviderService
 
 
 
-    public function searchServiceProviders(array $filters)
+    public function searchServiceProviders($filters): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = Customer::query();
+        $limit = $filters->query('limit', config('app.pagination_limit'));
 
         // البحث حسب نوع الحساب
         if (!empty($filters['type'])) {
@@ -59,7 +60,8 @@ class SearchServiceProviderService
                 }
             });
         }
-         return $query->with(['location', 'therapist','therapist.specialty', 'rehabilitationCenter' , 'medicalSpecialties'])->get();
+
+         return $query->selectRaw('AVG(rating) as average_rating, COUNT(*) as total_reviews')->groupBy('reviewee_id')->with(['location', 'therapist','therapist.specialty', 'rehabilitationCenter' , 'medicalSpecialties'])->paginate($limit ?? 10);
     }
 
 

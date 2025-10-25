@@ -5,16 +5,39 @@ namespace App\Http\Controllers\Api\Program;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProgramEnrollmentRequest;
 use App\Http\Requests\UpdateProgramEnrollmentRequest;
+use App\Http\Resources\Api\Program\ProgramResource;
 use App\Models\ProgramEnrollment;
+use App\Services\api\EnrollmentService;
+use App\Traits\ResponseTrait;
+use Illuminate\Http\Request;
 
 class ProgramEnrollmentController extends Controller
 {
+    use ResponseTrait;
+
+    protected EnrollmentService $enrollmentService;
+
+    public function __construct(EnrollmentService $enrollmentService)
+    {
+        $this->enrollmentService = $enrollmentService;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         //
+    }
+
+
+    public function getTopEnrolledProgram(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $reviewees = $this->enrollmentService->handle($request);
+            return $this->successResponse('DATA_RETRIEVED_SUCCESSFULLY', ProgramResource::collection($reviewees) , 202, app()->getLocale());
+        }catch (\Exception $exception){
+            return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500);
+        }
     }
 
     /**

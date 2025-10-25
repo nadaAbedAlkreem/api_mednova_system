@@ -71,7 +71,6 @@ class StorePatientRequest extends FormRequest
     }
      public function messages(): array
      {
-
         return [
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.integer'  => __('validation.integer', ['attribute' => __('validation.attributes.customer_id')]),

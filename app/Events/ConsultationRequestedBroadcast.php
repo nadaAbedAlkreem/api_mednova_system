@@ -46,7 +46,6 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
 
             if($this->eventType === 'cancelled_by_system'  || $this->eventType === 'completed' || $this->eventType === 'reminder_for_all')
             {
-
                 return [
                     new PrivateChannel('consultant.' . $this->consultation->consultant_id),
                     new PrivateChannel('patient.' . $this->consultation->patient_id),

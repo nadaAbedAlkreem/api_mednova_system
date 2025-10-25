@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
+use App\Models\Rating;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class RatingFactory extends Factory
 {
+    protected $model = Rating::class;
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +21,11 @@ class RatingFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'reviewer_id' => 1,
+            'reviewee_id' => 2,
+            'reviewee_type' => 'therapist',
+            'rating' =>4.5,
+
         ];
     }
 }

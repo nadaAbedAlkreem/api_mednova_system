@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,16 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'customer_id' => Customer::factory(),
+            'latitude' => $this->faker->latitude(),
+            'longitude' => $this->faker->longitude(),
+            'formatted_address' => $this->faker->address(),
+            'country' => $this->faker->country(),
+            'region' => $this->faker->state(),
+            'city' => $this->faker->city(),
+            'district' => $this->faker->streetName(),
+            'postal_code' => $this->faker->postcode(),
+            'location_type' => $this->faker->randomElement(['home', 'clinic', 'center']),
         ];
     }
 }

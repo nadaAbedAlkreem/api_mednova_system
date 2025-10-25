@@ -27,6 +27,7 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    'pagination_limit' => env('PAGINATION_LIMIT' , 5),
 
     /*
     |--------------------------------------------------------------------------

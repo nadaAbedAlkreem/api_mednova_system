@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CustomerResource;
+use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
+use App\Traits\ResponseTrait;
 use Google_Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;
-use App\Traits\ResponseTrait;
-use App\Models\User;
-use App ;
 use Illuminate\Support\Str;
-
-
+use Laravel\Socialite\Facades\Socialite;
 
 
 class SocialAuthController extends Controller

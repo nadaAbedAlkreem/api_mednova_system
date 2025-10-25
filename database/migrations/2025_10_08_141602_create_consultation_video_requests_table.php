@@ -13,14 +13,20 @@ return new class extends Migration
     {
         Schema::create('consultation_video_requests', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('appointment_request_id')->nullable()->constrained('appointment_requests')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-            $table->morphs('consultable', 'consultable_idx');
-            $table->enum('status',['pending','approved','rejected','active','completed','cancelled'])->default('pending');
-            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('set null');
-            $table->integer('duration_minutes')->default(15);
+            $table->foreignId('consultant_id')->constrained('customers')->onDelete('cascade');
+            $table->enum('consultant_type', ['therapist','rehabilitation_center']);
+            $table->string('health_status');
+            $table->enum('status',['pending','approved','active','completed','cancelled'])->default('pending');
+            $table->integer('duration_minutes')->default(10);// توقيت الفراغ بين كل جلسة
             $table->string('video_room_link')->nullable();
-            $table->timestamp('start_time')->nullable();
-            $table->timestamp('end_time')->nullable();
+            $table->enum('action_by',['patient','consultable','system'])->nullable();
+            $table->text('action_reason')->nullable();
+            $table->integer('session_duration_hours')->default(1); // وقت الافتراضي لكل جلسة
+            $table->timestamp('last_reminder_sent_at')->nullable();
+            $table->integer('last_reminder_level')->default(0);
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -29,8 +29,5 @@ class RehabilitationCenter extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-    public function schedules(): \Illuminate\Database\Eloquent\Relations\MorphMany
-    {
-        return $this->morphMany(Schedule::class, 'schedulable');
-    }
+
 }

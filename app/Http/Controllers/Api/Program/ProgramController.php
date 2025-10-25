@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\program\StoreProgramRequest;
-use App\Http\Requests\api\program\StoreProgramVideosRequest;
 use App\Http\Requests\api\program\UpdateProgramRequest;
-use App\Http\Resources\ProgramResource;
+use App\Http\Resources\Api\Program\ProgramResource;
 use App\Models\Customer;
 use App\Models\Program;
 use App\Repositories\IProgramRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use function Symfony\Component\Translation\t;
+use Illuminate\Support\Facades\Request;
 
 class ProgramController extends Controller
 {
@@ -26,10 +25,11 @@ class ProgramController extends Controller
      * Display a listing of the resource.
      */
 
-    public function getAll(): \Illuminate\Http\JsonResponse
+    public function getAll(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $programs = $this->programRepositories->getWhereWith(['creator'],['is_approved'=>1]);
+            $limit = $request->get('limit', config('app.pagination_limit'));
+            $programs = $this->programRepositories->paginateWhereWith(['is_approved'=>1] ,['creator'] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit );
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
 
         }catch (\Exception $e){

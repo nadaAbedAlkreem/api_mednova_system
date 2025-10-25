@@ -16,14 +16,12 @@ return new class extends Migration
             $table->foreignId('reviewer_id')
                 ->constrained('customers')
                 ->onDelete('cascade');
-            $table->unsignedBigInteger('reviewee_id');
-            $table->enum('reviewee_type',[ 'therapist', 'center', 'platform']);
+            $table->foreignId('reviewee_id')->constrained('customers')->onDelete('cascade');;
+            $table->enum('reviewee_type',[ 'therapist', 'rehabilitation_center', 'platform']);
             $table->decimal('rating', 2, 1);
             $table->text('comment')->nullable();
-
             $table->timestamps();
             $table->index(['reviewee_id', 'reviewee_type']);
-
             $table->softDeletes();
         });
     }

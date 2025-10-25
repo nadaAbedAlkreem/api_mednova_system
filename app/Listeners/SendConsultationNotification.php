@@ -45,7 +45,7 @@ class SendConsultationNotification
                 Log::warning("No notification target found for event type: {$eventType}");
                 return;
             }
-
+           $notification = new Notification();
             foreach ($targets as $targetId) {
                 $notification = Notification::create([
                     'type' => 'consultation_' . $eventType,
@@ -64,19 +64,18 @@ class SendConsultationNotification
                     'status' => 'pending',
                 ]);
 
-                SendConsultationNotificationJob::dispatch(
-                    $consultation,
-                    $message,
-                    $eventType,
-                    $notification
-                );
-
                 Log::info('Notification created successfully', [
                     'notification_id' => $notification->id,
                     'target_id' => $targetId,
                     'event_type' => $eventType,
                 ]);
             }
+            SendConsultationNotificationJob::dispatch(
+                $consultation,
+                $message,
+                $eventType,
+                $notification
+            );
         } catch (Throwable $e) {
             Log::error('Failed to create consultation notification', [
                 'consultation_id' => $consultation->id,

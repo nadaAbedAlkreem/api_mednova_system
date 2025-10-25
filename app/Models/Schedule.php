@@ -11,19 +11,27 @@ class Schedule extends Model
     /** @use HasFactory<\Database\Factories\ScheduleFactory> */
     use HasFactory , softDeletes;
     protected $fillable = [
-        'schedulable_id' ,
-        'schedulable_type',
+        'consultant_id' ,
+        'consultant_type' ,
         'day_of_week' ,
         'start_time_morning' ,
         'end_time_morning' ,
+        'is_have_evening_time',
         'start_time_evening' ,
         'end_time_evening' ,
-        'is_have_evening_time',
         'type' ,
         'is_active' ,
     ];
-    public function schedulable(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    protected $casts = [
+        'start_time_morning' => 'datetime',
+        'end_time_morning' => 'datetime',
+        'start_time_evening' => 'datetime',
+        'end_time_evening' => 'datetime',
+        'is_have_evening_time' => 'boolean',
+    ];
+
+    public function consultant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(Customer::class, 'consultant_id');
     }
 }

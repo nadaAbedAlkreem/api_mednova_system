@@ -83,6 +83,17 @@ class Customer extends Authenticatable
             $customer->notifications()->each(function ($notifications) {
                 $notifications->delete();
             });
+
+            $customer->ratingReviewer()->each(function ($reviewer) {
+                $reviewer->delete();
+            });
+
+            $customer->ratingsReviewee()->each(function ($reviewee) {
+                $reviewee->delete();
+            });
+            $customer->schedule()->each(function ($schedule) {
+                $schedule->delete();
+            });
         });
     }
     public function senderMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -111,10 +122,15 @@ class Customer extends Authenticatable
     {
         return $this->hasOne(Therapist::class);
     }
-    public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function ratingsReviewer(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Rating::class);
+        return $this->hasMany(Rating::class , 'reviewer_id');
     }
+    public function ratingsReviewee(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Rating::class , 'reviewee_id');
+    }
+
 
     public function rehabilitationCenter(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
@@ -131,18 +147,15 @@ class Customer extends Authenticatable
     }
 
 
-    // علاقة المواعيد (أوفلاين أو أونلاين)
-    public function schedules(): \Illuminate\Database\Eloquent\Relations\MorphMany
-    {
-        return $this->morphMany(Schedule::class, 'schedulable');
-    }
-
     // علاقة طلبات الحجوزات
     public function appointmentRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AppointmentRequest::class);
     }
-
+    public function schedules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Schedule::class, 'consultant_id');
+    }
     // علاقة طلبات الاستشارة (محادثة)
     public function receivedConsultations(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

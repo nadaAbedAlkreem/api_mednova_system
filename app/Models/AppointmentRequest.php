@@ -11,23 +11,26 @@ class AppointmentRequest extends Model
     /** @use HasFactory<\Database\Factories\AppointmentRequestFactory> */
     use HasFactory , softDeletes;
     protected $fillable = [
-        'customer_id',
-        'schedulable_id',
-        'schedulable_type',
+        'consultant_id',
+        'patient_id',
+        'consultant_type',
+        'requested_day',
         'requested_time',
         'status',
-        'description',
+        'type_appointment',
         'confirmed_end_time',
         'session_duration'
     ];
 
-    public function customer()
+    public function patient(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class , 'patient_id');
+    }
+    public function consultant()
+    {
+        return $this->belongsTo(Customer::class, 'consultant_id');
     }
 
-    public function schedulable()
-    {
-        return $this->morphTo();
-    }
+
+
 }

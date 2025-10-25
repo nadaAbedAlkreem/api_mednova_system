@@ -11,11 +11,24 @@ class Rating extends Model
     /** @use HasFactory<\Database\Factories\RatingFactory> */
     use HasFactory, softDeletes;
     protected $fillable = [
-        'customer_id',
+        'reviewer_id',
+        'reviewee_id',
+        'reviewee_type',
         'rating',
+        'comment',
     ];
-    public function customer()
+    protected $casts = [
+        'rating' => 'float',
+
+    ];
+    public function reviewee()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class , 'reviewee_id');
     }
+    public function reviewer()
+    {
+        return $this->belongsTo(Customer::class , 'reviewer_id');
+    }
+
+
 }
