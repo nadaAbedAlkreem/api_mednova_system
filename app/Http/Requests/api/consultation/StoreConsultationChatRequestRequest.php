@@ -26,6 +26,7 @@ class StoreConsultationChatRequestRequest extends FormRequest
             'patient_id' => 'required|exists:customers,id',
             'consultant_id' => 'required|exists:customers,id',
             'consultant_type'=>'required|in:therapist,rehabilitation_center',
+            ''
 
         ];
     }

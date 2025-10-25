@@ -31,7 +31,7 @@ class RatingController extends Controller
     public function store(StoreRatingRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
-            $rating = $this->ratingRepositories->create($request->validated());
+            $rating = $this->ratingRepositories->create($request->handle());
             $rating->load(['reviewer','reviewee']);
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new RatingResource($rating), 201,);
         }catch (\Exception $exception){

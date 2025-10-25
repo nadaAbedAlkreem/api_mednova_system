@@ -18,7 +18,12 @@ class EnrollmentService
     {
         $limit = $request->get('limit', config('app.pagination_limit')) ;
 
-        $topEnrolled = ProgramEnrollment::with('program')
+        $topEnrolled = ProgramEnrollment::with([
+           'program' => function ($query) {
+            $query->withAvg('ratings', 'rating')
+            ->withCount('ratings');
+           }
+           ])
             ->select('program_id')
             ->selectRaw('COUNT(*) as enrollments_count')
             ->groupBy('program_id')

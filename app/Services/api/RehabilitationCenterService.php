@@ -3,6 +3,7 @@ namespace App\Services\api;
 
 use App\Models\User;
 use App\Repositories\ICustomerRepositories;
+use App\Repositories\ILocationRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
@@ -15,12 +16,15 @@ class RehabilitationCenterService
     protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
     protected ITherapistRepositories $therapistRepositories;
 
-
-    public function __construct(ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    protected  IScheduleRepositories $scheduleRepositories;
+    protected ILocationRepositories $locationRepositories;
+    public function __construct(IScheduleRepositories $scheduleRepositories ,ILocationRepositories $locationRepositories  ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
         $this->therapistRepositories = $therapistRepositories;
+        $this->locationRepositories = $locationRepositories;
+        $this->scheduleRepositories = $scheduleRepositories;
     }
 
     public function store(array $data, int $customerId, array $specialtyIds)
@@ -38,6 +42,12 @@ class RehabilitationCenterService
             // إنشاء بيانات مركز التأهيل
            $this->rehabilitationCenterRepositories->create($data['center']->toArray());
 
+              // إنشاء بيانات
+
+            $this->locationRepositories->create($data['location']->toArray());
+
+            // إنشاء بيانات  مواعيد العمل
+            $this->scheduleRepositories->create($data['schedule']->toArray());
 
 
             return $customer->load([

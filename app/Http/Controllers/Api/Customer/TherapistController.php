@@ -8,6 +8,7 @@ use App\Http\Requests\api\user\UpdateTherapistRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Therapist;
 use App\Repositories\ICustomerRepositories;
+use App\Repositories\ILocationRepositories;
 use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
 use App\Traits\ResponseTrait;
@@ -19,26 +20,31 @@ class TherapistController extends Controller
     protected  ITherapistRepositories $therapistRepositories;
     protected  IScheduleRepositories $scheduleRepositories;
     protected ICustomerRepositories $customerRepositories;
+    protected ILocationRepositories $locationRepositories;
 
-    public function __construct(IScheduleRepositories $scheduleRepositories , ITherapistRepositories $therapistRepositories , ICustomerRepositories $customerRepositories)
+    public function __construct( ILocationRepositories $locationRepositories , IScheduleRepositories $scheduleRepositories , ITherapistRepositories $therapistRepositories , ICustomerRepositories $customerRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->therapistRepositories = $therapistRepositories;
         $this->scheduleRepositories = $scheduleRepositories;
+        $this->locationRepositories = $locationRepositories;
     }
 
     public function store(StoreTherapistRequest $request): \Illuminate\Http\JsonResponse
     {
         DB::beginTransaction();
         try {
-            $this->customerRepositories->update($request->getData(),$request['customer_id'] );
-            $therapist = $this->therapistRepositories->create($request->getData());
+            $data = $request->getData();
+            $this->customerRepositories->update($data['data']->toArray(),$request['customer_id'] );
+            $this->locationRepositories->create($data['data']->toArray());
+            $therapist = $this->therapistRepositories->create($data['data']->toArray(),);
+            $this->scheduleRepositories->create($data['schedule']->toArray());
             $therapist->load('customer');
             $therapist->customer->load(['location' ,'schedules','therapist' ,'therapist.specialty']);
-                DB::commit();
+        DB::commit();
                 return $this->successResponse(__('messages.CREATE_SUCCESS'), new CustomerResource($therapist->customer), 201,);
             } catch (\Exception $e) {
-                 DB::rollback();
+        DB::rollback();
                 return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
             }
     }

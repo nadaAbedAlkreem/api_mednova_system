@@ -39,14 +39,14 @@ class RatingSeeder extends Seeder
         foreach ($therapists as $t) {
             $allReviewees->push([
                 'id' => $t->customer->id,
-                'type' => 'therapist'
+                'type' => 'App\Models\Program'
             ]);
         }
 
         foreach ($centers as $c) {
             $allReviewees->push([
                 'id' => $c->customer->id,
-                'type' => 'rehabilitation_center'
+                'type' => 'App\Models\Customer'
             ]);
         }
 

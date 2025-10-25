@@ -56,7 +56,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [TherapistController::class, 'get']);
         Route::post('/store', [TherapistController::class, 'store']);
         Route::post('/update', [TherapistController::class, 'update']);
+    });
 
+    Route::prefix('schedule')->group(function ()
+    {
+        Route::post('store', [ScheduleController::class, 'store']);
+        Route::post('/update', [ScheduleController::class, 'update']);
+
+    });
+    Route::prefix('location')->group(function ()
+    {
+        Route::post('store', [LocationController::class, 'store']);
+        Route::post('update', [LocationController::class, 'update']);
     });
     Route::prefix('consultation-request')->group(function ()
     {
@@ -117,17 +128,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update', [RehabilitationCenterController::class, 'update']);
     });
 
-    Route::prefix('schedule')->group(function ()
-    {
-        Route::post('store', [ScheduleController::class, 'store']);
-        Route::post('/update', [ScheduleController::class, 'update']);
-
-    });
-    Route::prefix('location')->group(function ()
-    {
-        Route::post('store', [LocationController::class, 'store']);
-        Route::post('update', [LocationController::class, 'update']);
-    });
 
 
     Route::prefix('rating')->group(function ()

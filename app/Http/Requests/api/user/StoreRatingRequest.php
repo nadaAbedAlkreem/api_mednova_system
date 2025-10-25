@@ -3,6 +3,7 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
+use App\Models\Program;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRatingRequest extends FormRequest
@@ -19,13 +20,33 @@ class StoreRatingRequest extends FormRequest
         $validator->after(function ($validator) {
             $reviewer = Customer::find($this->reviewer_id);
             $reviewee = Customer::find($this->reviewee_id);
-
             if ($reviewer && $reviewer->type_account !== 'patient') {
                 $validator->errors()->add('reviewer_id', 'المراجع يجب أن يكون مريضًا.');
             }
+            if ($reviewee && $reviewee->type_account == 'patient') {
+                $validator->errors()->add('reviewer_id', 'المقيم يجب أن يكون يا مختص يا مركز.');
+            }
+            $type = $this->input('reviewee_type');
+            $id = $this->input('reviewee_id');
 
-            if ($reviewee &&(( $reviewee->type_account == 'therapist' && $this['reviewee_type'] != 'therapist' ) || ($reviewee->type_account == 'rehabilitation_center' && $this['reviewee_type'] != 'rehabilitation_center' ))  ) { //rehabilitation_center
-                $validator->errors()->add('reviewee_id', 'المقيَّم يجب أن يكون مختصًا أو مركزًا.');
+            switch ($type) {
+                case 'customer':
+                    if (!\App\Models\Customer::where('id', $id)->exists()) {
+                        $validator->errors()->add('reviewee_id', 'المستخدم غير موجود.');
+                    }
+                    break;
+
+                case 'program':
+                    if (!\App\Models\Program::where('id', $id)->exists()) {
+                        $validator->errors()->add('reviewee_id', 'البرنامج غير موجود.');
+                    }
+                    break;
+
+//                case 'platform':
+//                    if (!\App\Models\Platform::where('id', $id)->exists()) {
+//                        $validator->errors()->add('reviewee_id', 'المنصة غير موجودة.');
+//                    }
+                    break;
             }
         });
     }
@@ -39,8 +60,8 @@ class StoreRatingRequest extends FormRequest
     {
         return [
             'reviewer_id'  => 'required|exists:customers,id',
-            'reviewee_id'   => 'required|exists:customers,id',
-            'reviewee_type' =>'required|in:therapist,rehabilitation_center',
+            'reviewee_type' => 'required|string|in:customer,program,platform',
+            'reviewee_id'   => 'required',
             'rating'  => 'required|numeric|min:0|max:5',
             'comment' => 'nullable|string'
         ];
@@ -74,4 +95,10 @@ class StoreRatingRequest extends FormRequest
             'comment.string'    => __('validation.string', ['attribute' => __('validation.attributes.comment')]),
         ];
     }
+    public function handle()
+    {
+        $data = $this->validated();
+        $data['reviewee_type'] = ($data['reviewee_type']) == 'customer' ? 'App\\Models\\Customer' :'App\\Models\\Program';
+        return $data;
+     }
 }

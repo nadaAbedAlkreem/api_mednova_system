@@ -43,7 +43,16 @@ class Program extends Model
             $program->enrollments()->each(function ($enrollments) {
                 $enrollments->delete();
             });
+
+            $program->ratings()->each(function ($ratings) {
+                $ratings->delete();
+            });
         });
+    }
+
+    public function ratings()
+    {
+        return $this->morphMany(Rating::class, 'reviewee');
     }
 
     public function creator()

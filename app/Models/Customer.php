@@ -88,7 +88,7 @@ class Customer extends Authenticatable
                 $reviewer->delete();
             });
 
-            $customer->ratingsReviewee()->each(function ($reviewee) {
+            $customer->ratings()->each(function ($reviewee) {
                 $reviewee->delete();
             });
             $customer->schedule()->each(function ($schedule) {
@@ -126,9 +126,9 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(Rating::class , 'reviewer_id');
     }
-    public function ratingsReviewee(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function ratings()
     {
-        return $this->hasMany(Rating::class , 'reviewee_id');
+        return $this->morphMany(Rating::class, 'reviewee');
     }
 
 

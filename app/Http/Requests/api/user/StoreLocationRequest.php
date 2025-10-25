@@ -23,15 +23,15 @@ class StoreLocationRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|unique:locations,customer_id,NULL,id,deleted_at,NULL|exists:customers,id',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'formatted_address'=>'required',
+            'latitude' => '',
+            'longitude' => '',
+            'formatted_address'=>'',
             'region' => '',
-            'country' => 'required',
-            'city' => 'required',
+            'country' => '',
+            'city' => '',
             'district' => '',
             'postal_code' => '',
-            'location_type' => 'required',
+            'location_type' => '',
         ];
     }
 

@@ -46,16 +46,21 @@ class StoreRehabilitationCenterRequest extends FormRequest
 
 //
 //            ///schedule
-//            'day_of_week' => 'required|array',
-//            'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-//
-//            'start_time_morning' => 'required|date_format:H:i',
-//            'end_time_morning' => 'required|date_format:H:i|after:start_time_morning',
-//
-//            'is_have_evening_time' => 'required|boolean',
-//            'start_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i',
-//            'end_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i|after:start_time_evening',
-//            'type' => '',
+            'day_of_week' => 'required|array',
+            'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
+
+            'start_time_morning' => 'required|date_format:H:i',
+            'end_time_morning' => 'required|date_format:H:i|after:start_time_morning',
+
+            'is_have_evening_time' => 'required|boolean',
+            'start_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i',
+            'end_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i|after:start_time_evening',
+            'type' => '',
+            'formatted_address'=>'required',
+            'country' => 'required',
+            'city' => 'required',
+
+
         ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
@@ -114,27 +119,31 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'commercial_registration_authority.string' => __('validation.string', ['attribute' => __('validation.attributes.commercial_registration_authority')]),
             'commercial_registration_authority.max' => __('validation.max.string', ['attribute' => __('validation.attributes.commercial_registration_authority'), 'max' => 255]),
 
-//            'day_of_week.required' => __('validation.required', ['attribute' => __('validation.attributes.day_of_week')]),
-//            'day_of_week.array' => __('validation.array', ['attribute' => __('validation.attributes.day_of_week')]),
-//            'day_of_week.*.in' => __('validation.in', ['attribute' => __('validation.attributes.day_of_week')]),
-//
-//            'start_time_morning.required' => __('validation.required', ['attribute' => __('validation.attributes.start_time_morning')]),
-//            'start_time_morning.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.start_time_morning'), 'format' => 'H:i']),
-//
-//            'end_time_morning.required' => __('validation.required', ['attribute' => __('validation.attributes.end_time_morning')]),
-//            'end_time_morning.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.end_time_morning'), 'format' => 'H:i']),
-//            'end_time_morning.after' => __('validation.after', ['attribute' => __('validation.attributes.end_time_morning'), 'date' => __('validation.attributes.start_time_morning')]),
-//
-//
-//            'start_time_evening.required' => __('validation.required', ['attribute' => __('validation.attributes.start_time_evening')]),
-//            'start_time_evening.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.start_time_evening'), 'format' => 'H:i']),
-//
-//            'end_time_evening.required' => __('validation.required', ['attribute' => __('validation.attributes.end_time_evening')]),
-//            'end_time_evening.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.end_time_evening'), 'format' => 'H:i']),
-//            'end_time_evening.after' => __('validation.after', ['attribute' => __('validation.attributes.end_time_evening'), 'date' => __('validation.attributes.start_time_evening')]),
-//
-//            'is_have_evening_time.required' => __('validation.required', ['attribute' => __('validation.attributes.is_have_evening_time')]),
-//            'is_have_evening_time.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_have_evening_time')]),
+            'day_of_week.required' => __('validation.required', ['attribute' => __('validation.attributes.day_of_week')]),
+            'day_of_week.array' => __('validation.array', ['attribute' => __('validation.attributes.day_of_week')]),
+            'day_of_week.*.in' => __('validation.in', ['attribute' => __('validation.attributes.day_of_week')]),
+
+            'start_time_morning.required' => __('validation.required', ['attribute' => __('validation.attributes.start_time_morning')]),
+            'start_time_morning.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.start_time_morning'), 'format' => 'H:i']),
+
+            'end_time_morning.required' => __('validation.required', ['attribute' => __('validation.attributes.end_time_morning')]),
+            'end_time_morning.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.end_time_morning'), 'format' => 'H:i']),
+            'end_time_morning.after' => __('validation.after', ['attribute' => __('validation.attributes.end_time_morning'), 'date' => __('validation.attributes.start_time_morning')]),
+
+
+            'start_time_evening.required' => __('validation.required', ['attribute' => __('validation.attributes.start_time_evening')]),
+            'start_time_evening.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.start_time_evening'), 'format' => 'H:i']),
+
+            'end_time_evening.required' => __('validation.required', ['attribute' => __('validation.attributes.end_time_evening')]),
+            'end_time_evening.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.end_time_evening'), 'format' => 'H:i']),
+            'end_time_evening.after' => __('validation.after', ['attribute' => __('validation.attributes.end_time_evening'), 'date' => __('validation.attributes.start_time_evening')]),
+
+            'is_have_evening_time.required' => __('validation.required', ['attribute' => __('validation.attributes.is_have_evening_time')]),
+            'is_have_evening_time.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_have_evening_time')]),
+
+            'formatted_address.required' => __('validation.required', ['attribute' => __('validation.attributes.formatted_address')]),
+            'city.required' => __('validation.required', ['attribute' => __('validation.attributes.city')]),
+            'country.required' => __('validation.required', ['attribute' => __('validation.attributes.country')]),
         ];
     }
     public function getData()
@@ -157,14 +166,15 @@ class StoreRehabilitationCenterRequest extends FormRequest
         }
         $data = collect($data);
         $dataCustomer = $data->only(['customer_id','gender', 'birth_date','image']);
+        $dataLocation = $data->only(['customer_id','formatted_address', 'city','country']);
         $dataRehabilitation_centers = $data->only(['customer_id','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
-//        $data['consultant_id'] =  $data['customer_id'] ;
-//        $data['consultant_type'] = 'therapist' ;
-//        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
-//        $data['type'] = 'online' ;
-//        $dataSchedule = $data->only([ 'type','consultant_id' , 'consultant_type' , 'day_of_week' , 'start_time_morning' ,'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time']);
+        $data['consultant_id'] =  $data['customer_id'] ;
+        $data['consultant_type'] = 'rehabilitation_center' ;
+        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
+        $data['type'] = 'online' ;
+        $dataSchedule = $data->only([ 'type','consultant_id' , 'consultant_type' , 'day_of_week' , 'start_time_morning' ,'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time']);
 
-        return ['customer'=>$dataCustomer  , 'center' => $dataRehabilitation_centers ];
+        return ['customer'=>$dataCustomer , 'location' => $dataLocation ,'schedule'=>$dataSchedule, 'center' => $dataRehabilitation_centers ];
     }
 
 

@@ -21,13 +21,14 @@ class Rating extends Model
         'rating' => 'float',
 
     ];
-    public function reviewee()
-    {
-        return $this->belongsTo(Customer::class , 'reviewee_id');
-    }
+
     public function reviewer()
     {
         return $this->belongsTo(Customer::class , 'reviewer_id');
+    }
+    public function reviewee()
+    {
+        return $this->morphTo();
     }
 
 

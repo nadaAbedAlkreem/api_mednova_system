@@ -16,8 +16,7 @@ return new class extends Migration
             $table->foreignId('reviewer_id')
                 ->constrained('customers')
                 ->onDelete('cascade');
-            $table->foreignId('reviewee_id')->constrained('customers')->onDelete('cascade');;
-            $table->enum('reviewee_type',[ 'therapist', 'rehabilitation_center', 'platform']);
+            $table->morphs('reviewee');
             $table->decimal('rating', 2, 1);
             $table->text('comment')->nullable();
             $table->timestamps();
