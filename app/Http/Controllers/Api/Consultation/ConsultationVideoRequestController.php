@@ -74,13 +74,7 @@ class ConsultationVideoRequestController extends Controller
         try {
             $consultation = $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']);
             $consultation->load('appointmentRequest');
-            $message = $this->statusService->handleStatusChange(
-                $consultation,
-                $request->status,
-                'video',
-                $request->action_by
-            );
-
+            $message = $this->statusService->handleStatusChange($consultation, $request->status, 'video', $request->action_by);
             return $this->successResponse($message, [], 200);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), [

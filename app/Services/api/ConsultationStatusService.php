@@ -19,7 +19,8 @@ class ConsultationStatusService
                     'name' => $consultation->consultant->full_name,
                 ]);
                 if($type == 'video'){
-                 $meetingLink = $this->googleMeetingService->createMeetingLinkGoogle( ,$consultation->patient->email,$consultation->consultant->email);
+                 $meetingLink = $this->googleMeetingService->createMeetingLinkGoogle( $consultation->appointmentRequest->requested_time ,$consultation->appointmentRequest->confirmed_end_time ,$consultation->patient->email,$consultation->consultant->email);
+                 dd($meetingLink);
                 }
                 event(new ConsultationRequested($consultation, $message, 'accepted'));
                 break;

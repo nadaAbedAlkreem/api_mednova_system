@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Consultation\AppointmentRequestController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
+use App\Http\Controllers\Api\Consultation\ConsultationVideoRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
 use App\Http\Controllers\Api\Program\ProgramController;
@@ -40,7 +41,7 @@ Route::prefix('medical-specialties')->group(function ()
 Route::get('programs/show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
 Route::prefix('customer')->group(function ()
 {
-    Route::get('customer/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
+    Route::get('/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
     Route::get('/{id}', [CustomerController::class, 'getById']);
 });
 
@@ -79,7 +80,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [ConsultationChatRequestController::class, 'store']);
         Route::get('/get-status-request', [ConsultationChatRequestController::class, 'getStatusRequest']);
         Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
-        Route::post('/update-status-request', [ConsultationChatRequestController::class, 'updateStatusRequest']);
+        Route::post('/update-status-chat-request', [ConsultationChatRequestController::class, 'updateStatusRequest']);
+        Route::post('/update-status-video-request', [ConsultationVideoRequestController::class, 'updateStatusRequest']);
         Route::post('update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
 
     });
