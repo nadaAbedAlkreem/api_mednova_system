@@ -92,7 +92,8 @@ class ConsultationChatRequestController extends Controller
             );
             $message = $this->statusService->handleStatusChange(
                 $consultation,
-                $request->status,
+                $request->status
+                ,'chat',
                 $request->action_by
             );
 

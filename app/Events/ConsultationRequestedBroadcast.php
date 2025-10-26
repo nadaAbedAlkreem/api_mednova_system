@@ -2,8 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\ConsultationChatRequest;
-use Illuminate\Broadcasting\Channel;
+
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -16,7 +15,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
 
     public $consultation , $message  , $eventType , $notification;
 
-    public function __construct(ConsultationChatRequest $consultation, $message, string $eventType , $notification )
+    public function __construct( $consultation, $message, string $eventType , $notification )
     {
         $this->consultation = $consultation;
         $this->message = $message;

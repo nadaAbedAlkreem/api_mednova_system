@@ -133,7 +133,12 @@ class StoreConsultationChatRequestRequest extends FormRequest
                 ->addMinutes(60)
                 ->format('H:i');
         }
+        if(isset($data['requested_time']))
+        {
+            $data['requested_time'] = Carbon::parse($data['requested_day'].' '.$data['requested_time'])
+                ->format('Y-m-d H:i:s');
 
+        }
 
 
         return $data;

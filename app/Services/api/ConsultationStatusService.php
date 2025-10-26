@@ -3,15 +3,12 @@ namespace App\Services\api;
 
 use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
-use App\Models\Customer;
-use App\Models\User;
-use App\Repositories\ICustomerRepositories;
-use Exception;
+
 
 class ConsultationStatusService
 {
 
-    public function handleStatusChange(ConsultationChatRequest $consultation, string $status, ?string $actionBy = null): string
+    public function handleStatusChange($consultation, string $status , string $type, ?string $actionBy = null): string
     {
         $consultation->load(['patient', 'consultant']);
 
@@ -20,6 +17,9 @@ class ConsultationStatusService
                 $message = __('messages.ACCEPTED_REQUEST', [
                     'name' => $consultation->consultant->full_name,
                 ]);
+                if($type == 'video'){
+
+                }
                 event(new ConsultationRequested($consultation, $message, 'accepted'));
                 break;
 

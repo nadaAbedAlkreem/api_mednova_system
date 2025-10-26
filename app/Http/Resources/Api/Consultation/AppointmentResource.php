@@ -18,9 +18,15 @@ class AppointmentResource extends JsonResource
     {
 
         return
-            [
-//                'day'=>$this->day ,
-                'available_slots' => $this->available_slots,
-            ] ;
+             [
+             'consultant_id' => new CustomerResource($this->whenLoaded('consultant')) ,
+             'patient_id' => new CustomerResource($this->whenLoaded('patient')) ,
+             'consultant_type'  => $this->consultant_type ,
+             'requested_day'=>$this->requested_day ,
+             'requested_time' => $this->requested_time ,
+             'status'   => $this->status ,
+             'type_appointment' => $this->type_appointment ,
+             'confirmed_end_time'=> $this->confirmed_end_time
+             ] ;
     }
 }
