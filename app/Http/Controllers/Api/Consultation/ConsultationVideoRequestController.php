@@ -72,10 +72,8 @@ class ConsultationVideoRequestController extends Controller
     public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $consultation = $this->consultationVideoRequestRepositories->updateAndReturn(
-                $request->getData(),
-                $request['id']
-            );
+            $consultation = $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']);
+            $consultation->load('appointmentRequest');
             $message = $this->statusService->handleStatusChange(
                 $consultation,
                 $request->status,

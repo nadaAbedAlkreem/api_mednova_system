@@ -31,26 +31,30 @@ Route::prefix('auth')->group(function ()
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
     Route::post('verifyToken', [ForgotPasswordController::class, 'verifyToken']);
 });
+Route::get('rating', [RatingController::class, 'getTopRatedServiceProvider']);
+Route::prefix('medical-specialties')->group(function ()
+{
+    Route::get('', [MedicalSpecialtieController::class, 'getAll']);
+    Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
+});
+Route::get('programs/show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
+Route::prefix('customer')->group(function ()
+{
+    Route::get('customer/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
+    Route::get('/{id}', [CustomerController::class, 'getById']);
+});
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 
-    Route::prefix('customer')->group(function ()
-    {
-        Route::get('/{id}', [CustomerController::class, 'getById']);
-        Route::get('/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
-    });
+
     Route::prefix('patient')->group(function ()
     {
         Route::post('/store', [PatientController::class, 'store']);
         Route::post('/update', [PatientController::class, 'update']);
 
     });
-    Route::prefix('medical-specialties')->group(function ()
-    {
-     Route::get('', [MedicalSpecialtieController::class, 'getAll']);
-     Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
-    });
+
 
     Route::prefix('therapist')->group(function ()
     {
@@ -88,7 +92,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('program/update', [ProgramController::class, 'update']);
         Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
         Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
-        Route::get('show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
 
     });
 
@@ -134,7 +137,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('rating')->group(function ()
     {
-        Route::get('', [RatingController::class, 'getTopRatedServiceProvider']);
         Route::post('store', [RatingController::class, 'store']);
 
     });

@@ -7,6 +7,7 @@ use App\Models\ConsultationChatRequest;
 
 class ConsultationStatusService
 {
+    protected GoogleMeetingService $googleMeetingService;
 
     public function handleStatusChange($consultation, string $status , string $type, ?string $actionBy = null): string
     {
@@ -18,7 +19,7 @@ class ConsultationStatusService
                     'name' => $consultation->consultant->full_name,
                 ]);
                 if($type == 'video'){
-
+                 $meetingLink = $this->googleMeetingService->createMeetingLinkGoogle( ,$consultation->patient->email,$consultation->consultant->email);
                 }
                 event(new ConsultationRequested($consultation, $message, 'accepted'));
                 break;
