@@ -241,6 +241,12 @@ return [
         'rating' => 'التقييم',
         'comment' => 'التعليق',
         'type_time'=> 'نوع الموعد' ,
+        'day' =>'يوم' ,
+        'consultant_nature' => 'طبيعة الاستشارة' ,
+        'requested_day' => 'اليوم المراد حجزه' ,
+        'requested_time' => 'الوقت المراد حجزه' ,
+        'type_appointment' => 'نوع الحجز ',
+
 
 
 

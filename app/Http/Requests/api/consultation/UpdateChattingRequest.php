@@ -6,7 +6,7 @@ use App\Models\ConsultationChatRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class updateChattingRequest extends FormRequest
+class UpdateChattingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

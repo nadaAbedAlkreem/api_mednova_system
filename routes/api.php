@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
+use App\Http\Controllers\Api\Consultation\AppointmentRequestController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
@@ -71,8 +72,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('consultation-request')->group(function ()
     {
-        Route::get('/get-status-request', [ConsultationChatRequestController::class, 'getStatusRequest']);
         Route::post('/store', [ConsultationChatRequestController::class, 'store']);
+        Route::get('/get-status-request', [ConsultationChatRequestController::class, 'getStatusRequest']);
+        Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
         Route::post('/update-status-request', [ConsultationChatRequestController::class, 'updateStatusRequest']);
         Route::post('update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
 

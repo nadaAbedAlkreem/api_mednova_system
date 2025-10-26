@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('consultation_video_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('appointment_request_id')->nullable()->constrained('appointment_requests')->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->foreignId('patient_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('consultant_id')->constrained('customers')->onDelete('cascade');
             $table->enum('consultant_type', ['therapist','rehabilitation_center']);
-            $table->string('health_status');
             $table->enum('status',['pending','approved','active','completed','cancelled'])->default('pending');
             $table->integer('duration_minutes')->default(10);// توقيت الفراغ بين كل جلسة
             $table->string('video_room_link')->nullable();

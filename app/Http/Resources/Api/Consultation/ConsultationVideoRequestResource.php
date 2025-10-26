@@ -6,7 +6,7 @@ use App\Http\Resources\Api\Customer\CustomerResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ConsultationChatRequestResource extends JsonResource
+class ConsultationVideoRequestResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,18 +19,15 @@ class ConsultationChatRequestResource extends JsonResource
            return
             [
                 'id' => $this->id ,
-                //يجب عرض تخصص المستشار
                 'patient' => new CustomerResource($this->whenLoaded('patient')),
                 'consultant' => new CustomerResource($this->whenLoaded('consultant')) ,
                 'consultant_type' => $this->consultant_type ,
+                'appointment'=> new AppointmentResource($this->whenLoaded('appointmentRequest')),
                 'status' => $this->status ,
-                'max_messages_for_patient' => $this->max_messages_for_patient ,
-                'patient_message_count' => $this->patient_message_count ?? 0  ,
-                'consultant_message_count' => $this->consultant_message_count ?? 0,
-                'first_patient_message_at' => $this->first_patient_message_at  ,
-                'first_consultant_reply_at' => $this->first_consultant_reply_at ,
-                'started_at' => $this->started_at ,
-                'ended_at' => $this->ended_at ,
+                'duration_minutes' => $this->duration_minutes ?? 10 ,
+                'video_room_link' => $this->video_room_link ,
+                'session_duration_hours' => $this->session_duration_hours  ?? 1,
+
              ] ;
     }
 }

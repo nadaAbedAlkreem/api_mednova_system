@@ -40,15 +40,15 @@ class ScheduleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreScheduleRequest $request)
-    {
-        try{
-            $rating = $this->scheduleRepositories->create($request->getData());
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ScheduleResource($rating), 201,);
-        }catch (\Exception $exception){
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500, app()->getLocale());
-        }
-    }
+//    public function store(StoreScheduleRequest $request)
+//    {
+//        try{
+//            $rating = $this->scheduleRepositories->create($request->getData());
+//            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ScheduleResource($rating), 201,);
+//        }catch (\Exception $exception){
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500, app()->getLocale());
+//        }
+//    }
 
     /**
      * Display the specified resource.

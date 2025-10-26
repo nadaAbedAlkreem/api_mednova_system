@@ -30,6 +30,11 @@ class AppointmentRequest extends Model
     {
         return $this->belongsTo(Customer::class, 'consultant_id');
     }
+    public function consultationVideoRequest()
+    {
+        return $this->hasOne(ConsultationVideoRequest::class, 'appointment_request_id');
+    }
+
 
 
 

@@ -3,15 +3,25 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\api\consultation\ChackAvailableSlotsRequest;
 use App\Http\Requests\StoreAppointmentRequestRequest;
 use App\Http\Requests\UpdateAppointmentRequestRequest;
+use App\Http\Resources\Api\Consultation\AppointmentResource;
 use App\Models\AppointmentRequest;
 use App\Models\Schedule;
+use App\Services\api\ConsultantAvailabilityService;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class AppointmentRequestController extends Controller
 {
+    use ResponseTrait;
+    protected  ConsultantAvailabilityService $consultantAvailabilityService;
+    public function __construct(ConsultantAvailabilityService $consultantAvailabilityService)
+    {
+        $this->consultantAvailabilityService = $consultantAvailabilityService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -23,71 +33,27 @@ class AppointmentRequestController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function getAvailableSlots(Request $request)
+    public function checkAvailableSlots(ChackAvailableSlotsRequest $request)
     {
-        $request->validate([
-            'center_id' => 'required|integer|exists:customers,id',
-            'day' => 'required|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', //
-        ]);
-
-        $centerId = $request->center_id;
-        $day = strtolower($request->day);
-        $schedule = Schedule::where('schedulable_id', $centerId)
-            ->where('schedulable_type', 'App\\Models\\Customer')
-            ->where('is_active', true)
-            ->firstOrFail();
-
-        $duration = 60;
-        $availableSlots = [];
-        if ($schedule->start_time_morning && $schedule->end_time_morning) {
-            $availableSlots = array_merge(
-                $availableSlots,
-                $this->generateTimeSlots(
-                    $schedule->start_time_morning,
-                    $schedule->end_time_morning,
-                    $duration
-                )
+        try{
+             $freeSlots = $this->consultantAvailabilityService->checkAvailableSlots(
+                $request->consultant_id,
+                $request->consultant_type,
+                $request->day
             );
-        }
-        if ($schedule->is_have_evening_time && $schedule->start_time_evening && $schedule->end_time_evening) {
-            $availableSlots = array_merge(
-                $availableSlots,
-                $this->generateTimeSlots(
-                    $schedule->start_time_evening,
-                    $schedule->end_time_evening,
-                    $duration
-                )
-            );
-        }
-        $bookedTimes = AppointmentRequest::where('service_provider_id', $centerId)
-            ->where('requested_day', $day)
-            ->pluck('requested_time')
-            ->map(fn($t) => Carbon::parse($t)->format('H:i'))
-            ->toArray();
-        $freeSlots = array_values(array_diff($availableSlots, $bookedTimes));
+             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['day' =>$request->day ,'available_slots' => $freeSlots], 202,);
 
-        return response()->json([
-            'day' => $day,
-            'available_slots' => $freeSlots,
-        ]);
+        }catch (\Exception $exception){
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+
+        }
+
     }
 
     /**
      * 🔹 توليد فترات زمنية بين وقتي البداية والنهاية
      */
-    private function generateTimeSlots($startTime, $endTime, $duration): array
-    {
-        $slots = [];
-        $start = Carbon::parse($startTime);
-        $end = Carbon::parse($endTime);
 
-        while ($start->lt($end)) {
-            $slots[] = $start->format('H:i');
-            $start->addMinutes($duration);
-        }
-
-        return $slots;
-    }
 
     /**
      * Store a newly created resource in storage.

@@ -9,9 +9,12 @@ use App\Http\Requests\api\consultation\updateChattingRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Requests\UpdateConsultationChatRequestRequest;
 use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
+use App\Http\Resources\Api\Consultation\ConsultationResource;
 use App\Models\ConsultationChatRequest;
 use App\Models\Customer;
 use App\Repositories\IConsultationChatRequestRepositories;
+use App\Repositories\IConsultationVideoRequestRepositories;
+use App\Services\api\ConsultantService;
 use App\Services\api\ConsultationStatusService;
 use App\Traits\ResponseTrait;
 use Exception;
@@ -21,14 +24,16 @@ class ConsultationChatRequestController extends Controller
 {
     use ResponseTrait;
     protected ConsultationStatusService $statusService;
-
+    protected ConsultantService $consultantService;
     protected IConsultationChatRequestRepositories $consultationChatRequestRepositories;
+    protected IConsultationVideoRequestRepositories $consultationVideoRequestRepositories;
 
-    public function __construct(IConsultationChatRequestRepositories $consultationChatRequestRepositories ,ConsultationStatusService $statusService)
+    public function __construct(ConsultantService $consultantService , IConsultationVideoRequestRepositories $consultationVideoRequestRepositories ,IConsultationChatRequestRepositories $consultationChatRequestRepositories ,ConsultationStatusService $statusService)
     {
         $this->consultationChatRequestRepositories = $consultationChatRequestRepositories;
         $this->statusService = $statusService;
-
+        $this->consultationVideoRequestRepositories = $consultationVideoRequestRepositories;
+        $this->consultantService = $consultantService;
     }
 
     /**
@@ -53,11 +58,9 @@ class ConsultationChatRequestController extends Controller
     public function store(StoreConsultationChatRequestRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-             $consultation = $this->consultationChatRequestRepositories->create($request->getData());
-             $consultation->load(['patient','consultant']);
-             $message = __('messages.new_consultation_notify', ['name' => $consultation->patient->full_name]);
-             event(new ConsultationRequested($consultation , $message, 'requested'));
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationChatRequestResource($consultation), 201,);
+            $type = $request['consultant_nature'];
+            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
+            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }

@@ -12,10 +12,9 @@ class ConsultationVideoRequest extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
       'appointment_request_id',
-      'customer_id' ,
+      'patient_id' ,
       'consultant_id',
       'consultant_type',
-      'health_status',
       'status',
       'duration_minutes',
       'video_room_link',
@@ -32,5 +31,14 @@ class ConsultationVideoRequest extends Model
         return $this->belongsTo(Customer::class, 'consultant_id');
     }
 
+    public function patient(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'patient_id');
+    }
+
+    public function appointmentRequest(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AppointmentRequest::class, 'appointment_request_id');
+    }
 
 }
