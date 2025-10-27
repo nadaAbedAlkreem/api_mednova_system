@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('patient_id')->constrained('customers')->onDelete('cascade');
             $table->string('requested_day')->nullable();
             $table->timestamp('requested_time')->nullable();
-            $table->enum('status', ['pending','approved','rejected','completed'])->default('pending');
+            $table->enum('status', ['pending','approved' ,'cancelled','completed'])->default('pending');
             $table->enum('type_appointment', ['online' , 'offline'])->default('online');
             $table->timestamp('confirmed_end_time')->nullable();
             $table->integer('session_duration')->nullable();

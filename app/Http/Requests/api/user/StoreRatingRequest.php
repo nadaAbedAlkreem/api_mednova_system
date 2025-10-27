@@ -59,7 +59,7 @@ class StoreRatingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reviewer_id'  => 'required|exists:customers,id',
+            'reviewer_id'  => 'required|exists:customers,id,deleted_at,NULL',
             'reviewee_type' => 'required|string|in:customer,program,platform',
             'reviewee_id'   => 'required',
             'rating'  => 'required|numeric|min:0|max:5',

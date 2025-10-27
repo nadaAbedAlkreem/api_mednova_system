@@ -39,7 +39,7 @@ class UpdateProgramVideosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'video_id' => 'required|exists:program_videos,id',
+            'video_id' => 'required|exists:program_videos,id,deleted_at,NULL',
             'video.title_ar' => 'nullable|string|max:255',
             'video.duration_minute' => 'nullable|integer|min:0',
             'video.order' => 'nullable|integer|min:0',

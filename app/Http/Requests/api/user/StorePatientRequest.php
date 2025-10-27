@@ -28,7 +28,7 @@ class StorePatientRequest extends FormRequest
                 'required',
                 'integer',
                 'unique:patients,customer_id',
-                'exists:customers,id'
+                'exists:customers,id,deleted_at,NULL'
             ],
             'gender' => ['required', 'in:Male,Female'],
             'birth_date' => [

@@ -5,9 +5,8 @@ namespace App\Console\Commands;
 use App\Models\ConsultationChatRequest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
-class UpdateConsultationStatus extends Command
+class UpdateChatConsultationStatus extends Command
 {
     protected $signature = 'consultations:update-status';
     protected $description = 'Mark consultations as completed after 24 hours of activation';
@@ -130,6 +129,7 @@ class UpdateConsultationStatus extends Command
             $message,
             'completed'
         ));
+
     }
 
     private function sendReminder($consultation, int $hours)

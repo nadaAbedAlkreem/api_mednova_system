@@ -25,6 +25,19 @@ class ConsultationVideoRequest extends Model
       'last_reminder_level' ,
       'expires_at' ,
     ];
+    protected $dates = ['deleted_at'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($consultationVideoRequest) {
+            $consultationVideoRequest->activities()->each(function ($activities) {
+                $activities->delete();
+            });
+
+        });
+    }
 
     public function consultant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -39,6 +52,10 @@ class ConsultationVideoRequest extends Model
     public function appointmentRequest(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(AppointmentRequest::class, 'appointment_request_id');
+    }
+    public function activities()
+    {
+        return $this->hasMany(ConsultationVideoActivity::class, 'consultation_video_request_id');
     }
 
 }

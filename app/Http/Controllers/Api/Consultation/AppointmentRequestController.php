@@ -11,6 +11,7 @@ use App\Models\AppointmentRequest;
 use App\Models\Schedule;
 use App\Services\api\ConsultantAvailabilityService;
 use App\Traits\ResponseTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -39,11 +40,19 @@ class AppointmentRequestController extends Controller
              $freeSlots = $this->consultantAvailabilityService->checkAvailableSlots(
                 $request->consultant_id,
                 $request->consultant_type,
-                $request->day
+                $request->day ,
+                $request->date
             );
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['day' =>$request->day ,'available_slots' => $freeSlots], 202,);
 
-        }catch (\Exception $exception){
+        }catch (ModelNotFoundException $e) {
+            return $this->errorResponse(
+                __('messages.ERROR_OCCURRED'),
+                ['error' => 'لا يوجد مواعيد متاحة لهذا المختص في اليوم المحدد.'],
+                404
+            );
+        }
+        catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
         }

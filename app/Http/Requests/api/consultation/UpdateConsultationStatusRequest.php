@@ -3,10 +3,14 @@
 namespace App\Http\Requests\api\consultation;
 
 use App\Models\ConsultationChatRequest;
+use App\Models\ConsultationVideoRequest;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateConsultationStatusRequest extends FormRequest
 {
+    protected $table;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -15,6 +19,16 @@ class UpdateConsultationStatusRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+         $nature = $this->input('consultant_nature');
+
+         $this->table = match ($nature) {
+            'video' => 'consultation_video_requests',
+            'chat' => 'consultation_chat_requests',
+            default => null,
+        };
+    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,24 +37,30 @@ class UpdateConsultationStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>'required|exists:consultation_chat_requests,id',
+            'id'=>'required|exists:'.$this->table.',id,deleted_at,NULL',
             'status' => 'required|in:accepted,cancelled,active,completed',
+            'consultant_nature' => 'required|in:video,chat' ,
             'action_by' => 'required_if:status,cancelled|in:patient,consultable|nullable',
-            'action_reason' => 'required_if:status,cancelled|string|max:500',
-        ];
+            'action_reason' => 'required_if:status,cancelled|string|max:500', ];
     }
+
     public function withValidator($validator): void
     {
 
         $validator->after(function ($validator) {
-            $record = ConsultationChatRequest::find($this->id);
+
+            $record = ($this->consultant_nature == 'video')?  ConsultationVideoRequest::find($this->id) :  ConsultationChatRequest::find($this->id);
 
             if ($record) {
-                if ($record->patient_message_count > 0 && $record->consultant_message_count > 0) {
-                     if ($this->status == 'cancelled') {
-                         $validator->errors()->add('status', __('لا يمكنك لغي جلسة ألأن .'));
-                    }
-                }
+               if($this->consultant_nature == 'chat')
+               {
+                   if ($record->patient_message_count > 0 && $record->consultant_message_count > 0) {
+                       if ($this->status == 'cancelled') {
+                           $validator->errors()->add('status', __('لا يمكنك لغي جلسة ألأن .'));
+                       }
+                   }
+               }
+
                 if ($record->status === $this->status) {
                     if($this->status == 'accepted')
                     {
@@ -101,6 +121,11 @@ class UpdateConsultationStatusRequest extends FormRequest
             'action_by.required' => __('validation.required', ['attribute' => __('validation.attributes.action_by')]),
             'action_by.in' => __('validation.exists', ['attribute' => __('validation.attributes.action_by')]),
             'action_reason.string' => __('validation.string', ['attribute' => __('validation.attributes.action_by')]),
-         ];
+            'consultant_nature.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_nature')]),
+            'consultant_nature.in' => __('validation.in', ['attribute' => __('validation.attributes.consultant_nature')]),
+
+
+
+        ];
     }
 }

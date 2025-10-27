@@ -27,7 +27,7 @@ class UpdatePatientRequest extends FormRequest
             'customer_id' => [
                 'required',
                 'integer',
-                'exists:customers,id'
+                'exists:customers,id,deleted_at,NULL'
             ],
             'gender' => ['in:Male,Female'],
             'birth_date' => [

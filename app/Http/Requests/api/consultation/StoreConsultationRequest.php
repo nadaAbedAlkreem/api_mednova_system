@@ -7,7 +7,7 @@ use App\Models\ConsultationVideoRequest;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreConsultationChatRequestRequest extends FormRequest
+class StoreConsultationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,12 @@ class StoreConsultationChatRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => 'required|exists:customers,id',
-            'consultant_id' => 'required|exists:customers,id',
+            'patient_id' => 'required|exists:customers,id,deleted_at,NULL',
+            'consultant_id' => 'required|exists:customers,id,deleted_at,NULL',
             'consultant_type'=>'required|in:therapist,rehabilitation_center',
             'consultant_nature'=>'required|in:chat,video',
             'requested_day'=>'required_if:consultant_nature,video|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'requested_time'=>'required_if:consultant_nature,video|date_format:H:i',
+            'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d h:i A',
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
 
@@ -127,20 +127,12 @@ class StoreConsultationChatRequestRequest extends FormRequest
     {
         $data= $this::validated();
         $data['status'] =   $data['status'] ?? 'pending';
-        if(isset($data['confirmed_end_time']))
-        {
-            $data['confirmed_end_time'] = Carbon::parse($data['requested_time'])
-                ->addMinutes(60)
-                ->format('H:i');
-        }
-        if(isset($data['requested_time']))
-        {
-            $data['requested_time'] = Carbon::parse($data['requested_day'].' '.$data['requested_time'])
-                ->format('Y-m-d H:i:s');
+
+        if (isset($data['requested_time'])) {
+            $data['requested_time'] = Carbon::createFromFormat('Y-m-d h:i A', $data['requested_time']);
+            $data['confirmed_end_time'] = $data['requested_time']->copy()->addMinutes(60);
 
         }
-
-
         return $data;
 
 

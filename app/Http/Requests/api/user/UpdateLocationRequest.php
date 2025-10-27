@@ -22,7 +22,7 @@ class UpdateLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'latitude'          => 'numeric|',
             'longitude'         => 'numeric|',
             'formatted_address' => 'string',

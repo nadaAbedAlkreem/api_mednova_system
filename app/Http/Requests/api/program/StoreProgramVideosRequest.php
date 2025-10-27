@@ -38,7 +38,7 @@ class StoreProgramVideosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'program_id' => 'required|exists:programs,id',  // يجب أن يكون موجودًا في جدول العملاء
+            'program_id' => 'required|exists:programs,id,deleted_at,NULL',  // يجب أن يكون موجودًا في جدول العملاء
             'videos' => 'nullable|array',
             'videos.*.title_ar' => 'required|string|max:255',
 //            'videos.*.title_en' => 'nullable|string|max:255',

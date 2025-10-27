@@ -1,32 +1,17 @@
 <?php
 namespace App\Services\api;
 
-use App\Events\ConsultationRequested;
-use App\Models\AppointmentRequest;
-use App\Models\ConsultationChatRequest;
-use App\Models\Customer;
-use App\Models\Schedule;
-use App\Models\User;
-use App\Repositories\IAppointmentRequestRepositories;
-use App\Repositories\IConsultationChatRequestRepositories;
-use App\Repositories\IConsultationVideoRequestRepositories;
-use App\Repositories\ICustomerRepositories;
-use Exception;
-use Google_Client;
-use Google_Service_Calendar;
-use Google_Service_Calendar_Event;
-use Illuminate\Support\Carbon;
+
 use Illuminate\Support\Facades\DB;
 
-class GoogleMeetingService
+class ZoomMeetingService
 {
 
 
 
-    public function createMeetingLinkGoogle($startTime, $endTime , $patientEmail  ,$consultantEmail)
+    public function createMeetingLinkZoom($startTime, $endTime , $patientEmail  ,$consultantEmail)
     {
-        dd(storage_path('app/private/client_secret_429602649937-7c6jkhcanrdhq7mophnb3ucp745mtcbt.apps.googleusercontent.com.json'));
-        return DB::transaction(function () use ($startTime, $endTime , $patientEmail, $consultantEmail) {
+         return DB::transaction(function () use ($startTime, $endTime , $patientEmail, $consultantEmail) {
 
             $client = new Google_Client();
             $client->setAuthConfig(storage_path('app/private/client_secret_429602649937-7c6jkhcanrdhq7mophnb3ucp745mtcbt.apps.googleusercontent.com.json'));

@@ -24,16 +24,53 @@ class UpdateScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'schedule_id' => 'required|exists:schedules,id',
+            'schedule_id' => 'required|exists:schedules,id,deleted_at,NULL',
             'day_of_week' => 'array',
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
 
-            'start_time_morning' => 'date_format:H:i',
-            'end_time_morning' => 'date_format:H:i|after:start_time_morning',
-
+            'start_time_morning' => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour >= 12) {
+                        $fail('الوقت الصباحي يجب أن يكون قبل الساعة 12:00.');
+                    }
+                }
+            ],
+            'end_time_morning' => [
+                'required',
+                'date_format:H:i',
+                'after:start_time_morning',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour >= 12) {
+                        $fail('نهاية الفترة الصباحية يجب أن تكون قبل الساعة 12:00.');
+                    }
+                }
+            ],
             'is_have_evening_time' => 'boolean',
-            'start_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i',
-            'end_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i|after:start_time_evening',
+            'start_time_evening' => [
+                'required_if:is_have_evening_time,true',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour < 12) {
+                        $fail('الوقت المسائي يجب أن يكون بعد الساعة 12:00.');
+                    }
+                }
+            ],
+            'end_time_evening' => [
+                'required_if:is_have_evening_time,true',
+                'date_format:H:i',
+                'after:start_time_evening',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour < 12) {
+                        $fail('نهاية الفترة المسائية يجب أن تكون بعد الساعة 12:00.');
+                    }
+                }
+            ],
 
         ];
     }

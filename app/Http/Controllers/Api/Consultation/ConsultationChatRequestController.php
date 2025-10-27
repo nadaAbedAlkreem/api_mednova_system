@@ -26,13 +26,11 @@ class ConsultationChatRequestController extends Controller
     protected ConsultationStatusService $statusService;
     protected ConsultantService $consultantService;
     protected IConsultationChatRequestRepositories $consultationChatRequestRepositories;
-    protected IConsultationVideoRequestRepositories $consultationVideoRequestRepositories;
 
-    public function __construct(ConsultantService $consultantService , IConsultationVideoRequestRepositories $consultationVideoRequestRepositories ,IConsultationChatRequestRepositories $consultationChatRequestRepositories ,ConsultationStatusService $statusService)
+    public function __construct(ConsultantService $consultantService ,IConsultationChatRequestRepositories $consultationChatRequestRepositories ,ConsultationStatusService $statusService)
     {
         $this->consultationChatRequestRepositories = $consultationChatRequestRepositories;
         $this->statusService = $statusService;
-        $this->consultationVideoRequestRepositories = $consultationVideoRequestRepositories;
         $this->consultantService = $consultantService;
     }
 
@@ -55,55 +53,40 @@ class ConsultationChatRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreConsultationChatRequestRequest $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $type = $request['consultant_nature'];
-            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-        }
-    }
-
-    public function getStatusRequest(Request $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $user = auth()->user();
-            if(!$user instanceof Customer){
-                throw new \Exception('Get Current User  Failed');
-            }
-            $status = $request->query('status');
-            $limit = $request->query('limit', 10);
-            $consultations = $this->consultationChatRequestRepositories->getConsultationRequests($user['id'], $user['type_account'], $status, $limit);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ConsultationChatRequestResource::collection($consultations), 200);
-        }catch (\Exception $exception){
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-        }
-    }
+//    public function store(StoreConsultationChatRequestRequest $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $type = $request['consultant_nature'];
+//            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
+//            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
 
 
-    public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $consultation = $this->consultationChatRequestRepositories->updateAndReturn(
-                $request->getData(),
-                $request['id']
-            );
-            $message = $this->statusService->handleStatusChange(
-                $consultation,
-                $request->status
-                ,'chat',
-                $request->action_by
-            );
 
-            return $this->successResponse($message, [], 200);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
-                'error' => $exception->getMessage()
-            ], 500);
-        }
-    }
+//    public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $consultation = $this->consultationChatRequestRepositories->updateAndReturn(
+//                $request->getData(),
+//                $request['id']
+//            );
+//            $message = $this->statusService->handleStatusChange(
+//                $consultation,
+//                $request->status
+//                ,'chat',
+//                $request->action_by
+//            );
+//
+//            return $this->successResponse($message, [], 200);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
+//                'error' => $exception->getMessage()
+//            ], 500);
+//        }
+//    }
 
     public function updateChatting(updateChattingRequest $request): \Illuminate\Http\JsonResponse
     {

@@ -23,15 +23,15 @@ class UpdateTherapistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gender' => 'required',
-            'birth_date' => 'required',
+            'gender' => '',
+            'birth_date' => '',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'full_name' => 'string|max:255',
             'email' => 'string|email|max:255',
             'phone' => ['string', 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
 
-            'medical_specialties_id' => 'exists:medical_specialties,id',
+            'medical_specialties_id' => 'exists:medical_specialties,id,deleted_at,NULL',
             'experience_years' => 'integer|min:0|max:80',
             'university_name' => 'string|max:255',
             'countries_certified' => 'string',

@@ -16,20 +16,29 @@ class ConsultationResource extends JsonResource
 
     public function toArray($request)
     {
-        if ($this->resource instanceof \App\Models\ConsultationChatRequest) {
-            return [
-                'type' => 'chat',
-                'data' => new ConsultationChatRequestResource($this->resource),
-            ];
-        }
+        $type = match(true) {
+            $this->resource instanceof \App\Models\ConsultationChatRequest => 'chat',
+            $this->resource instanceof \App\Models\ConsultationVideoRequest => 'video',
+            default => 'unknown'
+        };
 
-        if ($this->resource instanceof \App\Models\ConsultationVideoRequest) {
-            return [
-                'type' => 'video',
-                'data' => new ConsultationVideoRequestResource($this->resource),
-            ];
-        }
+        $data = match($type) {
+            'chat' => new ConsultationChatRequestResource($this->resource),
+            'video' => new ConsultationVideoRequestResource($this->resource),
+            default => null,
+        };
+        return [
+            'id' => $this->id,
+            'type' => $type,
+            'status' => $this->status,
+            'created_at' => $this->created_at
+                ? $this->created_at->locale('ar')->isoFormat('dddd، D MMMM YYYY HH:mm')
+                : null,
+            'updated_at' => $this->updated_at
+                ? $this->updated_at->locale('ar')->isoFormat('dddd، D MMMM YYYY HH:mm')
+                : null,
+            'data' => $data,
+        ];
 
-        return [];
     }
 }

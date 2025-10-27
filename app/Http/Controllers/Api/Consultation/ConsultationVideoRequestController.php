@@ -69,19 +69,19 @@ class ConsultationVideoRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $consultation = $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']);
-            $consultation->load('appointmentRequest');
-            $message = $this->statusService->handleStatusChange($consultation, $request->status, 'video', $request->action_by);
-            return $this->successResponse($message, [], 200);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
-                'error' => $exception->getMessage()
-            ], 500);
-        }
-    }
+//    public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $consultation = $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']);
+//            $consultation->load('appointmentRequest');
+//            $message = $this->statusService->handleStatusChange($consultation, $request->status, 'video', $request->action_by);
+//            return $this->successResponse($message, [], 200);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
+//                'error' => $exception->getMessage()
+//            ], 500);
+//        }
+//    }
 
     /**
      * Remove the specified resource from storage.

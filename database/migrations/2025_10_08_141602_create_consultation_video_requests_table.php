@@ -17,15 +17,15 @@ return new class extends Migration
             $table->foreignId('patient_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('consultant_id')->constrained('customers')->onDelete('cascade');
             $table->enum('consultant_type', ['therapist','rehabilitation_center']);
-            $table->enum('status',['pending','approved','active','completed','cancelled'])->default('pending');
+            $table->enum('status',['pending','accepted','active','completed','cancelled'])->default('pending');
             $table->integer('duration_minutes')->default(10);// توقيت الفراغ بين كل جلسة
             $table->string('video_room_link')->nullable();
             $table->enum('action_by',['patient','consultable','system'])->nullable();
             $table->text('action_reason')->nullable();
             $table->integer('session_duration_hours')->default(1); // وقت الافتراضي لكل جلسة
+            $table->timestamp('expires_at')->nullable();
             $table->timestamp('last_reminder_sent_at')->nullable();
             $table->integer('last_reminder_level')->default(0);
-            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

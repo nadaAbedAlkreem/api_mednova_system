@@ -24,7 +24,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'gender' => '',
             'birth_date' => '',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -33,7 +33,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'phone' => ['string', 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
 
             'specialty_id' => 'array',
-            'specialty_id.*' => 'exists:medical_specialties,id',
+            'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
 
 
             'year_establishment' => 'digits:4|integer|min:1900|max:' . date('Y'),

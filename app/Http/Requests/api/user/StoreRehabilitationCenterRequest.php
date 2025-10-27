@@ -25,12 +25,12 @@ class StoreRehabilitationCenterRequest extends FormRequest
        public function rules(): array
     {
           return [
-            'customer_id' => 'required|exists:customers,id|unique:rehabilitation_centers,customer_id',
+            'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:rehabilitation_centers,customer_id',
             'gender' => 'required',
             'birth_date' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'specialty_id' => 'required|array',
-            'specialty_id.*' => 'exists:medical_specialties,id',
+            'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
 
 
             'year_establishment' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
@@ -49,12 +49,49 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'day_of_week' => 'required|array',
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
 
-            'start_time_morning' => 'required|date_format:H:i',
-            'end_time_morning' => 'required|date_format:H:i|after:start_time_morning',
-
-            'is_have_evening_time' => 'required|boolean',
-            'start_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i',
-            'end_time_evening' => 'required_if:is_have_evening_time,true|date_format:H:i|after:start_time_evening',
+              'start_time_morning' => [
+                  'required',
+                  'date_format:H:i',
+                  function ($attribute, $value, $fail) {
+                      $hour = intval(explode(':', $value)[0]);
+                      if ($hour >= 12) {
+                          $fail('الوقت الصباحي يجب أن يكون قبل الساعة 12:00.');
+                      }
+                  }
+              ],
+              'end_time_morning' => [
+                  'required',
+                  'date_format:H:i',
+                  'after:start_time_morning',
+                  function ($attribute, $value, $fail) {
+                      $hour = intval(explode(':', $value)[0]);
+                      if ($hour >= 12) {
+                          $fail('نهاية الفترة الصباحية يجب أن تكون قبل الساعة 12:00.');
+                      }
+                  }
+              ],
+              'is_have_evening_time' => 'required|boolean',
+              'start_time_evening' => [
+                  'required_if:is_have_evening_time,true',
+                  'date_format:H:i',
+                  function ($attribute, $value, $fail) {
+                      $hour = intval(explode(':', $value)[0]);
+                      if ($hour < 12) {
+                          $fail('الوقت المسائي يجب أن يكون بعد الساعة 12:00.');
+                      }
+                  }
+              ],
+              'end_time_evening' => [
+                  'required_if:is_have_evening_time,true',
+                  'date_format:H:i',
+                  'after:start_time_evening',
+                  function ($attribute, $value, $fail) {
+                      $hour = intval(explode(':', $value)[0]);
+                      if ($hour < 12) {
+                          $fail('نهاية الفترة المسائية يجب أن تكون بعد الساعة 12:00.');
+                      }
+                  }
+              ],
             'type' => '',
             'formatted_address'=>'required',
             'country' => 'required',

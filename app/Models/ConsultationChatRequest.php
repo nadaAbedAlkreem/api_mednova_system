@@ -29,6 +29,8 @@ class ConsultationChatRequest extends Model
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
     ];
+    protected $dates = ['deleted_at'];
+
 
     // المريض
     public function patient(): \Illuminate\Database\Eloquent\Relations\BelongsTo

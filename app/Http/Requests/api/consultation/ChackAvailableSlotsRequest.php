@@ -23,9 +23,12 @@ class ChackAvailableSlotsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'consultant_id' => 'required|integer|exists:customers,id',
+            'consultant_id' => 'required|integer|exists:customers,id,deleted_at,NULL',
             'consultant_type' => 'required|in:therapist,rehabilitation_center',
             'day' => 'required|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', //
+            'date' => 'required|date|after_or_equal:today', // التاريخ الفعلي للجلسة 2025-11-27
+
+
         ];
     }
 
@@ -60,7 +63,11 @@ class ChackAvailableSlotsRequest extends FormRequest
             'consultant_type.in' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_type')]),
             'day.required' => __('validation.required', ['attribute' => __('validation.attributes.day')]),
             'day.in' => __('validation.in', ['attribute' => __('validation.attributes.day')]),
-         ];
+            'date.required' => __('validation.required', ['attribute' => __('validation.attributes.date')]),
+            'date.date' => __('validation.date', ['attribute' => __('validation.attributes.date')]),
+            'date.after_or_equal' => __('validation.after_or_equal', ['attribute' => __('validation.attributes.date')]),
+
+        ];
     }
 
 }

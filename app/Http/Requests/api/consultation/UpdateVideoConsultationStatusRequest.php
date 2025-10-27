@@ -24,7 +24,7 @@ class UpdateVideoConsultationStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>'required|exists:consultation_video_requests,id',
+            'id'=>'required|exists:consultation_video_requests,id,deleted_at,NULL',
             'status' => 'required|in:accepted,cancelled,active,completed',
             'action_by' => 'required_if:status,cancelled|in:patient,consultable|nullable',
             'action_reason' => 'required_if:status,cancelled|string|max:500',

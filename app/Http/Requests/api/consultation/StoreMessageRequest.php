@@ -23,8 +23,8 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'chat_request_id' => 'required|exists:consultation_chat_requests,id',
-            'receiver_id' => 'required|exists:customers,id',
+            'chat_request_id' => 'required|exists:consultation_chat_requests,id,deleted_at,NULL',
+            'receiver_id' => 'required|exists:customers,id,deleted_at,NULL',
             'sender_id' => '',
             'message' => 'nullable|string',
             'attachment' => 'nullable|mimes:pdf,jpg,jpeg,png,gif|max:5120',

@@ -38,7 +38,7 @@ class UpdateProgramRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'program_id' => 'required|exists:programs,id',  // يجب أن يكون موجودًا في جدول العملاء
+            'program_id' => 'required|exists:programs,id,deleted_at,NULL',  // يجب أن يكون موجودًا في جدول العملاء
             'title_ar' => 'nullable|string|max:255',         // العنوان العربي مطلوب
 //            'title_en' => 'nullable|string|max:255',         // العنوان الانجليزي اختياري
             'description_ar' => 'nullable|string',
