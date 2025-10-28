@@ -41,7 +41,8 @@ class AppointmentRequestController extends Controller
                 $request->consultant_id,
                 $request->consultant_type,
                 $request->day ,
-                $request->date
+                $request->date ,
+                $request->type_appointment
             );
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['day' =>$request->day ,'available_slots' => $freeSlots], 202,);
 

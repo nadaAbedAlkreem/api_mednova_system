@@ -92,7 +92,7 @@ class PatientController extends Controller
     {
         try {
             $customerData = $request->getData();
-            $customerData = array_intersect_key($customerData, array_flip(['full_name', 'email', 'phone', 'image', 'gender']));
+            $customerData = array_intersect_key($customerData, array_flip(['full_name', 'email', 'phone','birth_date', 'image', 'gender']));
             $this->customerRepositories->update($customerData,$request['customer_id'] );
             $patientData = $request->only(['emergency_phone', 'relationship',]);
             $this->patientRepository->updateWhere($patientData, ['customer_id' => $request['customer_id']]);

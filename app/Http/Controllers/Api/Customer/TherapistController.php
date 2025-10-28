@@ -74,7 +74,7 @@ class TherapistController extends Controller
     {
         try {
             $data = $request->getData();
-            $customerData = array_intersect_key($data, array_flip(['full_name', 'email', 'phone', 'image', 'gender']));
+            $customerData = array_intersect_key($data, array_flip(['full_name', 'email', 'birth_date', 'phone', 'image', 'gender']));
             $this->customerRepositories->update($customerData,$request['customer_id'] );
             $therapistData = array_intersect_key($data, array_flip(['medical_specialties_id', 'experience_years', 'university_name', 'countries_certified', 'graduation_year', 'certificate_file', 'license_number', 'license_authority', 'license_file', 'bio',]));
             $therapistData = array_filter($therapistData, fn($value) => !is_null($value) && $value !== '');

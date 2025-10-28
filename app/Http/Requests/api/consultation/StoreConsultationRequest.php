@@ -30,7 +30,7 @@ class StoreConsultationRequest extends FormRequest
             'consultant_type'=>'required|in:therapist,rehabilitation_center',
             'consultant_nature'=>'required|in:chat,video',
             'requested_day'=>'required_if:consultant_nature,video|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d h:i A',
+            'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d h:i',
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
 
@@ -129,7 +129,7 @@ class StoreConsultationRequest extends FormRequest
         $data['status'] =   $data['status'] ?? 'pending';
 
         if (isset($data['requested_time'])) {
-            $data['requested_time'] = Carbon::createFromFormat('Y-m-d h:i A', $data['requested_time']);
+            $data['requested_time'] = Carbon::createFromFormat('Y-m-d h:i', $data['requested_time']);
             $data['confirmed_end_time'] = $data['requested_time']->copy()->addMinutes(60);
 
         }

@@ -14,23 +14,25 @@ use Illuminate\Support\Carbon;
 class ConsultantAvailabilityService
 {
     protected int $duration;
+    protected int $durationMinutes; // وقت الفراغ بين كل جلسة
 
-    public function __construct(int $duration = 60)
+    public function __construct(int $duration = 60 , int $durationMinutes = 10)
     {
         $this->duration = $duration; // مدة كل جلسة بالدقائق
+        $this->durationMinutes = $durationMinutes; // مدة كل جلسة بالدقائق
     }
 
     /**
      * الحصول على الفترات المتاحة لمستشار معين في يوم محدد
      */
-    public function checkAvailableSlots(int $consultantId, string $consultantType, string $day, string $date): array
+    public function checkAvailableSlots(int $consultantId, string $consultantType, string $day, string $date , string $typeAppointment): array
     {
         $schedule = Schedule::where('consultant_id', $consultantId)
             ->where('is_active', true)
             ->where('consultant_type', $consultantType)
             ->firstOrFail();
          $availableSlots = $this->mergeAllSlots($schedule, $date);
-         $bookedTimes = $this->getBookedTimes($consultantId, $day, $date);
+         $bookedTimes = $this->getBookedTimes($consultantId, $day, $date , $typeAppointment);
 
         $freeSlots = $availableSlots->diff($bookedTimes)->values();
 
@@ -78,13 +80,14 @@ class ConsultantAvailabilityService
     /**
      * جلب المواعيد المحجوزة لنفس اليوم
      */
-    protected function getBookedTimes(int $consultantId, string $day, string $date)
+    protected function getBookedTimes(int $consultantId, string $day, string $date , string $typeAppointment)
     {
          return AppointmentRequest::where('consultant_id', $consultantId)
             ->where('requested_day', $day)
             ->whereDate('requested_time', $date)
-             ->where('status', 'pending')
-             ->orWhere('status', 'approved')
+            ->where('type_appointment' , $typeAppointment)
+            ->where('status', 'pending')
+            ->orWhere('status', 'approved')
             ->pluck('requested_time')
             ->map(fn($t) => Carbon::parse($t)->format('Y-m-d H:i'));
     }
@@ -95,13 +98,13 @@ class ConsultantAvailabilityService
     protected function generateTimeSlots(string $start, string $end, int $duration, string $date): array
     {
         $slots = [];
-
         $startTime = Carbon::parse($date.' '.$start);
         $endTime = Carbon::parse($date.' '.$end);
-         while ($startTime->lt($endTime)) {
-            $slots[] = $startTime->format('Y-m-d H:i');
-            $startTime->addMinutes($duration);
-        }
+         while ($startTime->lt($endTime))
+         {
+             $slots[] = $startTime->format('Y-m-d H:i');
+             $startTime->addMinutes($duration)->addMinutes($this->durationMinutes);
+         }
         return $slots;
     }
 
