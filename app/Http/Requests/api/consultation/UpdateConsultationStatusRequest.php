@@ -21,14 +21,14 @@ class UpdateConsultationStatusRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-         $nature = $this->input('consultant_nature');
-
-         $this->table = match ($nature) {
-            'video' => 'consultation_video_requests',
-            'chat' => 'consultation_chat_requests',
-            default => null,
-        };
-    }
+//         $nature = $this->input('consultant_nature');
+//
+//         $this->table = match ($nature) {
+//            'video' => 'consultation_video_requests',
+//            'chat' => 'consultation_chat_requests',
+//            default => null,
+//        };
+     }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -36,12 +36,25 @@ class UpdateConsultationStatusRequest extends FormRequest
      */
     public function rules(): array
     {
+        $nature = $this->input('consultant_nature');
+        $table = match ($nature) {
+            'video' => 'consultation_video_requests',
+            'chat' => 'consultation_chat_requests',
+            default => null,
+        };
+
+         $idRules = ['required'];
+        if ($table) {
+             $idRules[] = "exists:{$table},id,deleted_at,NULL";
+        }
+
         return [
-            'id'=>'required|exists:'.$this->table.',id,deleted_at,NULL',
+            'id' => $idRules,
             'status' => 'required|in:accepted,cancelled,active,completed',
-            'consultant_nature' => 'required|in:video,chat' ,
+            'consultant_nature' => 'required|in:video,chat',
             'action_by' => 'required_if:status,cancelled|in:patient,consultable|nullable',
-            'action_reason' => 'required_if:status,cancelled|string|max:500', ];
+            'action_reason' => 'required_if:status,cancelled|string|max:500',
+        ];
     }
 
     public function withValidator($validator): void

@@ -95,8 +95,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //        Route::post('/update-status-video-request', [ConsultationVideoRequestController::class, 'updateStatusRequest']);
 //
     });
-
-        Route::prefix('programs')->group(function () {
+    Route::post('/zoom/webhooks', [ZoomWebhookController::class, 'handle']);
+    Route::prefix('programs')->group(function () {
         Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
 //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
         Route::post('/', [ProgramController::class, 'store']);

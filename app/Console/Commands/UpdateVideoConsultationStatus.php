@@ -49,11 +49,11 @@ class UpdateVideoConsultationStatus extends Command
 
         foreach ($consultations as $consultation) {
             $hoursSinceCreated = Carbon::parse($consultation->created_at)->diffInSeconds($now);  //diffInSeconds diffInHours
-            $levels = [6, 12, 24];
+            $levels = [20, 40, 50];
 
             foreach ($levels as $level) {
                 if ($hoursSinceCreated >= $level && $consultation->last_reminder_level < $level) {
-                    $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$level} ساعة" );
+                    $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$hoursSinceCreated} ساعة" );
                     $consultation->last_reminder_level = $level;
                     $consultation->last_reminder_sent_at = now();
                     $consultation->save();
@@ -73,15 +73,15 @@ class UpdateVideoConsultationStatus extends Command
             ->where('status', 'accepted')
             ->get();
 
-        foreach ($consultations as $consultation) {
-            if (!$consultation->appointmentRequest) continue;
-
-            $startTime = Carbon::parse($consultation->appointmentRequest->requested_time);
-            if ($now->gte($startTime)) {
-                $consultation->update(['status' => 'active']);
-                $this->sendReminder($consultation, "جلسة الفيديو بدأت الآن");
-            }
-        }
+//        foreach ($consultations as $consultation) {
+//            if (!$consultation->appointmentRequest) continue;
+//
+//            $startTime = Carbon::parse($consultation->appointmentRequest->requested_time);
+//            if ($now->gte($startTime)) {
+//                $consultation->update(['status' => 'active']);
+//                $this->sendReminder($consultation, "جلسة الفيديو بدأت الآن");
+//            }
+//        }
     }
 
     private function processActive(Carbon $now)
@@ -92,20 +92,29 @@ class UpdateVideoConsultationStatus extends Command
 
         foreach ($consultations as $consultation) {
             if (!$consultation->appointmentRequest) continue;
-
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
+            // تحقق إن الجلسة انتهى وقتها
             if ($now->gte($endTime)) {
-                $this->completeConsultation($consultation);
+
+                // 🔹 تحقق من تفاعل الطرفين قبل إتمام الجلسة
+                if ($this->bothParticipantsInteracted($consultation)) {
+                    $this->completeConsultation($consultation);
+                } else {
+                    $this->cancelConsultation($consultation, "لم يتفاعل الطرفان بشكل كافٍ قبل انتهاء الوقت");
+                }
+
                 continue;
+            }
             }
 
             // تذكير ومتابعة تفاعل كل طرف
             foreach ($consultation->activities as $activity) {
                 $minutesSinceJoined = $activity->joined_at ? Carbon::parse($activity->joined_at)->diffInSeconds($now) : null;  //diffInMinutes //diffInSeconds
+
                 if ($activity->status !== 'joined') continue;
 
                 // التذكيرات: 15، 30، 60 دقيقة
-                $reminderLevels = [15, 30, 60];
+                $reminderLevels = [20, 40, 60];
                 foreach ($reminderLevels as $level) {
                     if ($minutesSinceJoined !== null && $minutesSinceJoined >= $level && $activity->last_reminder_level < $level) {
                         $this->sendReminder($consultation, "{$activity->role} لم يتفاعل خلال {$level} دقيقة");
@@ -121,7 +130,6 @@ class UpdateVideoConsultationStatus extends Command
                     $this->cancelConsultation($consultation, "عدم تفاعل {$activity->role} خلال ساعة");
                 }
             }
-        }
     }
 
     private function sendReminder($consultation, string $message)
@@ -170,7 +178,29 @@ class UpdateVideoConsultationStatus extends Command
             "تم اكتمال جلسة الفيديو بين {$patientName} و {$consultantName}",
             'completed'
         ));
+    }
 
+    private function bothParticipantsInteracted($consultation): bool
+    {
+        // اجلب كل الأنشطة للطرفين
+        $activities = $consultation->activities;
+        // تأكد أن عندنا نشاطين بالضبط: patient + consultant
+        if ($activities->count() < 2) {
+            return false;
+        }
+        foreach ($activities as $activity) {
+            // لازم يكون انضم فعلاً
+            if (!$activity->joined_at) {
+                return false;
+            }
+            // لازم يكون بقي وقت معقول
+            $left = $activity->left_at ?? now();
+            $duration = Carbon::parse($activity->joined_at)->diffInMinutes($left);
+            if ($duration < 5) { // أقل من 5 دقائق نعتبره لم يتفاعل
+                return false;
+            }
+        }
 
+        return true;
     }
 }

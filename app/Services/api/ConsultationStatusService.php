@@ -2,6 +2,7 @@
 namespace App\Services\api;
 
 use App\Events\ConsultationRequested;
+use App\Events\ConsultationVideoApproval;
 use Illuminate\Support\Facades\DB;
 
 
@@ -19,15 +20,21 @@ class ConsultationStatusService
                     'name' => $consultation->consultant->full_name,
                 ]);
                 if($type == 'video'){
-//                 $meetingLink = $this->zoomMeetingService->createMeetingLinkZoom( $consultation->appointmentRequest->requested_time ,$consultation->appointmentRequest->confirmed_end_time ,$consultation->patient->email,$consultation->consultant->email);
-                   // update  row in consultation   for video_link
-
+                    $consultation->load('appointmentRequest');
+                    if($consultation->appointmentRequest != null){
+                        event(new ConsultationVideoApproval($consultation->appointmentRequest->requested_time, $consultation->session_duration_hours ,$consultation));
+                        $consultation->appointmentRequest->update(['status' => 'approved']);
+                    }
                 }
                 event(new ConsultationRequested($consultation, $message, 'accepted'));
                 break;
 
             case 'cancelled':
                 $message = $this->handleCancellation($consultation, $actionBy);
+                if($type == 'video'){
+                    $consultation->load('appointmentRequest');
+                    if($consultation->appointmentRequest != null){$consultation->appointmentRequest->update(['status' => 'cancelled']);}
+                }
                 $consultation->delete();
                 break;
 

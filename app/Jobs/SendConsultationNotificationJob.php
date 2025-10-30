@@ -2,9 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Events\ConsultationRequested;
 use App\Events\ConsultationRequestedBroadcast;
-use App\Models\ConsultationChatRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
