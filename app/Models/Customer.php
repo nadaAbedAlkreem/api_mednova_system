@@ -27,6 +27,8 @@ class Customer extends Authenticatable
         'last_active_at' ,
         'is_banned' ,
         'type_account',
+        'status',
+        'timezone'
     ];
     protected static function boot()
     {

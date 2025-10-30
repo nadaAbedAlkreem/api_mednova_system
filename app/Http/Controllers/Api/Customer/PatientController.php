@@ -8,6 +8,7 @@ use App\Http\Requests\api\user\UpdatePatientRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Patient;
 use App\Repositories\ICustomerRepositories;
+use App\Repositories\ILocationRepositories;
 use App\Repositories\IPatientRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
@@ -17,16 +18,18 @@ class PatientController extends Controller
    use ResponseTrait;
     protected IPatientRepositories $patientRepository ;
     protected ICustomerRepositories $customerRepositories;
+    protected ILocationRepositories $locationRepositories;
     /**
      * Display a listing of the resource.
      */
 
 
 
-    public function __construct(IPatientRepositories $patientRepository , ICustomerRepositories $customerRepositories)
+    public function __construct(ILocationRepositories $locationRepositories , IPatientRepositories $patientRepository , ICustomerRepositories $customerRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->patientRepository  = $patientRepository;
+        $this->locationRepositories = $locationRepositories;
     }
 
     /**
@@ -54,6 +57,7 @@ class PatientController extends Controller
 
         try {
             $this->customerRepositories->update($request->getData() ,$request['customer_id'] );
+            $this->locationRepositories->create($request->getData());
             $patient = $this->patientRepository->create($request->getData());
             if(!$patient instanceof Patient){
                 throw new \Exception('Create Patient  Failed');

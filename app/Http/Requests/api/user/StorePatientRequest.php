@@ -52,6 +52,11 @@ class StorePatientRequest extends FormRequest
                 'regex:/^[\pL\s\-]+$/u'
             ],
 
+            //location
+            'formatted_address'=>'required',
+            'country' => 'required',
+            'city' => 'required',
+
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\api\user\UpdateTimeZoneRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Repositories\ICustomerRepositories;
@@ -12,6 +13,7 @@ use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\ITherapistRepositories;
 use App\Services\api\SearchServiceProviderService;
 use App\Traits\ResponseTrait;
+use DateTimeZone;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -58,6 +60,23 @@ class CustomerController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
 
+   }
+   public function updateTimezone(UpdateTimeZoneRequest $timeZoneRequest): \Illuminate\Http\JsonResponse
+   {
+       try {
+            $this->customerRepositories->update(['timezone' => $timeZoneRequest['timezone']] ,$timeZoneRequest['customer_id']);
+           return $this->errorResponse(__('messages.UPDATE_SUCCESS'), [], 202);
+       }catch (\Exception $e){
+           return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+       }
+   }
+   public function getTimezone(): \Illuminate\Http\JsonResponse
+   {
+       try {
+            return $this->errorResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), DateTimeZone::listIdentifiers(), 202);
+       }catch (\Exception $e){
+           return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+       }
    }
 
 }

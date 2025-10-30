@@ -19,7 +19,16 @@ class AppointmentRequest extends Model
         'status',
         'type_appointment',
         'confirmed_end_time',
-        'session_duration'
+        'session_duration' ,
+        'created_at',
+        'updated_at',
+    ];
+    protected $casts = [
+        'requested_time' => 'datetime',
+        'confirmed_end_time' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+
     ];
 
     public function patient(): \Illuminate\Database\Eloquent\Relations\BelongsTo

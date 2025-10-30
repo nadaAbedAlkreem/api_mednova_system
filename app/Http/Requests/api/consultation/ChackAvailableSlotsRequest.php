@@ -50,10 +50,8 @@ class ChackAvailableSlotsRequest extends FormRequest
             $schedule = Schedule::where('consultant_id', $consultantId)
                 ->where('is_active', true)
                 ->where('consultant_type', $consultantType)
-
                 ->first();
-
-            if (! $schedule) {
+             if (! $schedule) {
                 $validator->errors()->add('consultant_id', 'لا يوجد جدول مواعيد لهذا المختص.');
                 return;
             }
@@ -72,12 +70,13 @@ class ChackAvailableSlotsRequest extends FormRequest
     }
     public function rules(): array
     {
-        return [
-            'consultant_id' => 'required|integer|exists:customers,id,deleted_at,NULL',
-            'consultant_type' => 'required|in:therapist,rehabilitation_center',
-            'day' => 'required|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', // مفروض هذه القيمة يتم تحدديها من قبل الفروتت حسب ابام كل مستشار
-            'date' => 'required|date|after_or_equal:today', // التاريخ الفعلي للجلسة 2025-11-27
-            'type_appointment' => 'required|string|in:offline,online',
+         return [
+             'patient_id' => 'required|integer|exists:customers,id,deleted_at,NULL',
+             'consultant_id' => 'required|integer|exists:customers,id,deleted_at,NULL',
+             'consultant_type' => 'required|in:therapist,rehabilitation_center',
+             'day' => 'required|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', // مفروض هذه القيمة يتم تحدديها من قبل الفروتت حسب ابام كل مستشار
+             'date' => 'required|date|after_or_equal:today', // التاريخ الفعلي للجلسة 2025-11-27
+             'type_appointment' => 'required|string|in:offline,online',
          ];
     }
 
@@ -106,7 +105,12 @@ class ChackAvailableSlotsRequest extends FormRequest
     {
 
         return [
+            'patient_id.required' => __('validation.required', ['attribute' => __('validation.attributes.patient_id')]),
+            'patient_id.integer' => __('validation.integer', ['attribute' => __('validation.attributes.patient_id')]),
+            'patient_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.patient_id')]),
+
             'consultant_id.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_id')]),
+            'consultant_id.integer' => __('validation.integer', ['attribute' => __('validation.attributes.consultant_id')]),
             'consultant_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_id')]),
             'consultant_type.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_type')]),
             'consultant_type.in' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_type')]),

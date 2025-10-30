@@ -53,7 +53,7 @@ class UpdateVideoConsultationStatus extends Command
 
             foreach ($levels as $level) {
                 if ($hoursSinceCreated >= $level && $consultation->last_reminder_level < $level) {
-                    $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$hoursSinceCreated} ساعة" );
+                    $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$level} ساعة" );
                     $consultation->last_reminder_level = $level;
                     $consultation->last_reminder_sent_at = now();
                     $consultation->save();

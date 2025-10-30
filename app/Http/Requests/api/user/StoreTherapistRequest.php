@@ -3,8 +3,10 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
+use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class StoreTherapistRequest extends FormRequest
 {
@@ -205,8 +207,19 @@ class StoreTherapistRequest extends FormRequest
         $data['consultant_type'] = 'therapist' ;
         $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
         $data['type'] = 'online' ;
-        $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ]);
+        ////
 
-        return ['data'=>$data ,'schedule'=> $dataSchedule] ;
+        $customer = Customer::find($data['customer_id']) ;
+        if($customer)
+        {
+            $localTimezone = $customer->timezone ?? config('app.timezone');
+            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+            $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+            $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+        }
+
+         $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ]);
+         return ['data'=>$data ,'schedule'=> $dataSchedule] ;
     }
 }

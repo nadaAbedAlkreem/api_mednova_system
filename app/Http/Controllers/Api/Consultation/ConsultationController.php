@@ -12,6 +12,7 @@ use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
 use App\Services\api\ConsultantService;
 use App\Services\api\ConsultationStatusService;
+use App\Services\api\TimezoneService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
@@ -34,8 +35,10 @@ class ConsultationController extends Controller
     public function store(StoreConsultationRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $type = $request['consultant_nature'];
-            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
+             $type = $request['consultant_nature'];
+             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
+
+
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

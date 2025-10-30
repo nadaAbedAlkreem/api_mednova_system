@@ -2,13 +2,17 @@
 
 namespace App\Http\Requests\api\consultation;
 
+use App\Models\AppointmentRequest;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
+use App\Services\api\TimezoneService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreConsultationRequest extends FormRequest
 {
+    protected $timeZone ;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -24,13 +28,13 @@ class StoreConsultationRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+         return [
             'patient_id' => 'required|exists:customers,id,deleted_at,NULL',
             'consultant_id' => 'required|exists:customers,id,deleted_at,NULL',
             'consultant_type'=>'required|in:therapist,rehabilitation_center',
             'consultant_nature'=>'required|in:chat,video',
             'requested_day'=>'required_if:consultant_nature,video|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d h:i',
+            'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d H:i',
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
 
@@ -43,8 +47,9 @@ class StoreConsultationRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $patient = \App\Models\Customer::find($this->patient_id);
+             $patient = \App\Models\Customer::find($this->patient_id);
             $consultant = \App\Models\Customer::find($this->consultant_id);
+
             if ($patient && $patient->type_account !== 'patient') {
                 $validator->errors()->add('patient_id',  __('messages.patient_account'));
             }
@@ -52,7 +57,11 @@ class StoreConsultationRequest extends FormRequest
 
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
-           if($this['consultant_nature'] == 'chat')
+            $patient = \App\Models\Customer::find($this->patient_id);
+            $patientTimezone = $patient->timezone ?? config('app.timezone');
+            // تحويل وقت البدء إلى UTC
+            $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
+            if($this['consultant_nature'] == 'chat')
            {
                $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
                    ->where('consultant_id', $this->consultant_id)
@@ -67,16 +76,18 @@ class StoreConsultationRequest extends FormRequest
             {
                 $exists = ConsultationVideoRequest::where('patient_id', $this->patient_id)
                     ->where('consultant_id', $this->consultant_id)
-                    ->where('appointment_request_id', $this->consultant_id)
-                    ->where('status', 'pending')
+                    ->whereHas('appointmentRequest',function($query) use ($requestedTimeUtc) {
+                        $query->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i'));
+                    })
+                    ->where(function($q) { $q->where('status', 'pending') ->orWhere('status', 'approved'); })
                     ->exists();
 
                 if ($exists) {
 
                     $validator->errors()->add('duplicate_request', __('messages.duplicate_request'));
                 }
-            }
 
+            }
 
         });
     }
@@ -106,20 +117,22 @@ class StoreConsultationRequest extends FormRequest
             'patient_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.patient_id')]),
             'consultant_id.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_id')]),
             'consultant_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_id')]),
-            'consultant_type.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_type')]),
-            'consultant_type.in' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_type')]),
-            'consultant_nature.required' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_nature')]),
-            'consultant_nature.in' => __('validation.exists', ['attribute' => __('validation.attributes.consultant_nature')]),
 
-            'requested_day.required' => __('validation.exists', ['attribute' => __('validation.attributes.requested_day')]),
+            'consultant_type.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_type')]),
+            'consultant_type.in' => __('validation.in', ['attribute' => __('validation.attributes.consultant_type')]),
+
+            'consultant_nature.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_nature')]),
+            'consultant_nature.in' => __('validation.in', ['attribute' => __('validation.attributes.consultant_nature')]),
+
+            'requested_day.required' => __('validation.required', ['attribute' => __('validation.attributes.requested_day')]),
             'requested_day.string' => __('validation.string', ['attribute' => __('validation.attributes.requested_day')]),
             'requested_day.in' => __('validation.in', ['attribute' => __('validation.attributes.requested_day')]),
 
-            'requested_time.required' => __('validation.exists', ['attribute' => __('validation.attributes.requested_time')]),
-            'requested_time.date_format' => __('validation.exists', ['attribute' => __('validation.attributes.requested_time')]),
+            'requested_time.required' => __('validation.required', ['attribute' => __('validation.attributes.requested_time')]),
+            'requested_time.date_format' => __('validation.date_format', ['attribute' => __('validation.attributes.requested_time')]),
 
-            'type_appointment.required' => __('validation.exists', ['attribute' => __('validation.attributes.type_appointment')]),
-            'type_appointment.in' => __('validation.exists', ['attribute' => __('validation.attributes.type_appointment')]),
+            'type_appointment.required' => __('validation.required', ['attribute' => __('validation.attributes.type_appointment')]),
+            'type_appointment.in' => __('validation.in', ['attribute' => __('validation.attributes.type_appointment')]),
 
         ];
     }
@@ -127,10 +140,15 @@ class StoreConsultationRequest extends FormRequest
     {
         $data= $this::validated();
         $data['status'] =   $data['status'] ?? 'pending';
-
-        if (isset($data['requested_time'])) {
-            $data['requested_time'] = Carbon::createFromFormat('Y-m-d h:i', $data['requested_time']);
-            $data['confirmed_end_time'] = $data['requested_time']->copy()->addMinutes(60);
+         if (isset($data['requested_time'])) {
+             $patient = \App\Models\Customer::find($this->patient_id);
+             $patientTimezone = $patient->timezone ?? config('app.timezone');
+             // تحويل وقت البدء إلى UTC
+             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
+             $data['requested_time'] = $requestedTimeUtc;
+             // حساب وقت الانتهاء (بناءً على مدة 60 دقيقة) وتحويله أيضاً إلى UTC
+             $confirmedEndTimeUtc = Carbon::parse($requestedTimeUtc)->addMinutes(60)->format('Y-m-d H:i:s');
+             $data['confirmed_end_time'] = $confirmedEndTimeUtc;
 
         }
         return $data;

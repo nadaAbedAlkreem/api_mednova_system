@@ -44,6 +44,8 @@ Route::prefix('customer')->group(function ()
 {
     Route::get('/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
     Route::get('/{id}', [CustomerController::class, 'getById']);
+    Route::post('update-timezone', [CustomerController::class, 'updateTimezone']);
+    Route::get('show/timezone', [CustomerController::class, 'getTimezone']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -79,7 +81,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('consultation-request')->group(function ()
     {
         Route::post('/store', [ConsultationController::class, 'store']);
-        Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']);
+        Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
         Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
         Route::prefix('video')->group(function ()
         {

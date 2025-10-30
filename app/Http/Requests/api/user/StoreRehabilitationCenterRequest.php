@@ -3,6 +3,7 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
+use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -188,17 +189,22 @@ class StoreRehabilitationCenterRequest extends FormRequest
         $uploadService = new UploadService();
         $data= $this::validated();
         if ($this->hasFile('image')) {
-            $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
+            $path = $uploadService->upload($this->file('image'), 'center_profile_images' ,'public' ,'center_profile');
             $data['image'] =  asset('storage/' . $path);
         }
 
         if ($this->hasFile('certificate_file')) {
-            $path = $uploadService->upload($this->file('certificate_file'), 'therapist_certificate_images' ,'public' ,'therapistCertificate');
+            $path = $uploadService->upload($this->file('certificate_file'), 'center_certificate_images' ,'public' ,'center_profile');
             $data['certificate_file'] =  asset('storage/' . $path);
         }
 
+        if ($this->hasFile('commercial_registration_file')) {
+            $path = $uploadService->upload($this->file('commercial_registration_file'), 'center_certificate_images' ,'public' ,'center_profile');
+            $data['commercial_registration_file'] =  asset('storage/' . $path);
+        }
+
         if ($this->hasFile('license_file')) {
-            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
+            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'centerLicense');
             $data['license_file'] =  asset('storage/' . $path);;
         }
         $data = collect($data);
@@ -209,6 +215,15 @@ class StoreRehabilitationCenterRequest extends FormRequest
         $data['consultant_type'] = 'rehabilitation_center' ;
         $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
         $data['type'] = 'online' ;
+        $customer = Customer::find($data['customer_id']) ;
+        if($customer)
+        {
+            $localTimezone = $customer->timezone ?? config('app.timezone');
+            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+            $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+            $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+        }
         $dataSchedule = $data->only([ 'type','consultant_id' , 'consultant_type' , 'day_of_week' , 'start_time_morning' ,'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time']);
 
         return ['customer'=>$dataCustomer , 'location' => $dataLocation ,'schedule'=>$dataSchedule, 'center' => $dataRehabilitation_centers ];

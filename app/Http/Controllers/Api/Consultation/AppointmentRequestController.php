@@ -37,7 +37,8 @@ class AppointmentRequestController extends Controller
     public function checkAvailableSlots(ChackAvailableSlotsRequest $request)
     {
         try{
-             $freeSlots = $this->consultantAvailabilityService->checkAvailableSlots(
+              $freeSlots = $this->consultantAvailabilityService->checkAvailableSlots(
+                $request->patient_id ,
                 $request->consultant_id,
                 $request->consultant_type,
                 $request->day ,
@@ -47,7 +48,7 @@ class AppointmentRequestController extends Controller
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['day' =>$request->day ,'available_slots' => $freeSlots], 202,);
 
         }catch (ModelNotFoundException $e) {
-            return $this->errorResponse(
+             return $this->errorResponse(
                 __('messages.ERROR_OCCURRED'),
                 ['error' => 'لا يوجد مواعيد متاحة لهذا المختص في اليوم المحدد.'],
                 404

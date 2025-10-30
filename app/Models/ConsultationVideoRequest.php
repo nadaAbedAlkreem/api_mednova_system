@@ -24,9 +24,14 @@ class ConsultationVideoRequest extends Model
       'last_reminder_sent_at',
       'last_reminder_level' ,
       'expires_at' ,
+      'created_at',
+      'updated_at',
     ];
     protected $dates = ['deleted_at'];
-
+//    protected $casts = [
+//        'created_at' => 'datetime',
+//        'updated_at' => 'datetime',
+//    ];
     protected static function boot()
     {
         parent::boot();

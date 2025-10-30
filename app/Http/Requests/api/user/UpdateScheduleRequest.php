@@ -3,6 +3,7 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
+use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -125,7 +126,16 @@ class UpdateScheduleRequest extends FormRequest
             $data['end_time_evening'] = null ;
 
         }
-
+        $customer = auth()->user();
+        if ($customer) {
+           $localTimezone = $customer->timezone ?? config('app.timezone');
+            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+            if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 1) {
+                $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+                $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+            }
+        }
         return $data;
     }
 }

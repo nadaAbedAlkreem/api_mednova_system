@@ -52,6 +52,28 @@ class ConsultantService
             else {
                 throw new Exception('Invalid consultation type');
             }
+            $patientTimezone = $consultation->patient->timezone ?? config('app.timezone');
+            $consultation->appointmentRequest->requested_time = TimezoneService::toUserTimezone(
+                $consultation->appointmentRequest->requested_time,
+                $patientTimezone,
+                'Y-m-d H:i'
+            );
+            $consultation->appointmentRequest->confirmed_end_time = TimezoneService::toUserTimezone(
+                $consultation->appointmentRequest->confirmed_end_time,
+                $patientTimezone,
+                'Y-m-d H:i'
+            );
+            $consultation->created_at = TimezoneService::toUserTimezone(
+                $consultation->created_at,
+                $patientTimezone,
+                'Y-m-d H:i'
+            );
+
+            $consultation->updated_at = TimezoneService::toUserTimezone(
+                $consultation->updated_at,
+                $patientTimezone,
+                'Y-m-d H:i'
+            );
             $message = __('messages.new_consultation_notify', [
                 'name' => $consultation->patient->full_name
             ]);
@@ -91,8 +113,42 @@ class ConsultantService
             return $item;
         });
 
-        $videos = $videoQuery->get()->map(function ($item) {
+        $videos = $videoQuery->get()->map(function ($item)  use ($userId) {
             $item->consultation_type = 'video';
+            $userTimezone = null;
+            if ($item->consultant->id == $userId) {
+                $userTimezone = $item->consultant->timezone ?? config('app.timezone');
+            }
+            if ($item->patient->id == $userId) {
+
+                $userTimezone = $item->patient->timezone ?? config('app.timezone');
+            }
+
+            if ($userTimezone) {
+                $item->appointmentRequest->requested_time = TimezoneService::toUserTimezone(
+                    $item->appointmentRequest->requested_time,
+                    $userTimezone,
+                    'Y-m-d H:i'
+                );
+
+                $item->appointmentRequest->confirmed_end_time = TimezoneService::toUserTimezone(
+                    $item->appointmentRequest->confirmed_end_time,
+                    $userTimezone,
+                    'Y-m-d H:i'
+                );
+                $item->created_at = TimezoneService::toUserTimezone(
+                    $item->created_at,
+                    $userTimezone,
+                    'Y-m-d H:i'
+                );
+                $item->updated_at = TimezoneService::toUserTimezone(
+                    $item->updated_at,
+                    $userTimezone,
+                    'Y-m-d H:i'
+                );
+
+            }
+
             return $item;
         });
 

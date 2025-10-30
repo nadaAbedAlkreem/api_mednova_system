@@ -3,8 +3,10 @@
 namespace App\Http\Resources\Api\Consultation;
 
 use App\Http\Resources\Api\Customer\CustomerResource;
+use App\Services\api\TimezoneService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 class ConsultationResource extends JsonResource
 {
@@ -27,16 +29,12 @@ class ConsultationResource extends JsonResource
             'video' => new ConsultationVideoRequestResource($this->resource),
             default => null,
         };
-        return [
+         return [
             'id' => $this->id,
             'type' => $type,
             'status' => $this->status,
-            'created_at' => $this->created_at
-                ? $this->created_at->locale('ar')->isoFormat('dddd، D MMMM YYYY HH:mm')
-                : null,
-            'updated_at' => $this->updated_at
-                ? $this->updated_at->locale('ar')->isoFormat('dddd، D MMMM YYYY HH:mm')
-                : null,
+            'created_at' =>$this->created_at->format('Y-m-d H:i'),
+            'updated_at' =>$this->updated_at->format('Y-m-d H:i'),
             'data' => $data,
         ];
 

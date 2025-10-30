@@ -246,7 +246,8 @@ return [
         'requested_day' => 'اليوم المراد حجزه' ,
         'requested_time' => 'الوقت المراد حجزه' ,
         'type_appointment' => 'نوع الحجز ',
-        'date' => 'تاريخ'
+        'date' => 'تاريخ' ,
+        'timezone' => 'المنطقة الزمنية' ,
 
 
 

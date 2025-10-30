@@ -23,12 +23,18 @@ class ConsultationChatRequest extends Model
         'started_at' ,
         'ended_at' ,
         'action_by' ,
-        'action_reason'
+        'action_reason',
+        'created_at',
+        'updated_at',
+
     ];
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
+
     protected $dates = ['deleted_at'];
 
 
