@@ -50,7 +50,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'day_of_week' => 'required|array',
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
 
-              'start_time_morning' => [
+            'start_time_morning' => [
                   'required',
                   'date_format:H:i',
                   function ($attribute, $value, $fail) {

@@ -15,7 +15,7 @@ class CustomerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return
+         return
             [
                 'id' => $this->id ,
                 'image' =>  ($this->image)  ,
@@ -32,8 +32,17 @@ class CustomerResource extends JsonResource
                 'medicalSpecialties' => MedicalSpecialtyResource::collection($this->whenLoaded('medicalSpecialties')),
                 'schedules' =>  ScheduleResource::collection($this->whenLoaded('schedules')),
                 'average_rating' => $this->average_rating ,
-                'total_reviews'=> $this->total_reviews
-
+                'total_reviews'=> $this->total_reviews   ,
+                'is_completed' => $this->isProfileCompleted(),
              ] ;
+    }
+    private function isProfileCompleted(): bool
+    {
+        return match ($this->type_account) {
+            'patient' => $this->relationLoaded('patient') && $this->patient !== null,
+            'therapist' => $this->relationLoaded('therapist') && $this->therapist !== null,
+            'rehabilitation_center' => $this->relationLoaded('rehabilitationCenter') && $this->rehabilitationCenter !== null,
+            default => false,
+        };
     }
 }
