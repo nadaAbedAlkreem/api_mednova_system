@@ -34,7 +34,13 @@ class CustomerResource extends JsonResource
                 'average_rating' => $this->average_rating ,
                 'total_reviews'=> $this->total_reviews   ,
                 'is_completed' => $this->isProfileCompleted(),
-             ] ;
+                'status' => $this->status ,
+                'is_banned' => $this->is_banned ,
+                'timezone'=> $this->timezone ,
+
+
+
+            ] ;
     }
     private function isProfileCompleted(): bool
     {
