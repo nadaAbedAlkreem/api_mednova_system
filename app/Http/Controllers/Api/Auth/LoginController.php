@@ -26,10 +26,14 @@ class LoginController extends Controller
            try {
               $credentials = $request->only('email', 'password');
               $token = $this->authService->login($credentials);
+              $customer = Auth::guard('api')->user();
+              $customer->load(['location','patient','therapist' ,'therapist.specialty','rehabilitationCenter' ,'medicalSpecialties','schedules']);
+
+
               return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
                    [
                    'access_token' =>'Bearer ' . $token,
-                   'user' => new CustomerResource(Auth::guard('api')->user()),
+                   'user' => new CustomerResource($customer),
                ], 202,app()->getLocale());
           } catch (\Exception $e) {
               return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
