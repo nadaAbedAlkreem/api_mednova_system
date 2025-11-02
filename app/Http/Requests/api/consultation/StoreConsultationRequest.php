@@ -151,7 +151,7 @@ class StoreConsultationRequest extends FormRequest
              $data['confirmed_end_time'] = $confirmedEndTimeUtc;
 
         }
-        return $data;
+         return $data;
 
 
     }

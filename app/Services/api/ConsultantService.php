@@ -47,33 +47,33 @@ class ConsultantService
                 $data['appointment_request_id'] = $appointment->id;
                 $consultation = $this->videoRepo->create($data);
                 $consultation->load(['patient', 'consultant', 'appointmentRequest']);
+                $patientTimezone = $consultation->patient->timezone ?? config('app.timezone');
+                $consultation->appointmentRequest->requested_time = TimezoneService::toUserTimezone(
+                    $consultation->appointmentRequest->requested_time,
+                    $patientTimezone,
+                    'Y-m-d H:i'
+                );
+                $consultation->appointmentRequest->confirmed_end_time = TimezoneService::toUserTimezone(
+                    $consultation->appointmentRequest->confirmed_end_time,
+                    $patientTimezone,
+                    'Y-m-d H:i'
+                );
+                $consultation->created_at = TimezoneService::toUserTimezone(
+                    $consultation->created_at,
+                    $patientTimezone,
+                    'Y-m-d H:i'
+                );
 
+                $consultation->updated_at = TimezoneService::toUserTimezone(
+                    $consultation->updated_at,
+                    $patientTimezone,
+                    'Y-m-d H:i'
+                );
             }
             else {
                 throw new Exception('Invalid consultation type');
             }
-            $patientTimezone = $consultation->patient->timezone ?? config('app.timezone');
-            $consultation->appointmentRequest->requested_time = TimezoneService::toUserTimezone(
-                $consultation->appointmentRequest->requested_time,
-                $patientTimezone,
-                'Y-m-d H:i'
-            );
-            $consultation->appointmentRequest->confirmed_end_time = TimezoneService::toUserTimezone(
-                $consultation->appointmentRequest->confirmed_end_time,
-                $patientTimezone,
-                'Y-m-d H:i'
-            );
-            $consultation->created_at = TimezoneService::toUserTimezone(
-                $consultation->created_at,
-                $patientTimezone,
-                'Y-m-d H:i'
-            );
 
-            $consultation->updated_at = TimezoneService::toUserTimezone(
-                $consultation->updated_at,
-                $patientTimezone,
-                'Y-m-d H:i'
-            );
             $message = __('messages.new_consultation_notify', [
                 'name' => $consultation->patient->full_name
             ]);
