@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-Broadcast::routes(['middleware' => ['auth:api']]); // استخدم guard api
+Broadcast::routes(['middleware' => ['auth:api']]);
 
 Route::prefix('auth')->group(function ()
 {
