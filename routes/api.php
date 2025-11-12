@@ -31,7 +31,13 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-
+Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    Log::info('🔑 Broadcast auth request', [
+        'user' => $request,
+        'channel_name' => $request->channel_name,
+    ]);
+    return Broadcast::auth($request);
+});
 Route::prefix('auth')->group(function ()
 {
     Route::post('/register', [RegisterController::class, 'register']);
@@ -59,13 +65,7 @@ Route::prefix('auth')->group(function ()
         Route::prefix('device')->group(function () {
             Route::get('/', [DeviceController::class, 'get']);
         });
-Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
-    Log::info('🔑 Broadcast auth request', [
-        'user_' => $request,
-        'channel_name' => $request->channel_name,
-    ]);
-    return Broadcast::auth($request);
-});
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 
