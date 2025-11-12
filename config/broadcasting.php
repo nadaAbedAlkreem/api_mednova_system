@@ -13,7 +13,19 @@ return [
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
+                'encrypted' => true,
+                'host' => 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
+                'port' => 443,
+                'scheme' => 'https',
+                'curl_options' => [
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                ],
                 'useTLS' => true,
+                'auth_endpoint' => '/api/broadcasting/auth', // Or your custom auth endpoint
+                'auth_options' => [
+                    'guard' => 'sanctum',
+                ],
             ],
         ],
 

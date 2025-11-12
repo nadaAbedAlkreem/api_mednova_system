@@ -14,7 +14,8 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "pusher/pusher-php-server": "^7.2",
-        "yajra/laravel-datatables-oracle": "^12.4"
+        "yajra/laravel-datatables-oracle": "^12.4",
+        "ext-curl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

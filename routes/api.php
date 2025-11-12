@@ -27,11 +27,11 @@ use App\Http\Controllers\Api\Customer\PatientController;
 use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::prefix('auth')->group(function ()
 {
@@ -64,6 +64,58 @@ Route::prefix('auth')->group(function ()
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 
+
+    $channels = [
+        'consultant.{consultantId}' => function ($user, $consultantId) {
+            Log::info("Consultant ID: $consultantId");
+            Log::info("Current Consultant ID: $user->id");
+            return (int) $user->id === (int) $consultantId;
+        },
+        'patient.{patientId}' => function ($user, $patientId) {
+            return (int) $user->id === (int)$patientId;
+        },
+        'chat.between.{senderId}.{receiverId}' => function ($user, $senderId, $receiverId) {
+            return in_array($user->id, [(int)$senderId, (int)$receiverId]);
+        },
+        'glove-data.customer.{customerId}' => function ($user, $customerId) {
+            return (int) $user->id === (int)$customerId;
+        },
+    ];
+
+    Route::post('/broadcasting/auth', function (Request $request) use ($channels) {
+        $user = $request->user('sanctum');
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 403);
+        }
+
+        $channelName = $request->input('channel_name'); // مثال: "private-consultant.27"
+
+        // إزالة "private-" prefix لو موجود
+        $channelName = preg_replace('/^private-/', '', $channelName);
+
+        foreach ($channels as $pattern => $callback) {
+            // تحويل pattern الى regex ديناميكي
+            $regex = '/^' . str_replace(
+                    ['{consultantId}', '{patientId}', '{senderId}', '{receiverId}', '{customerId}'],
+                    '(\d+)',
+                    $pattern
+                ) . '$/';
+
+            if (preg_match($regex, $channelName, $matches)) {
+                array_shift($matches); // إزالة العنصر الأول الذي هو النص الكامل
+                $authorized = $callback($user, ...$matches);
+
+                if ($authorized) {
+                    return response()->json(['authenticated' => true]);
+                }
+
+                return response()->json(['message' => 'Unauthorized.'], 403);
+            }
+        }
+
+        return response()->json(['message' => 'Channel not found.'], 404);
+    });
 
     Route::prefix('patient')->group(function ()
     {
