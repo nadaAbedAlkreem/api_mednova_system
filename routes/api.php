@@ -65,7 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
         Log::info('🔑 Broadcast auth request', [
-            'user_' => auth('api')->user(),
+            'user_' => $request,
             'channel_name' => $request->channel_name,
         ]);
         return Broadcast::auth($request);
