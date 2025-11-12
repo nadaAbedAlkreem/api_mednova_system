@@ -38,7 +38,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
                 Log::info(' for nada', [
                     'requested' =>$this->consultation->consultant_id,
                 ]);
-                return new Channel('consultant.' . $this->consultation->consultant_id);
+                return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
             }
             if ($this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
                 Log::info(' for cancelled', [
