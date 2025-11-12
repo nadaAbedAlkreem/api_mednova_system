@@ -59,17 +59,17 @@ Route::prefix('auth')->group(function ()
         Route::prefix('device')->group(function () {
             Route::get('/', [DeviceController::class, 'get']);
         });
-
+Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    Log::info('🔑 Broadcast auth request', [
+        'user_' => $request,
+        'channel_name' => $request->channel_name,
+    ]);
+    return Broadcast::auth($request);
+});
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 
-    Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
-        Log::info('🔑 Broadcast auth request', [
-            'user_' => $request,
-            'channel_name' => $request->channel_name,
-        ]);
-        return Broadcast::auth($request);
-    });
+
     Route::prefix('patient')->group(function ()
     {
         Route::post('/store', [PatientController::class, 'store']);
