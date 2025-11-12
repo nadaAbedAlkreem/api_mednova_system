@@ -8,7 +8,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:3000',
-        'https://demoapplication.jawebhom.com',
+        'https://mednova-seven.vercel.app',
     ],
 
     'allowed_origins_patterns' => [],

@@ -3,7 +3,6 @@
 namespace App\Events;
 
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -35,7 +34,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
             $this->notification->update(['status' => 'sent']);
             $this->notification->save();
             if ($this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
-                return new Channel('consultant.' . $this->consultation->consultant_id);
+                return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
             }
             if ($this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
                 Log::info(' for cancelled', [

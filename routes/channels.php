@@ -27,3 +27,5 @@ Broadcast::channel('chat.between.{senderId}.{receiverId}', function ($user, $sen
 Broadcast::channel('glove-data.customer.{customerId}', function ($user, $customerId) {
     return (int) $user->id === (int) $customerId;
 });
+
+
