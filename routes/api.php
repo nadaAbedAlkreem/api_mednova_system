@@ -28,10 +28,16 @@ use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-Broadcast::routes(['middleware' => ['auth:sanctum']]);
-
+Route::post('/api/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    Log::info('🔑 Broadcast auth request', [
+        'user' => $request->user(),
+        'channel_name' => $request->channel_name,
+    ]);
+    return Broadcast::auth($request);
+});
 Route::prefix('auth')->group(function ()
 {
     Route::post('/register', [RegisterController::class, 'register']);
