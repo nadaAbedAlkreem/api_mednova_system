@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 */
 
 Broadcast::channel('consultant.{consultantId}', function ($user, $consultantId) {
+    Log::info("Consultant ID: $consultantId");
+    Log::info("Current Consultant ID:$user->id ");
     return (int) $user->id === (int) $consultantId;
 });
 
