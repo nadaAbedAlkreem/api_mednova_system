@@ -248,6 +248,8 @@ return [
         'type_appointment' => 'نوع الحجز ',
         'date' => 'تاريخ' ,
         'timezone' => 'المنطقة الزمنية' ,
+        'device_id'=> 'جهاز القفاز الذكي ',
+
 
 
 

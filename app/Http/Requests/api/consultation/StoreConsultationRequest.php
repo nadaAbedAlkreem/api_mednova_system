@@ -69,7 +69,6 @@ class StoreConsultationRequest extends FormRequest
                    ->exists();
 
                if ($exists) {
-
                    $validator->errors()->add('duplicate_request', __('messages.duplicate_request'));
                }
            }elseif($this['consultant_nature'] == 'video')

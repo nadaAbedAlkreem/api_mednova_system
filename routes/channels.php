@@ -18,11 +18,12 @@ Broadcast::channel('consultant.{consultantId}', function ($user, $consultantId) 
 Broadcast::channel('patient.{patientId}', function ($user, $patientId) {
     return (int) $user->id === (int) $patientId;
 });
-//Broadcast::channel('notify.for.{customerId}', function ($user, $customerId) {
-//    return in_array($user->id, [(int)$consultantId, (int)$patientId]);
-//});
+
 
 Broadcast::channel('chat.between.{senderId}.{receiverId}', function ($user, $senderId, $receiverId) {
     return in_array($user->id, [(int)$senderId, (int)$receiverId]);
 });
 
+Broadcast::channel('glove-data.customer.{customerId}', function ($user, $customerId) {
+    return (int) $user->id === (int) $customerId;
+});

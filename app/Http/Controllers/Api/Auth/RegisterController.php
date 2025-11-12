@@ -3,37 +3,66 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App;
-use App\Events\CustomerRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\auth\RegisterUserRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
+use App\Repositories\Eloquent\CustomerRepository;
 use App\Services\api\CustomerService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
 
-    use ResponseTrait ;
+     use ResponseTrait ;
      protected CustomerService $customerService ;
+     protected CustomerRepository $customerRepository;
 
-    public function __construct(CustomerService $customerService)
+    public function __construct(CustomerService $customerService , CustomerRepository $customerRepository)
     {
          $this->customerService = $customerService;
+         $this->customerRepository = $customerRepository;
     }
 
 
     public function register(RegisterUserRequest $request): JsonResponse
     {
         try {
+           DB::beginTransaction();
             $response = $this->customerService->register($request->getData());
-            if(!$response['customer'] instanceof App\Models\Customer){
+            $customer = $response['customer'] ;
+            if(!$customer instanceof App\Models\Customer){
                 throw new \Exception('User Registration Failed');
             }
-            return $this->successResponse('CREATE_USER_SUCCESSFULLY',
-               ['access_token' =>  $response['access_token'], 'user' => new CustomerResource($response['customer']),], 201, app()->getLocale());
+            $token = encrypt($customer->id);
+            $url = url("api/auth/verify-email?token={$token}");
+            Mail::to($response['customer'])->send(new App\Mail\VerificationEmailMail($customer,$url));
+            DB::commit();
+            return $this->successResponse('CREATE_USER_SUCCESSFULLY', ['access_token' =>  $response['access_token'], 'user' => new CustomerResource($response['customer']),], 201, app()->getLocale());
         } catch (\Exception $e) {
+            DB::rollBack();
              return $this->errorResponse('ERROR_OCCURRED', ['error' => $e->getMessage()], 500, app()->getLocale());
         }
      }
+
+
+    public function verifyEmail(Request $request): JsonResponse
+   {
+       try {
+           $token = $request->query('token');
+           $customerId = decrypt($token);
+           $customer = $this->customerRepository->findOrFail($customerId);
+           if($customer->email_verified_at != null){
+               throw new \Exception(__('messages.EMAIL_PRE_VERIFIED'));
+           }
+           $customer->email_verified_at = now();
+           $customer->save();
+           return $this->successResponse(__('messages.EMAIL_VERIFICATION_SUCCESSFUL'), [], 202, app()->getLocale());
+       }catch (\Exception $exception){
+           return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500, app()->getLocale());
+       }
+   }
 }

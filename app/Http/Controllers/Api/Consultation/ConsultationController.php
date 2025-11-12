@@ -37,8 +37,6 @@ class ConsultationController extends Controller
         try {
              $type = $request['consultant_nature'];
              $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
-
-
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

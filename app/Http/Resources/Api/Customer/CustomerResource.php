@@ -37,6 +37,7 @@ class CustomerResource extends JsonResource
                 'status' => $this->status ,
                 'is_banned' => $this->is_banned ,
                 'timezone'=> $this->timezone ,
+                'email_verified_at'=> $this->email_verified_at,
 
 
 

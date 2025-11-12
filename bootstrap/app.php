@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => \App\Http\Middleware\Authenticate::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
+        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

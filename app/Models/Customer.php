@@ -28,7 +28,8 @@ class Customer extends Authenticatable
         'is_banned' ,
         'type_account',
         'status',
-        'timezone'
+        'timezone',
+        'email_verified_at',
     ];
     protected static function boot()
     {
@@ -96,6 +97,9 @@ class Customer extends Authenticatable
             $customer->schedule()->each(function ($schedule) {
                 $schedule->delete();
             });
+            $customer->deviceRequests()->each(function ($deviceRequests) {
+                $deviceRequests->delete();
+            });
         });
     }
     public function senderMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -119,6 +123,10 @@ class Customer extends Authenticatable
     public function programs()
     {
         return $this->morphMany(Program::class, 'creator');
+    }
+    public function deviceRequests()
+    {
+        return $this->hasMany(DeviceRequest::class);
     }
     public function therapist(): \Illuminate\Database\Eloquent\Relations\HasOne
     {

@@ -40,10 +40,10 @@ class UpdatePatientRequest extends FormRequest
                 'mimes:jpeg,png,jpg,gif,svg,webp',
             ],
             'full_name' => 'string|max:255',
-            'email' => 'string|email|max:255',
+//            'email' => 'string|email|max:255',
 
-            'phone' => ['string', 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
-            'emergency_phone' => [  'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
+            'phone' => ['string',  'unique:customers,phone,' . $this->customer_id, 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
+            'emergency_phone' => [ 'unique:patients,emergency_phone,' . $this->id,'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
             'relationship' => [
                 'string',
                 'min:2',

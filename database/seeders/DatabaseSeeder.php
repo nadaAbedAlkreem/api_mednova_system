@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
     {
        $this->call([
 //                AdminSeeder::class,
-                MedicalSpecialtieSeeder::class,
+           MedicalSpecialtieSeeder::class,
+           DeviceSeeder::class,
          ]);
         // جلب التخصصات التي تم إنشاؤها
         $specialties = MedicalSpecialtie::all();
