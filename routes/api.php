@@ -32,8 +32,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    $user = auth('api')->user();
+
     Log::info('🔑 Broadcast auth request', [
-        'user' => $request,
+        'user_' => $request,
+        'user' => $user,
         'channel_name' => $request->channel_name,
     ]);
     return Broadcast::auth($request);
