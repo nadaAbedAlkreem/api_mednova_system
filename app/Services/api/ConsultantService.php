@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ConsultantService
 {
@@ -154,7 +155,7 @@ class ConsultantService
 
         // دمج الاثنين
         $allConsultations = $chats->concat($videos)
-            ->sortByDesc('id') // ترتيب حسب ID
+            ->sortByDesc('created_at') // ترتيب حسب ID
             ->values(); // إعادة ترتيب المفاتيح
 
         // تحويل Collection إلى LengthAwarePaginator

@@ -53,7 +53,9 @@ class GloveCommandController extends Controller
             DB::beginTransaction();
             $currentCustomer = auth('api')->user();
             if (!$currentCustomer) {throw new \Exception(__('messages.UNAUTHORISED'));}
+
             $responseData = $this->gloveCommandService->sendCommandToGlove($request->glove_command , $currentCustomer['id'] , $request['repeat']  ?? 1  , $request['rest_time'] ?? 60);
+
             DB::commit();
             return $this->successResponse('Command sent ', $responseData, 200);
         } catch (\Exception $exception) {
