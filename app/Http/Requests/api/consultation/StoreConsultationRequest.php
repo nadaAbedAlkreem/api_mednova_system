@@ -73,8 +73,7 @@ class StoreConsultationRequest extends FormRequest
                        ->where('consultant_id', $this->consultant_id)
                        ->whereIn('status', array_keys($statuses))
                        ->first();
-
-                   if (!$exists) {
+                   if ($exists) {
                        $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
                    }
                }elseif($this['consultant_nature'] == 'video')
@@ -86,7 +85,7 @@ class StoreConsultationRequest extends FormRequest
                         })
                         ->whereIn('status', array_keys($statuses))
                         ->first();
-                    if (!$exists) {
+                    if ($exists) {
 
                         $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
                     }
