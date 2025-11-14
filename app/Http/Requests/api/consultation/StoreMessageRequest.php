@@ -26,7 +26,7 @@ class StoreMessageRequest extends FormRequest
             }
             if ($chat->status != 'active' || $chat->status != 'accepted') {
                 $validator->errors()->add(
-                    'sender_id',
+                    'status',
                     __('messages.invalid_send')
                 );
                 return;
@@ -118,7 +118,6 @@ class StoreMessageRequest extends FormRequest
             $data['attachment'] =  asset('storage/' . $path);
         }
         $data['sender_id'] =  auth('api')->id();
-        $data['status'] = 'pending';
         return $data;
     }
 
