@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\StoreActiveChatting;
 use App\Http\Requests\api\consultation\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\Api\Consultation\MessageResource;
@@ -22,7 +21,7 @@ class MessageController extends Controller
     public function fetchMessages($chatRequestId, Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $user = auth()->user();
+            $user = auth('api')->user();
             $limit = $request->query('limit') ?? 20;
 
             if (!$user instanceof Customer) {
