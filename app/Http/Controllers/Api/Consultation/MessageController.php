@@ -15,6 +15,7 @@ use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
@@ -49,8 +50,8 @@ class MessageController extends Controller
             DB::beginTransaction();
               $message = Message::create($request->getData());
               $message->load(['sender','receiver' ,'chatRequest']);
-              $isPatient = (int)$request->sender_id === (int)$message->chatRequest->patient_id;
-                  $chat = $message->chatRequest;
+              $isPatient = (int)$message->sender_id === (int)$message->chatRequest->patient_id;
+              $chat = $message->chatRequest;
                   if ($isPatient)
                   {
                     $chat->patient_message_count++;

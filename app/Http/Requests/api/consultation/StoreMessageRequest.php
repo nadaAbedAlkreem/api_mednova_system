@@ -24,7 +24,13 @@ class StoreMessageRequest extends FormRequest
             if (!$chat) {
                 return;
             }
-
+            if ($chat->status != 'active' || $chat->status != 'accepted') {
+                $validator->errors()->add(
+                    'sender_id',
+                    __('messages.invalid_send')
+                );
+                return;
+            }
             $senderId = (int) auth('api')->id();
             $receiverId = (int) $this->receiver_id;
 
