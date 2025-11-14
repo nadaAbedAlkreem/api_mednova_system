@@ -2,23 +2,15 @@
 
 namespace App\Http\Controllers\Api\Consultation;
 
-use App\Events\ConsultationRequested;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\StoreConsultationChatRequestRequest;
-use App\Http\Requests\api\consultation\updateChattingRequest;
-use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
+use App\Http\Requests\api\consultation\UpdateChattingRequest;
 use App\Http\Requests\UpdateConsultationChatRequestRequest;
-use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
-use App\Http\Resources\Api\Consultation\ConsultationResource;
 use App\Models\ConsultationChatRequest;
-use App\Models\Customer;
 use App\Repositories\IConsultationChatRequestRepositories;
-use App\Repositories\IConsultationVideoRequestRepositories;
 use App\Services\api\ConsultantService;
 use App\Services\api\ConsultationStatusService;
 use App\Traits\ResponseTrait;
 use Exception;
-use Illuminate\Http\Request;
 
 class ConsultationChatRequestController extends Controller
 {
@@ -88,7 +80,7 @@ class ConsultationChatRequestController extends Controller
 //        }
 //    }
 
-    public function updateChatting(updateChattingRequest $request): \Illuminate\Http\JsonResponse
+    public function updateChatting(UpdateChattingRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
            $consultation = $this->consultationChatRequestRepositories->update($request->getData(), $request['chat_request_id']);

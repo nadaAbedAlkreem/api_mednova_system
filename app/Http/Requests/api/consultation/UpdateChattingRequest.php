@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\api\consultation;
 
-use App\Models\ConsultationChatRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
