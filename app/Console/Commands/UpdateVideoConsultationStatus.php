@@ -178,6 +178,8 @@ class UpdateVideoConsultationStatus extends Command
             "تم اكتمال جلسة الفيديو بين {$patientName} و {$consultantName}",
             'completed'
         ));
+        $consultation->delete();
+
     }
 
     private function bothParticipantsInteracted($consultation): bool

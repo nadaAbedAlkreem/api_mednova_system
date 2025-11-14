@@ -131,6 +131,7 @@ class UpdateChatConsultationStatus extends Command
             $message,
             'completed'
         ));
+        $consultation->delete();
 
     }
 

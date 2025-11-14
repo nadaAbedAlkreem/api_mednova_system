@@ -61,32 +61,37 @@ class StoreConsultationRequest extends FormRequest
             $patientTimezone = $patient->timezone ?? config('app.timezone');
             // تحويل وقت البدء إلى UTC
             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
+            $statuses = [
+                'pending'  => __('messages.consultation_pending'),
+                'accepted' => __('messages.consultation_accepted'),
+                'active'   => __('messages.consultation_active'),
+            ];
+
             if($this['consultant_nature'] == 'chat')
-           {
-               $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
-                   ->where('consultant_id', $this->consultant_id)
-                   ->where('status', 'pending')
-                   ->exists();
+               {
+                   $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
+                       ->where('consultant_id', $this->consultant_id)
+                       ->whereIn('status', array_keys($statuses))
+                       ->exists();
 
-               if ($exists) {
-                   $validator->errors()->add('duplicate_request', __('messages.duplicate_request'));
-               }
-           }elseif($this['consultant_nature'] == 'video')
-            {
-                $exists = ConsultationVideoRequest::where('patient_id', $this->patient_id)
-                    ->where('consultant_id', $this->consultant_id)
-                    ->whereHas('appointmentRequest',function($query) use ($requestedTimeUtc) {
-                        $query->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i'));
-                    })
-                    ->where(function($q) { $q->where('status', 'pending') ->orWhere('status', 'approved'); })
-                    ->exists();
+                   if ($exists) {
+                       $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
+                   }
+               }elseif($this['consultant_nature'] == 'video')
+                {
+                    $exists = ConsultationVideoRequest::where('patient_id', $this->patient_id)
+                        ->where('consultant_id', $this->consultant_id)
+                        ->whereHas('appointmentRequest',function($query) use ($requestedTimeUtc) {
+                            $query->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i'));
+                        })
+                        ->whereIn('status', array_keys($statuses))
+                        ->exists();
+                    if ($exists) {
 
-                if ($exists) {
+                        $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
+                    }
 
-                    $validator->errors()->add('duplicate_request', __('messages.duplicate_request'));
                 }
-
-            }
 
         });
     }
