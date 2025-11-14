@@ -27,19 +27,14 @@ class MessageController extends Controller
             if (!$user instanceof Customer) {
                 throw new \Exception('Get Current User Failed');
             }
-            if (!$chatRequestId instanceof ConsultationChatRequest ) {
-                throw new \Exception('Get Current User Failed');
+            $chat = ConsultationChatRequest::where(function ($q) use ($user) {$q->where('patient_id', $user->id)->orWhere('consultant_id', $user->id);})->findOrFail($chatRequestId);
+            if (!$chat instanceof ConsultationChatRequest ) {
+                throw new \Exception('Get chat consultation Request Failed');
             }
-            $chat = ConsultationChatRequest::where(function ($q) use ($user) {
-                $q->where('patient_id', $user->id)
-                    ->orWhere('consultant_id', $user->id);
-            })->findOrFail($chatRequestId);
-
             $messages = Message::where('chat_request_id', $chatRequestId)
                 ->with(['sender', 'receiver'])
                 ->orderBy('created_at', 'asc')
                 ->paginate($limit);
-
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), MessageResource::collection($messages), 200);
         }catch (Exception $exception)
         {
