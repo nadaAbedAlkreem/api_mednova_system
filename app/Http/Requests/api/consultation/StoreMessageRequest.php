@@ -24,8 +24,7 @@ class StoreMessageRequest extends FormRequest
             if (!$chat) {
                 return;
             }
-             dd($chat ) ;
-            if ($chat->status != 'active' || $chat->status != 'accepted') {
+            if ($chat->status !== 'active' && $chat->status !== 'accepted') {
                 $validator->errors()->add(
                     'status',
                     __('messages.invalid_send')
