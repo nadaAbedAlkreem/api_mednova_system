@@ -72,9 +72,9 @@ class StoreConsultationRequest extends FormRequest
                    $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
                        ->where('consultant_id', $this->consultant_id)
                        ->whereIn('status', array_keys($statuses))
-                       ->exists();
+                       ->first();
 
-                   if ($exists) {
+                   if (!$exists) {
                        $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
                    }
                }elseif($this['consultant_nature'] == 'video')
@@ -85,8 +85,8 @@ class StoreConsultationRequest extends FormRequest
                             $query->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i'));
                         })
                         ->whereIn('status', array_keys($statuses))
-                        ->exists();
-                    if ($exists) {
+                        ->first();
+                    if (!$exists) {
 
                         $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
                     }
