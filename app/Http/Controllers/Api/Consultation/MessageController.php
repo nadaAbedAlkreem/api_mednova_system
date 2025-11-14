@@ -14,6 +14,7 @@ use App\Models\Message;
 use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
@@ -45,11 +46,29 @@ class MessageController extends Controller
     public function sendMessage(StoreMessageRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
-             $message = Message::create($request->getData());
-             BroadcastMessageJob::dispatch($message);
-             $message->load(['sender','receiver']);
-              return $this->successResponse(__('messages.SEND'),new MessageResource($message), 200);
+            DB::beginTransaction();
+              $message = Message::create($request->getData());
+              $message->load(['sender','receiver' ,'chatRequest']);
+                $isPatient = $request->sender_id == $message->chatRequest->patient_id;
+                  $chat = $message->chatRequest;
+                  if ($isPatient)
+                  {
+                    $chat->patient_message_count++;
+                    if (!$chat->first_patient_message_at) {
+                        $chat->first_patient_message_at = now();
+                    }
+                  } else {
+                    $chat->consultant_message_count++;
+                    if (!$chat->first_consultant_message_at) {
+                        $chat->first_consultant_message_at = now();
+                    }
+                  }
+               $chat->save();
+            BroadcastMessageJob::dispatch($message);
+            DB::commit();
+            return $this->successResponse(__('messages.SEND'),new MessageResource($message), 200);
         }catch (Exception $exception){
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }

@@ -30,6 +30,8 @@ class UpdateChatConsultationStatus extends Command
             return ($consultation->patient_message_count + $consultation->consultant_message_count) <= 1;
         });
 
+
+
         $this->info('Consultation statuses and notifications processed successfully.');
     }
 

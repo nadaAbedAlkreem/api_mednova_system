@@ -98,10 +98,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         {
           Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
         });
-        Route::prefix('chat')->group(function ()
-        {
-            Route::post('update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
-        });
+//        Route::prefix('chat')->group(function ()
+//        {
+//            Route::post('update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+//        });
  //        Route::post('/update-status-chat-request', [ConsultationChatRequestController::class, 'updateStatusRequest']); // توحيد
 //        Route::post('/update-status-video-request', [ConsultationVideoRequestController::class, 'updateStatusRequest']);
 //
