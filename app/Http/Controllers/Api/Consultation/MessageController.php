@@ -49,7 +49,7 @@ class MessageController extends Controller
             DB::beginTransaction();
               $message = Message::create($request->getData());
               $message->load(['sender','receiver' ,'chatRequest']);
-                $isPatient = $request->sender_id == $message->chatRequest->patient_id;
+              $isPatient = (int)$request->sender_id === (int)$message->chatRequest->patient_id;
                   $chat = $message->chatRequest;
                   if ($isPatient)
                   {

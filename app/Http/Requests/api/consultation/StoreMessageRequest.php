@@ -15,6 +15,46 @@ class StoreMessageRequest extends FormRequest
         return true;
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+
+            $chat = \App\Models\ConsultationChatRequest::find($this->chat_request_id);
+
+            if (!$chat) {
+                return;
+            }
+
+            $senderId = (int) auth('api')->id();
+            $receiverId = (int) $this->receiver_id;
+
+            $patientId = (int) $chat->patient_id;
+            $consultantId = (int) $chat->consultant_id;
+            if (!in_array($senderId, [$patientId, $consultantId])) {
+                $validator->errors()->add(
+                    'sender_id',
+                    __('messages.invalid_sender')
+                );
+                return;
+            }
+
+            if ($senderId === $patientId && $receiverId !== $consultantId) {
+                $validator->errors()->add(
+                    'receiver_id',
+                    __('messages.invalid_receiver')
+                );
+            }
+
+            if ($senderId === $consultantId && $receiverId !== $patientId) {
+                $validator->errors()->add(
+                    'receiver_id',
+                    __('messages.invalid_receiver')
+                );
+            }
+        });
+    }
+
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -71,7 +111,7 @@ class StoreMessageRequest extends FormRequest
             $path = $uploadService->upload($this->file('attachment'), 'messages', 'public', 'messages');
             $data['attachment'] =  asset('storage/' . $path);
         }
-        $data['sender_id'] =  auth()->id();
+        $data['sender_id'] =  auth('api')->id();
         $data['status'] = 'pending';
         return $data;
     }
