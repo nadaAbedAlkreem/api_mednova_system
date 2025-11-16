@@ -38,33 +38,41 @@ class UpdateChatConsultationStatus extends Command
     /**
      * منطق معالجة نوع من الجلسات (مقبولة أو نشطة)
      */
-    private function processConsultations(string $status, string $timeField, Carbon $now, callable $shouldRemind)
+    private function processConsultations(string $status, string $timeField, Carbon $now, callable $shouldRemind): void
     {
-        $consultations = ConsultationChatRequest::where('status', $status)
+
+        ConsultationChatRequest::with(['patient:id,full_name', 'consultant:id,full_name'])
+            ->where('status', $status)
             ->whereNotNull($timeField)
             ->whereNull('ended_at')
-            ->get();
+            ->where('created_at', '<',  now()->subHours(6))
+            ->chunkById(100, function ($consultations) use ($now, $shouldRemind, $status, $timeField) {
+                foreach ($consultations as $consultation) {
+                     $timeValue = $consultation->$timeField;
+//                    if (!($timeValue instanceof Carbon)) {
+//                        $timeValue = Carbon::parse($timeValue);
+//                    }
+//                    $secondsSince = $timeValue->diffInSeconds($now);
+                    if ($timeValue) {
+                        $secondsSince = $now->getTimestamp() - $timeValue->getTimestamp();
+                    } else {
+                        continue;
+                    }
+                    $noMessages = $shouldRemind($consultation, $secondsSince);
 
-        foreach ($consultations as $consultation) {
-            $timeValue = $consultation->$timeField;
-            if (!($timeValue instanceof Carbon)) {
-                $timeValue = Carbon::parse($timeValue);
-            }
-
-            $secondsSince = $timeValue->diffInSeconds($now);
-            $noMessages = $shouldRemind($consultation, $secondsSince);
-
-            if ($noMessages) {
-                $this->handleReminders($consultation, $secondsSince, $status);
-            } else {
-                // لو كانت الجلسة active فقط، يتم إنهاؤها بعد مرور فترة طويلة
-                if ($status === 'active' && $secondsSince >= 70) {
-                    $this->completeConsultation($consultation);
+                    if ($noMessages) {
+                        $this->handleReminders($consultation, $secondsSince, $status);
+                    } else {
+                        // إذا كانت الجلسة نشطة يتم إنهاؤها بعد مدة معينة
+                        if ($status === 'active' && $secondsSince >= 70) { // يتم انهائها بعد مرور 24 ساعة
+                            $this->completeConsultation($consultation);
+                        }
+                    }
+                    if ($consultation->isDirty()) {
+                        $consultation->save();
+                    }
                 }
-            }
-
-            $consultation->save();
-        }
+            });
     }
 
     /**
@@ -79,7 +87,8 @@ class UpdateChatConsultationStatus extends Command
         ];
 
         foreach ($levels as $level => $limit) {
-            if ($secondsSince >= $limit && $consultation->last_reminder_level < $level) {
+//            if ($secondsSince >= $limit && $consultation->last_reminder_level < $level) {
+            if ($secondsSince >= $limit && $consultation->last_reminder_level === $level - 1){
                 if ($level === 3) {
                     $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
                 } else {

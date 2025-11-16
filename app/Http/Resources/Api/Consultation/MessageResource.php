@@ -24,7 +24,7 @@ class MessageResource extends JsonResource
                 'message' => $this->message,
                 'attachment' =>  $this->attachment,
                 'attachment_type' => $this->attachment_type,
-                'created_at' => $this->created_at->diffForHumans(),
+                'created_at' => $this->created_at->format('g:i A'), // مثال: 1:39 PM
                 'is_sender_current_user' => auth()->id() === $this->sender_id,
                 'is_receiver_current_user' => auth()->id() === $this->receiver_id,
                 'is_read' => $this->is_read,

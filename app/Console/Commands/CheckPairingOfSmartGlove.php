@@ -7,6 +7,7 @@ use App\Models\GloveData;
 use App\Models\GloveError;
 use App\Repositories\IGloveErrorRepositories;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CheckPairingOfSmartGlove extends Command
@@ -34,12 +35,17 @@ class CheckPairingOfSmartGlove extends Command
     public function handle()
     {
         $now = now();
-        $glovesData = GloveData::with('glove')->select('created_at','glove_id')->orderBy('created_at' ,'DESC')->get();
+        $glovesData = GloveData::with('glove')
+            ->whereHas('glove', fn($q) => $q->whereIn('status',['connected','active']))
+            ->select('glove_id', DB::raw('MAX(created_at) as created_at'))
+            ->groupBy('glove_id')
+            ->get();
+
 
         foreach ($glovesData as $gloveData) {
             $diff = $gloveData->created_at->diffInSeconds($now);
             Log::info("diff" . $diff);
-            if ($diff >= 2) {
+            if ($diff >= 5000) {
                 if($gloveData->glove){
                     $gloveData->glove->update(['status' =>'disconnected']);
                     Log::info("update" . 'disconnected');
@@ -58,20 +64,6 @@ class CheckPairingOfSmartGlove extends Command
 
             }
         }
-        $pendingCommands = GloveCommand::where('ack_status_device_response', 'pending')
-            ->where('sent_at', '<', now()->subSeconds(60))
-            ->get();
-
-        foreach ($pendingCommands as $command) {
-            $command->update(['ack_status_device_response' => 'failed' , 'ack_received_device_response_at' => $command->ack_status]);
-            $this->gloveErrorRepositories->storeGloveError(
-                'No response from glove after timeout',
-                $command->glove_id,
-                $command->id,
-                GloveError::COMMAND_TIMEOUT
-            );
-        }
-
 
 
     }

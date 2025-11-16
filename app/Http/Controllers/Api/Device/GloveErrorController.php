@@ -21,7 +21,10 @@ class GloveErrorController extends Controller
     public function receiveErrorReport(StoreGloveErrorRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $this->gloveErrorRepo->storeGloveError($request->error_message, $request->glove_id, $request->command_id ?? null, $request->error_type ?? GloveError::UNKNOWN);
+            logger()->info('Payload received tes ' );
+            $this->gloveErrorRepo->storeGloveError($request->error_message, $request->glove_id ?? null, $request->command_id ?? null, $request->error_type ?? GloveError::UNKNOWN);
+            logger()->info('Payload received tes ');
+
             return $this->successResponse('Store error glove successfully', [], 200);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

@@ -16,6 +16,7 @@ class GloveErrorRepository  extends BaseRepository implements IGloveErrorReposit
 
     public function storeGloveError(string $errorMessage, ?int $gloveId = null , ?int $commandId = null  ,?string $errorType = null): void
     {
+        logger()->info('Payload received create in store');
 
         switch ($errorType ?? GloveError::UNKNOWN) {
             case GloveError::PYTHON_UNREACHABLE:
@@ -31,6 +32,8 @@ class GloveErrorRepository  extends BaseRepository implements IGloveErrorReposit
                 $normalizedMessage = $errorMessage;
                 break;
         }
+        logger()->info('Payload received create in error type' . $errorType);
+
 
         $errorFlag = crc32($errorType . '_' . $normalizedMessage) % 255;
 //        $errorFlag = crc32($errorMessage) % 255;
@@ -56,6 +59,8 @@ class GloveErrorRepository  extends BaseRepository implements IGloveErrorReposit
         }
          $existingError = $query->first();
 
+        logger()->info('Payload received create in error exist' . $existingError);
+
         if ($existingError) {
             $existingError->increment('repeat_count');
             if($existingError->repeat_count  > 10 )
@@ -71,7 +76,8 @@ class GloveErrorRepository  extends BaseRepository implements IGloveErrorReposit
 
             }
         } else {
-            $this->model->create([
+
+             $this->model->create([
                 'glove_id'         => $gloveId,
                 'command_id'       => $commandId,
                 'error_flag'       => $errorFlag,
@@ -81,6 +87,7 @@ class GloveErrorRepository  extends BaseRepository implements IGloveErrorReposit
                 'first_occurrence' => now(),
                 'last_occurrence'  => now(),
             ]);
+
         }
     }
 }

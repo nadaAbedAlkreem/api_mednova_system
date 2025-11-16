@@ -114,6 +114,7 @@ class GloveCommandService
             'sent_at'          => now(),
         ]);
         $pythonApiUrl = 'http://127.0.0.1:5000/api/smart-glove-device/send-command';
+        $payload['command_id'] = $command->id ?? null;
 
         try {
             $response = $this->httpClient->post($pythonApiUrl, [

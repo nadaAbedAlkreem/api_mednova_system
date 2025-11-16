@@ -177,9 +177,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //Route::middleware(VerifyDeviceToken::class)->prefix('smart-glove-device-simulation')->group(function () {
 //    Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
 //});
-Route::prefix('smart-glove-device')->group(function () {
-     Route::post('feedback-error', [GloveErrorController::class, 'receiveErrorReport']);
-     Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
-     Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
-});
 
+Route::prefix('smart-glove-device')->group(function () {
+    Route::post('feedback-error', [GloveErrorController::class, 'receiveErrorReport']);
+    Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
+    Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
+});
