@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('table_consultation_chat_requests', function (Blueprint $table) {
+        Schema::table('consultation_chat_requests', function (Blueprint $table) {
             $table->index(['status']);
             $table->index(['ended_at']);
             $table->index(['created_at']);
