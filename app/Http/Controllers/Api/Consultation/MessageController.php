@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Consultation;
 
+use App\Events\MessageRead;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
@@ -96,13 +97,15 @@ class MessageController extends Controller
     public function markAsRead($senderId): \Illuminate\Http\JsonResponse
     {
         try{
-          if (!Customer::find($senderId)) {
+         $receiverId = auth()->id();
+            if (!Customer::find($senderId)) {
                 throw new \Exception('sender not found');
           }
-          Message::where('sender_id', $senderId)
-              ->where('receiver_id', auth()->id())
+         $updated = Message::where('sender_id', $senderId)
+              ->where('receiver_id', $receiverId)
               ->where('is_read', false)
               ->update(['is_read' => true]);
+         if($updated){ event(new MessageRead($senderId,  $receiverId));}
            return $this->successResponse(__('messages.UPDATE_SUCCESS'));
         }catch (Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()]);
