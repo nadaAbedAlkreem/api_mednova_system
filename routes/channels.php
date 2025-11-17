@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\Log;
 */
 
 Broadcast::channel('consultant.{consultantId}', function ($user, $consultantId) {
-    Log::info("Consultant ID: $consultantId");
-    Log::info("Current Consultant ID:$user->id ");
     return (int) $user->id === (int) $consultantId;
-
 }, ['guards' => ['sanctum']]);
 
 Broadcast::channel('patient.{patientId}', function ($user, $patientId) {
     return (int) $user->id === (int) $patientId;
 }, ['guards' => ['sanctum']]);
 
+Broadcast::channel('messages.{senderId}', function ($user, $senderId) {
+    return (int) $user->id === (int) $senderId;
+}, ['guards' => ['sanctum']]);
 
 Broadcast::channel('chat.between.{senderId}.{receiverId}', function ($user, $senderId, $receiverId) {
     return in_array($user->id, [(int)$senderId, (int)$receiverId]);

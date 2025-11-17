@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\ConsultationVideoApproval;
+use App\Events\MessageRead;
 use App\Listeners\SendConsultationVideoApprovalApiRequest;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\ConsultationRequested;
@@ -17,6 +18,8 @@ class EventServiceProvider extends ServiceProvider
         ConsultationVideoApproval::class => [
             SendConsultationVideoApprovalApiRequest::class,
         ],
+        MessageRead::class => [],
+
 
     ];
 
