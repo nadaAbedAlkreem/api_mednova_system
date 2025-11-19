@@ -24,7 +24,9 @@ Broadcast::channel('messages.{senderId}', function ($user, $senderId) {
 }, ['guards' => ['sanctum']]);
 
 Broadcast::channel('chat.between.{id1}.{id2}', function ($user, $id1, $id2) {
-     return in_array($user->id, [(int)$id1, (int)$id2]);
+    Log::info('test_channel'  .  in_array($user->id, [(int)$id1, (int)$id2]));
+
+    return in_array($user->id, [(int)$id1, (int)$id2]);
 }, ['guards' => ['sanctum']]);
 
 
