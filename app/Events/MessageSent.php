@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\Message;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -24,6 +23,6 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn()
     {
         $chatKey = min($this->message->sender_id, $this->message->receiver_id) . '.' . max($this->message->sender_id, $this->message->receiver_id);
-        return new Channel("chat.between.{$chatKey}");
+        return new PrivateChannel("chat.between.{$chatKey}");
     }
 }
