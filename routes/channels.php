@@ -23,9 +23,10 @@ Broadcast::channel('messages.{senderId}', function ($user, $senderId) {
     return (int) $user->id === (int) $senderId;
 }, ['guards' => ['sanctum']]);
 
-Broadcast::channel('chat.between.{senderId}.{receiverId}', function ($user, $senderId, $receiverId) {
-    return in_array($user->id, [(int)$senderId, (int)$receiverId]);
+Broadcast::channel('chat.between.{id1}.{id2}', function ($user, $id1, $id2) {
+    return in_array($user->id, [(int)$id1, (int)$id2]);
 }, ['guards' => ['sanctum']]);
+
 
 Broadcast::channel('glove-data.customer.{customerId}', function ($user, $customerId) {
     return (int) $user->id === (int) $customerId;
