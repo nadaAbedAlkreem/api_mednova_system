@@ -22,6 +22,14 @@ class ZoomWebhookController extends Controller
     public function handle(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            if ($request->has('payload') && $request->input('payload.plainToken')) {
+                // Construct the response for Zoom's validation
+                $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token')); // Replace with your actual secret token
+                return response()->json([
+                    'plainToken' => $request->input('payload.plainToken'),
+                    'encryptedToken' => $encryptedToken,
+                ]);
+            }
             $this->zoomWebhookService->handleEvent($request->all());
           return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [], 200);
         }catch (\Exception $exception){

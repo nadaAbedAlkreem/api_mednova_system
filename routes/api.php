@@ -189,10 +189,7 @@ Route::prefix('smart-glove-device')->group(function () {
 
 Route::prefix('zoom-webhook')->group(function ()
 {
-    Route::post('handle', function (\Illuminate\Http\Request $request) {
-        return response()->json([
-            "message" => "Webhook received"
-        ], 200);
-    });
+    Route::post('handle',[ZoomWebhookController::class, 'handle']);
+
 });
 
