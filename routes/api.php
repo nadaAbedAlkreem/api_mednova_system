@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Consultation\ConsultationController;
 use App\Http\Controllers\Api\Consultation\ConsultationVideoRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
+use App\Http\Controllers\Api\Consultation\ZoomWebhookController;
 use App\Http\Controllers\Api\Device\DeviceController;
 use App\Http\Controllers\Api\Device\DeviceRequestController;
 use App\Http\Controllers\Api\Device\GloveCommandController;
@@ -70,6 +71,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update', [PatientController::class, 'update']);
 
     });
+
 
     Route::prefix('therapist')->group(function ()
     {
@@ -156,6 +158,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [RehabilitationCenterController::class, 'store']);
         Route::post('/update', [RehabilitationCenterController::class, 'update']);
     });
+    Route::prefix('zoom-webhook')->group(function ()
+    {
+        Route::post('/handle', [ZoomWebhookController::class, 'handle']);
+    });
+
 
 
 

@@ -6,8 +6,10 @@ namespace App\Services\api;
 use App\Events\ConsultationRequested;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ZoomMeetingService
 {
@@ -15,10 +17,48 @@ class ZoomMeetingService
     protected string $zoomApiBase = 'https://api.zoom.us/v2';
     protected string $accessToken;
 
-    public function __construct(string $accessToken)
+//    public function __construct(string $accessToken)
+//    {
+//        $this->accessToken = $accessToken;
+//    }
+    /**
+     * الحصول على توكن زووم صالح
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function getAccessToken(): string
     {
-        $this->accessToken = $accessToken;
+        // نحاول أخذ التوكن من الكاش أولاً
+        $token = Cache::get('zoom_access_token');
+
+        if ($token) {
+            return $token;
+        }
+
+        // إذا لم يكن موجود أو انتهت صلاحيته، نولّد توكن جديد
+        $response = Http::withBasicAuth(
+            config('services.zoom.client_id'),
+            config('services.zoom.client_secret')
+        )->asForm()->post('https://zoom.us/oauth/token', [
+            'grant_type' => 'account_credentials',
+            'account_id' => config('services.zoom.account_id'),
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception("Failed to get Zoom access token: " . $response->body());
+        }
+
+        $data = $response->json();
+        $token = $data['access_token'];
+        $expiresIn = $data['expires_in'] - 60; // نقص دقيقة للأمان
+
+        // تخزين التوكن في Cache
+        Cache::put('zoom_access_token', $token, $expiresIn);
+
+        return $token;
     }
+
 
     /**
      * إنشاء رابط اجتماع زووم مُجدول بين مريض ومستشار
@@ -30,17 +70,14 @@ class ZoomMeetingService
      */
     public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
     {
-        // تحقق من أن التوكن موجود
-        if (empty($this->accessToken)) {
-            throw new \Exception("Zoom access token is missing.");
-        }
+        $accessToken = $this->getAccessToken();
+        Log::info('access token zoom: ' . $accessToken);
 
-        $hostUserId = config('services.zoom.host_email'); // البريد المرتبط بحساب Zoom المستضيف
+        $hostUserId = config('services.zoom.host_email');
         if (empty($hostUserId)) {
             throw new \Exception("Zoom host email is not configured.");
         }
 
-        // تحويل الوقت إلى ISO 8601 للتأكد من صلاحيته
         try {
             $startTimeIso = Carbon::parse($dateTime)->toIso8601String();
         } catch (\Exception $e) {
@@ -65,7 +102,7 @@ class ZoomMeetingService
         ];
 
         $response = Http::withHeaders([
-            'Authorization' => "Bearer {$this->accessToken}",
+            'Authorization' => "Bearer {$accessToken}",
             'Content-Type' => 'application/json',
         ])->post("{$this->zoomApiBase}/users/{$hostUserId}/meetings", $payload);
 
@@ -97,7 +134,7 @@ class ZoomMeetingService
 
 
 
-    /////////////////
+    ///////////////
     public function handleEvent(array $payload): void
     {
         $event = $payload['event'] ?? null;

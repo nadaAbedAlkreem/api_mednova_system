@@ -7,6 +7,7 @@ use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
+use function Symfony\Component\Translation\t;
 
 class StoreTherapistRequest extends FormRequest
 {
@@ -215,8 +216,13 @@ class StoreTherapistRequest extends FormRequest
             $localTimezone = $customer->timezone ?? config('app.timezone');
             $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
             $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
-            $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
-            $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+
+         if($data['is_have_evening_time'])
+         {
+             $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+             $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+         }
+
         }
 
          $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ]);

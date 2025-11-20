@@ -23,5 +23,6 @@ class SendConsultationVideoApprovalApiRequest
             'consultation_id' => $event->consultation->id,
             'start_time' => $event->dateTime,
             'duration' => $event->sessionDurationHours,
-        ]);    }
+        ]);
+    }
 }

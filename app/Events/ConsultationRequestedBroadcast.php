@@ -69,14 +69,16 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+        Log::info('cons video ' .$this->consultation );
         return [
-            'id' => $this->consultation->id,
-            'patient_id' => $this->consultation->patient_id,
-            'patient_name' => $this->consultation->patient->full_name,
-            'consultant_id' => $this->consultation->consultant_id,
+            'id'              => $this->consultation->id,
+            'patient_id'      => $this->consultation->patient_id,
+            'patient_name'    => $this->consultation->patient->full_name,
+            'consultant_id'   => $this->consultation->consultant_id,
             'consultant_name' => $this->consultation->consultant->full_name,
             'consultant_type' => $this->consultation->consultant_type,
-            'message' =>  $this->message,
+            'video_room_link' => $this->consultation instanceof \App\Models\ConsultationVideoRequest ? $this->consultation->video_room_link : null,
+            'message'         =>  $this->message,
         ];
     }
 }

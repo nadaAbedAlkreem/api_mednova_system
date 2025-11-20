@@ -24,8 +24,8 @@ class StoreRehabilitationCenterRequest extends FormRequest
      */
 
        public function rules(): array
-    {
-          return [
+      {
+           return [
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:rehabilitation_centers,customer_id',
             'gender' => 'required',
             'birth_date' => 'required',
@@ -221,8 +221,12 @@ class StoreRehabilitationCenterRequest extends FormRequest
             $localTimezone = $customer->timezone ?? config('app.timezone');
             $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
             $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
-            $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
-            $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+         if($data['is_have_evening_time'])
+         {
+             $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+             $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+         }
+
         }
         $dataSchedule = $data->only([ 'type','consultant_id' , 'consultant_type' , 'day_of_week' , 'start_time_morning' ,'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time']);
 

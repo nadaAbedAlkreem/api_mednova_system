@@ -5,16 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class ConsultationVideoRequest extends Model
 {
     /** @use HasFactory<\Database\Factories\ConsultationVideoRequestFactory> */
     use HasFactory, SoftDeletes;
-    protected $fillable = [
+    protected $fillable =
+    [
       'appointment_request_id',
       'patient_id' ,
       'consultant_id',
       'consultant_type',
+      'zoom_meeting_id',
       'status',
       'duration_minutes',
       'video_room_link',
@@ -27,6 +30,7 @@ class ConsultationVideoRequest extends Model
       'created_at',
       'updated_at',
     ];
+
     protected $dates = ['deleted_at'];
 //    protected $casts = [
 //        'created_at' => 'datetime',

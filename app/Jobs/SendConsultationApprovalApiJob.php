@@ -37,12 +37,14 @@ class SendConsultationApprovalApiJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $zoomService = new ZoomMeetingService(config('services.zoom.access_token'));
+        $zoomService = new ZoomMeetingService();
         try {
-            $meetingData = $zoomService->createMeetingLinkZoom($this->dateTime, $this->duration, $this->consultation,);
+            $meetingData = $zoomService->createMeetingLinkZoom($this->dateTime, $this->duration, $this->consultation);
+            Log::info('zoom '. json_encode($meetingData));
+            Log::info('consultation '. json_encode($this->consultation));
             $this->consultation->update(['video_room_link' => $meetingData['join_url'] , 'zoom_meeting_id' => $meetingData['meeting_id']]);
         } catch (\Exception $e) {
-            Log::error("Zoom Meeting creation failed: " . $e->getMessage());
+            Log::info("Zoom Meeting creation failed: " . $e->getMessage());
         }
     }
 }

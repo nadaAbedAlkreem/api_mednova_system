@@ -73,7 +73,6 @@ class ScheduleController extends Controller
     {
         try {
             $this->scheduleRepositories->update($request->getData() ,$request['schedule_id'] );
-
             return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 200);
 
         } catch (\Exception $e) {
