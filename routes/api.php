@@ -158,10 +158,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [RehabilitationCenterController::class, 'store']);
         Route::post('/update', [RehabilitationCenterController::class, 'update']);
     });
-    Route::prefix('zoom-webhook')->group(function ()
-    {
-        Route::post('/handle', [ZoomWebhookController::class, 'handle']);
-    });
 
 
 
@@ -190,3 +186,13 @@ Route::prefix('smart-glove-device')->group(function () {
     Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
     Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
 });
+
+Route::prefix('zoom-webhook')->group(function ()
+{
+    Route::post('/zoom-webhook/handle', function (\Illuminate\Http\Request $request) {
+        return response()->json([
+            "message" => "Webhook received"
+        ], 200);
+    });
+});
+
