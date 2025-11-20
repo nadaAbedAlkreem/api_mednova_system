@@ -8,6 +8,7 @@ use App\Services\api\ZoomMeetingService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ZoomWebhookController extends Controller
 {
@@ -21,10 +22,15 @@ class ZoomWebhookController extends Controller
 
     public function handle(Request $request): \Illuminate\Http\JsonResponse
     {
+        Log::info('ZoomWebhook handled' . $request);
         try {
             if ($request->has('payload') && $request->input('payload.plainToken')) {
+                Log::info('ZoomWebhook payload' . $request);
+
                 // Construct the response for Zoom's validation
                 $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token')); // Replace with your actual secret token
+                Log::info('ZoomWebhook encryptedToken' . $encryptedToken);
+
                 return response()->json([
                     'plainToken' => $request->input('payload.plainToken'),
                     'encryptedToken' => $encryptedToken,
