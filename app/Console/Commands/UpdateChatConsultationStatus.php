@@ -81,9 +81,9 @@ class UpdateChatConsultationStatus extends Command
     private function handleReminders($consultation, int $secondsSince, string $status)
     {
         $levels = [
-            1 => 12, // بعد 6 ساعة
-            2 => 20, // بعد 12 ساعة
-            3 => 50, // بعد 24 ساعة
+            1 => 60, // بعد 6 ساعة
+            2 => 120, // بعد 12 ساعة
+            3 => 260, // بعد 24 ساعة
         ];
 
         foreach ($levels as $level => $limit) {
