@@ -253,6 +253,7 @@ class ZoomMeetingService
             : ['id' => $consultation->patient_id, 'role' => 'patient'];
 
         $activity = $consultation->activities()->firstOrNew([
+            'consultation_video_request_id' => $consultation['id'],
             'invitee_id' => $user['id'],
             'role'       => $user['role'],
         ]);
