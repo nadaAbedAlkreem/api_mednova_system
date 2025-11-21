@@ -184,7 +184,7 @@ class ZoomMeetingService
 
     protected function handleParticipantJoined(array $payload): void
     {
-        Log::info('zoom consultation payload: ' . $payload['object']['id'] );
+        Log::info('zoom consultation payload: ' .  json_encode($payload)  );
 
         $consultation = ConsultationVideoRequest::with(['activities','consultant', 'patient'])
             ->where('zoom_meeting_id', $payload['object']['id'] ?? null)
