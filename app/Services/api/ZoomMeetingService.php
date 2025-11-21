@@ -196,8 +196,13 @@ class ZoomMeetingService
 
         if (!$consultation) return;
 
-        $participantEmail = $payload['payload']['object']['participant']['user_email'] ?? null;
-        if (!$participantEmail) return;
+        $participant = $payload['payload']['object']['participant'] ?? [];
+        $participantEmail = $participant['email'] ?? null;
+
+        if (!$participantEmail) {
+            Log::warning('Zoom participant email missing', $participant);
+            return;
+        }
 
         $user = ($consultation->consultant->email === $participantEmail)
             ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
