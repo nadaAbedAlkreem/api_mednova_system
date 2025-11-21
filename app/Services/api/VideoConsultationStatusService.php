@@ -25,7 +25,10 @@ class VideoConsultationStatusService
 
             $this->handlePendingReminders($consultation, $seconds );
 
-            if ($seconds >= 24 * 3600) {
+//            if ($seconds >= 24 * 3600) {
+//                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
+//            }
+            if ($seconds >= 300) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
             }
         }
@@ -35,7 +38,7 @@ class VideoConsultationStatusService
     {
         foreach (self::REMINDER_LEVELS as $level) {
             if ($seconds >= $level && $consultation->last_reminder_level < $level) {
-                $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$seconds} ثانية" , 'requested');
+                $this->sendReminder($consultation, "يوجد الاستشارة في حالة انتظار الموافقة منذ {$seconds}  يجب عليك توجه اما قبول او رفضها ثانية" , 'requested');
 
                 $consultation->update([
                     'last_reminder_level' => $level,

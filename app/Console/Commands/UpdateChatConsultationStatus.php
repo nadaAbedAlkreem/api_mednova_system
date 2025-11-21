@@ -92,7 +92,8 @@ class UpdateChatConsultationStatus extends Command
                 if ($level === 3) {
                     $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
                 } else {
-                    $this->sendReminder($consultation, $limit);
+                    $typeEvent = ($status == 'pending') ? 'requested' : 'reminder_for_all';
+                    $this->sendReminder($consultation, $limit , $typeEvent);
                 }
 
                 $consultation->last_reminder_level = $level;
@@ -144,7 +145,7 @@ class UpdateChatConsultationStatus extends Command
 
     }
 
-    private function sendReminder($consultation, int $hours)
+    private function sendReminder($consultation, int $hours , $eventType = 'reminder_for_all' )
     {
         $patientName = $consultation->patient->full_name ?? 'المريض';
         $consultantName = $consultation->consultant->full_name ?? 'المختص';
@@ -154,7 +155,7 @@ class UpdateChatConsultationStatus extends Command
         event(new \App\Events\ConsultationRequested(
             $consultation,
             $message,
-            'reminder_for_all'
+            $eventType
         ));
     }
 }
