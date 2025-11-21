@@ -184,44 +184,56 @@ class ZoomMeetingService
 
     protected function handleParticipantJoined(array $payload): void
     {
-        Log::info('zoom consultation payload: ' .  json_encode($payload)  );
+        try {
+            Log::info('zoom consultation payload: ' .  json_encode($payload)  );
 
-        $consultation = ConsultationVideoRequest::with(['activities','consultant', 'patient'])
-            ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
-            ->first();
+            $consultation = ConsultationVideoRequest::with(['activities','consultant', 'patient'])
+                ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
+                ->first();
 
-        Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
+            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
 
-        Log::info('zoom consultation: ' . $consultation);
+            Log::info('zoom consultation: ' . $consultation);
 
-        if (!$consultation) return;
+            if (!$consultation) return;
+            Log::info('zoom consultation:  exist');
 
-        $participant = $payload['payload']['object']['participant'] ?? [];
-        $participantEmail = $participant['email'] ?? null;
+            $participant = $payload['payload']['object']['participant'] ?? [];
+            $participantEmail = $participant['email'] ?? null;
 
-        if (!$participantEmail) {
-            Log::warning('Zoom participant email missing', $participant);
-            return;
+            if (!$participantEmail) {
+                Log::warning('Zoom participant email missing', $participant);
+                return;
+            }
+            Log::info('zoom consultation:  $participantEmail');
+
+
+            $user = ($consultation->consultant->email === $participantEmail)
+                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
+                : ['id' => $consultation->patient_id, 'role' => 'patient'];
+            Log::info('zoom consultation:  $user' . json_encode($user) );
+
+            $activity = $consultation->activities()->firstOrNew([
+                'consultation_video_request_id' => $consultation['id'],
+                'invitee_id' => $user['id'],
+                'role'       => $user['role'],
+            ]);
+            Log::info('zoom consultation:  $activity' . json_encode($activity) );
+
+
+            $participant = $payload['payload']['object']['participant'] ?? [];
+
+            $activity->joined_at  = $participant['join_time'] ?? now();
+            $activity->status     = 'joined';
+            $activity->ip_address = $participant['public_ip'] ?? null;
+            $activity->device     = $participant['user_name'] ?? null; // device غير موجود، فلازم تشيلها أو تستبدلها
+            $activity->joined_method = null; // غير موجود في Zoom
+            $activity->data_center   = null; // غير موجود
+            $activity->save();
+        }catch (\Exception $exception){
+            throw new \Exception("Zoom API request failed with status: " . $exception->getMessage());
         }
 
-        $user = ($consultation->consultant->email === $participantEmail)
-            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-            : ['id' => $consultation->patient_id, 'role' => 'patient'];
-
-        $activity = $consultation->activities()->firstOrNew([
-            'invitee_id' => $user['id'],
-            'role'       => $user['role'],
-        ]);
-
-        $participant = $payload['payload']['object']['participant'] ?? [];
-
-        $activity->joined_at  = $participant['join_time'] ?? now();
-        $activity->status     = 'joined';
-        $activity->ip_address = $participant['public_ip'] ?? null;
-        $activity->device     = $participant['user_name'] ?? null; // device غير موجود، فلازم تشيلها أو تستبدلها
-        $activity->joined_method = null; // غير موجود في Zoom
-        $activity->data_center   = null; // غير موجود
-        $activity->save();
 
     }
 
