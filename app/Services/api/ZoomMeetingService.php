@@ -138,14 +138,18 @@ class ZoomMeetingService
     public function handleEvent(array $payload): void
     {
         $event = $payload['event'] ?? null;
+        Log::info('event: ' . $event);
         if (!$event) return;
 
         switch ($event) {
             case 'meeting.started':
+                Log::info('started: ');
+
                 $this->handleMeetingStarted($payload);
                 break;
 
             case 'meeting.participant_joined':
+                Log::info('joined: ');
                 $this->handleParticipantJoined($payload);
                 break;
 
@@ -183,6 +187,8 @@ class ZoomMeetingService
         $consultation = ConsultationVideoRequest::with(['consultant', 'patient'])
             ->where('zoom_meeting_id', $payload['object']['id'] ?? null)
             ->first();
+
+        Log::info('zoom consultation: ' . $consultation);
 
         if (!$consultation) return;
 
