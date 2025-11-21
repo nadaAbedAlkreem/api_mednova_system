@@ -22,7 +22,7 @@ class ConsultationStatusService
                 if($type == 'video'){
                     $consultation->load('appointmentRequest');
                     if($consultation->appointmentRequest != null){
-                        event(new ConsultationVideoApproval($consultation->appointmentRequest->requested_time, $consultation->session_duration_hours ,$consultation));
+                        event(new ConsultationVideoApproval($consultation->appointmentRequest->requested_time, $consultation->appointmentRequest->confirmed_end_time ,$consultation));
                         $consultation->appointmentRequest->update(['status' => 'approved']);
                     }
                 }

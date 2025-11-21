@@ -72,8 +72,8 @@ class StoreMessageRequest extends FormRequest
             'chat_request_id' => 'required|exists:consultation_chat_requests,id,deleted_at,NULL',
             'receiver_id' => 'required|exists:customers,id,deleted_at,NULL',
             'sender_id' => '',
-            'message' => 'nullable|string',
-            'attachment' => 'nullable|mimes:pdf,jpg,jpeg,png,gif|max:5120',
+            'message' => 'nullable|string|required_without:attachment',
+            'attachment' => 'nullable|mimes:pdf,jpg,jpeg,png,gif|max:5120|required_without:message',
             'status' => '',
             ];
     }

@@ -68,7 +68,7 @@ class ZoomMeetingService
      * @return array                     بيانات الاجتماع (join_url, start_url, meeting_id, …)
      * @throws \Exception
      */
-    public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
+    public function createMeetingLinkZoom(\DateTime|string $dateTime,\DateTime|string $endTime  , ConsultationVideoRequest $consultation): array
     {
         $accessToken = $this->getAccessToken();
         Log::info('access token zoom: ' . $accessToken);
@@ -79,7 +79,13 @@ class ZoomMeetingService
         }
 
         try {
-            $startTimeIso = Carbon::parse($dateTime)->toIso8601String();
+            $start = Carbon::parse($dateTime);
+            $end   = Carbon::parse($endTime);
+            $duration = $start->diffInMinutes($end);
+            $startTimeIso = $start->toIso8601String();
+            $endTimeIso   = $end->toIso8601String();
+
+
         } catch (\Exception $e) {
             throw new \Exception("Invalid start time format: " . $e->getMessage());
         }
@@ -88,7 +94,7 @@ class ZoomMeetingService
             'topic' => 'Consultation Session',
             'type' => 2, // Scheduled meeting
             'start_time' => $startTimeIso,
-            'duration' => $duration,
+            'duration' => $duration ?? 30,
             'timezone' => 'UTC',
             'password' => null,
             'settings' => [
@@ -177,7 +183,7 @@ class ZoomMeetingService
 
         event(new ConsultationRequested(
             $consultation,
-            "تنبيه: جلسة الفيديو بدأت الآن بين {$patientName} و {$consultantName}",
+            "تنبيه: جلسة الفيديو بدأت الآن بين  تت{$patientName} و {$consultantName}",
             'reminder_for_all'
         ));
     }
