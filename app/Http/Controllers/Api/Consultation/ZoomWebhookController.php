@@ -28,10 +28,6 @@ class ZoomWebhookController extends Controller
                 Log::info('ZoomWebhook payload' . $request);
                 $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token_webhook')); // Replace with your actual secret token
                 Log::info('ZoomWebhook encryptedToken' . $encryptedToken);
-                return response()->json([
-                    'plainToken' => $request->input('payload.plainToken'),
-                    'encryptedToken' => $encryptedToken,
-                ]);
             }
             $this->zoomWebhookService->handleEvent($request->all());
           return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [], 200);
