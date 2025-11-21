@@ -208,13 +208,16 @@ class ZoomMeetingService
             'role'       => $user['role'],
         ]);
 
-        $activity->joined_at = now();
-        $activity->status = 'joined';
-        $activity->joined_method = $payload['payload']['object']['join_method'] ?? null;
-        $activity->ip_address = $payload['payload']['object']['ip_address'] ?? null;
-        $activity->device = $payload['payload']['object']['device'] ?? null;
-        $activity->data_center = $payload['payload']['object']['data_center'] ?? null;
+        $participant = $payload['payload']['object']['participant'] ?? [];
+
+        $activity->joined_at  = $participant['join_time'] ?? now();
+        $activity->status     = 'joined';
+        $activity->ip_address = $participant['public_ip'] ?? null;
+        $activity->device     = $participant['user_name'] ?? null; // device غير موجود، فلازم تشيلها أو تستبدلها
+        $activity->joined_method = null; // غير موجود في Zoom
+        $activity->data_center   = null; // غير موجود
         $activity->save();
+
     }
 
     protected function handleParticipantLeft(array $payload): void
