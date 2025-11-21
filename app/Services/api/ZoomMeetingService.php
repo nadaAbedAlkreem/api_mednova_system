@@ -187,16 +187,16 @@ class ZoomMeetingService
         Log::info('zoom consultation payload: ' .  json_encode($payload)  );
 
         $consultation = ConsultationVideoRequest::with(['activities','consultant', 'patient'])
-            ->where('zoom_meeting_id', $payload['object']['id'] ?? null)
+            ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
             ->first();
 
-        Log::info('zoom consultation payload: ' . $payload['object']['id'] . 'nada');
+        Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
 
         Log::info('zoom consultation: ' . $consultation);
 
         if (!$consultation) return;
 
-        $participantEmail = $payload['object']['participant']['user_email'] ?? null;
+        $participantEmail = $payload['payload']['object']['participant']['user_email'] ?? null;
         if (!$participantEmail) return;
 
         $user = ($consultation->consultant->email === $participantEmail)
@@ -210,22 +210,22 @@ class ZoomMeetingService
 
         $activity->joined_at = now();
         $activity->status = 'joined';
-        $activity->joined_method = $payload['object']['join_method'] ?? null;
-        $activity->ip_address = $payload['object']['ip_address'] ?? null;
-        $activity->device = $payload['object']['device'] ?? null;
-        $activity->data_center = $payload['object']['data_center'] ?? null;
+        $activity->joined_method = $payload['payload']['object']['join_method'] ?? null;
+        $activity->ip_address = $payload['payload']['object']['ip_address'] ?? null;
+        $activity->device = $payload['payload']['object']['device'] ?? null;
+        $activity->data_center = $payload['payload']['object']['data_center'] ?? null;
         $activity->save();
     }
 
     protected function handleParticipantLeft(array $payload): void
     {
         $consultation = ConsultationVideoRequest::with(['consultant', 'patient'])
-            ->where('zoom_meeting_id', $payload['object']['id'] ?? null)
+            ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
             ->first();
 
         if (!$consultation) return;
 
-        $participantEmail = $payload['object']['participant']['user_email'] ?? null;
+        $participantEmail = $payload['payload']['object']['participant']['user_email'] ?? null;
         if (!$participantEmail) return;
 
         $user = ($consultation->consultant->email === $participantEmail)
