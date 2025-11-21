@@ -35,7 +35,7 @@ class VideoConsultationStatusService
     {
         foreach (self::REMINDER_LEVELS as $level) {
             if ($seconds >= $level && $consultation->last_reminder_level < $level) {
-                $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$seconds} ثانية" , 'handlePendingReminders');
+                $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$seconds} ثانية" , 'requested');
 
                 $consultation->update([
                     'last_reminder_level' => $level,

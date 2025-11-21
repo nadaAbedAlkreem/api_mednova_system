@@ -34,7 +34,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
         try {
             $this->notification->update(['status' => 'sent']);
             $this->notification->save();
-            if ($this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient' || $this->eventType === 'reminded_for_consultation') {
+            if ($this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
                 Log::info(' for nada', [
                     'requested' =>$this->consultation->consultant_id,
                 ]);
