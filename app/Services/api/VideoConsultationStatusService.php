@@ -23,7 +23,7 @@ class VideoConsultationStatusService
         foreach ($consultations as $consultation) {
             $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
 
-            $this->handlePendingReminders($consultation, $seconds);
+            $this->handlePendingReminders($consultation, $seconds );
 
             if ($seconds >= 24 * 3600) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
@@ -31,14 +31,11 @@ class VideoConsultationStatusService
         }
     }
 
-    private function handlePendingReminders($consultation, int $seconds): void
+    private function handlePendingReminders($consultation, int $seconds ): void
     {
         foreach (self::REMINDER_LEVELS as $level) {
             if ($seconds >= $level && $consultation->last_reminder_level < $level) {
-                $this->sendReminder(
-                    $consultation,
-                    "الاستشارة في حالة انتظار منذ {$seconds} ثانية"
-                );
+                $this->sendReminder($consultation, "الاستشارة في حالة انتظار منذ {$seconds} ثانية" , 'handlePendingReminders');
 
                 $consultation->update([
                     'last_reminder_level' => $level,
@@ -165,14 +162,14 @@ class VideoConsultationStatusService
     }
 
 
-    public function sendReminder($consultation, string $message): void
+    public function sendReminder($consultation, string $message , $eventType ='reminder_for_all' ): void
     {
         Log::info('video zoom reminder', ['consultation_id' => $consultation->id]);
 
         event(new \App\Events\ConsultationRequested(
             $consultation,
             "تنبيه: {$message}",
-            'reminder_for_all'
+            $eventType
         ));
     }
 
