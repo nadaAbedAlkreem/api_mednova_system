@@ -87,7 +87,7 @@ class MessageController extends Controller
             $messengers = ConsultationChatRequest::with(['patient','consultant'])->withCount(['messages as unread_messages_count' => function($query) use ($customer) {
                 $query->where('is_read', false)
                     ->where('receiver_id', $customer->id);
-            }])->where($currentTypeCustomer , $customer->id)->where('status','accepted')->orderBy('created_at', 'desc')->paginate($limit);
+            }])->where($currentTypeCustomer , $customer->id)->whereIn('status',['accepted' ,'active'])->orderBy('created_at', 'desc')->paginate($limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), MessengersResource::collection($messengers), 200);
         }catch (Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

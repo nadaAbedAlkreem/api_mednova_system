@@ -183,7 +183,7 @@ class ZoomMeetingService
 
         event(new ConsultationRequested(
             $consultation,
-            "تنبيه: جلسة الفيديو بدأت الآن بين  تت{$patientName} و {$consultantName}",
+            "تنبيه: جلسة الفيديو بدأت الآن بين {$patientName} و {$consultantName}",
             'reminder_for_all'
         ));
     }
