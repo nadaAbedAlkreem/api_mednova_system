@@ -28,7 +28,7 @@ class ZoomWebhookController extends Controller
                 Log::info('ZoomWebhook payload' . $request);
 
                 // Construct the response for Zoom's validation
-                $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token')); // Replace with your actual secret token
+                $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token_webhook')); // Replace with your actual secret token
                 Log::info('ZoomWebhook encryptedToken' . $encryptedToken);
 
                 return response()->json([
