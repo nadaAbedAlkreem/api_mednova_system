@@ -245,15 +245,22 @@ class ZoomMeetingService
 
         if (!$consultation) return;
 
-        $participantEmail = $payload['payload']['object']['participant']['user_email'] ?? null;
-        if (!$participantEmail) return;
+        // Zoom sometimes sends "email" instead of "user_email"
+        $participantEmail = $payload['payload']['object']['participant']['email']
+            ?? $payload['payload']['object']['participant']['user_email']
+            ?? null;
+
+        if (!$participantEmail) {
+            Log::warning('Zoom participant email missing (left event)', $payload);
+            return;
+        }
 
         $user = ($consultation->consultant->email === $participantEmail)
             ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
             : ['id' => $consultation->patient_id, 'role' => 'patient'];
 
         $activity = $consultation->activities()->firstOrNew([
-            'consultation_video_request_id' => $consultation['id'],
+            'consultation_video_request_id' => $consultation->id,
             'invitee_id' => $user['id'],
             'role'       => $user['role'],
         ]);
@@ -265,5 +272,4 @@ class ZoomMeetingService
         $activity->status = 'left';
         $activity->save();
     }
-
 }
