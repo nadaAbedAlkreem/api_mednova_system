@@ -186,9 +186,11 @@ class ZoomMeetingService
     {
         Log::info('zoom consultation payload: ' . $payload['object']['id'] );
 
-        $consultation = ConsultationVideoRequest::with(['consultant', 'patient'])
+        $consultation = ConsultationVideoRequest::with(['activities','consultant', 'patient'])
             ->where('zoom_meeting_id', $payload['object']['id'] ?? null)
             ->first();
+
+        Log::info('zoom consultation payload: ' . $payload['object']['id'] . 'nada');
 
         Log::info('zoom consultation: ' . $consultation);
 

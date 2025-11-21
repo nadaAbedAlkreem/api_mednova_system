@@ -62,7 +62,7 @@ class ConsultationVideoRequest extends Model
     {
         return $this->belongsTo(AppointmentRequest::class, 'appointment_request_id');
     }
-    public function activities()
+    public function activities(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ConsultationVideoActivity::class, 'consultation_video_request_id');
     }
