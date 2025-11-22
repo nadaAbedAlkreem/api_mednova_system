@@ -106,6 +106,7 @@ class ConsultantService
 
         // تحميل العلاقات
         $chatQuery->with(['patient', 'consultant']);
+        $chatQuery->withCount(['unreadMessages']);
         $videoQuery->with(['patient', 'consultant', 'appointmentRequest']);
 
         // جلب البيانات

@@ -104,6 +104,9 @@ class ZoomMeetingService
                 'host_video' => false,
                 'participant_video' => false,
                 'mute_upon_entry' => true,
+                'authentication_option' => 'zoom_account', // أو 'sign_in_to_zoom'
+                'authentication_domains' => '', // إذا بدك تحدد دومين معين
+
             ],
         ];
 
@@ -150,7 +153,6 @@ class ZoomMeetingService
         switch ($event) {
             case 'meeting.started':
                 Log::info('started: ');
-
                 $this->handleMeetingStarted($payload);
                 break;
 
