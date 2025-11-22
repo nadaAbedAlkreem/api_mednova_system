@@ -36,7 +36,7 @@ class MessageController extends Controller
             }
             $messages = Message::where('chat_request_id', $chatRequestId)
                 ->with(['sender', 'receiver'])
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')
                 ->paginate($limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), MessageResource::collection($messages), 200);
         }catch (Exception $exception)
