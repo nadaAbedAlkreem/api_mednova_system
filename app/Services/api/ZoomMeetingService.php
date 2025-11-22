@@ -198,7 +198,7 @@ class ZoomMeetingService
 
             Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
 
-            Log::info('zoom consultation: ' . $consultation);
+            Log::info('zoom consultation nada: ' . $payload['payload']['object']['participant']);
 //
 //            if (!$consultation) return;
 //            Log::info('zoom consultation:  exist');
@@ -217,15 +217,15 @@ class ZoomMeetingService
 //                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
 //                : ['id' => $consultation->patient_id, 'role' => 'patient'];
 //            Log::info('zoom consultation:  $user' . json_encode($user) );
+            $participant = $payload['payload']['object']['participant'] ?? [];
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' =>$participant['participant_uuid'],
+                'invitee_id' =>$participant['user_id'],
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
 
-            $participant = $payload['payload']['object']['participant'] ?? [];
 
             $activity->joined_at  = $participant['join_time'] ?? now();
             $activity->status     = 'joined';
