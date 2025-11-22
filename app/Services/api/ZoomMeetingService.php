@@ -196,9 +196,9 @@ class ZoomMeetingService
                 ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
                 ->first();
 
-            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
+            Log::info('zoom consultation test: ' . $payload['payload']['object']['id'] . 'maha');
 
-            Log::info('zoom consultation nada: ' . $payload['payload']['object']);
+            Log::info('zoom consultation test: ' . $payload['payload']['object']);
 //
 //            if (!$consultation) return;
 //            Log::info('zoom consultation:  exist');
