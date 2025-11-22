@@ -218,6 +218,7 @@ class ZoomMeetingService
 //                : ['id' => $consultation->patient_id, 'role' => 'patient'];
 //            Log::info('zoom consultation:  $user' . json_encode($user) );
             $participant = $payload['payload']['object']['participant'] ?? [];
+            Log::info('zoom consultation:  $participant' . json_encode($participant) );
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
