@@ -220,17 +220,16 @@ class ZoomMeetingService
             Log::info('zoom consultation:  $participantEmail');
 
 
-            $user = ($consultation->consultant->email === $participantEmail)
-                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-                : ['id' => $consultation->patient_id, 'role' => 'patient'];
-            Log::info('zoom consultation:  $user' . json_encode($user) );
+//            $user = ($consultation->consultant->email === $participantEmail)
+//                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
+//                : ['id' => $consultation->patient_id, 'role' => 'patient'];
+//            Log::info('zoom consultation:  $user' . json_encode($user) );
             $participant = $payload['payload']['object']['participant'] ?? [];
             Log::info('zoom consultation:  $participant' . json_encode($participant) );
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' => $user['id'],
-                'role'  => $user['role'],
+                'invitee_id' => $participant['user_id'] ,
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
@@ -271,10 +270,11 @@ class ZoomMeetingService
 //        $user = ($consultation->consultant->email === $participantEmail)
 //            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
 //            : ['id' => $consultation->patient_id, 'role' => 'patient'];
-
+        $participant = $payload['payload']['object']['participant'] ?? [];
+        Log::info('zoom consultation:  $participant' . json_encode($participant) );
         $activity = $consultation->activities()->firstOrNew([
             'consultation_video_request_id' => $consultation->id,
-            'invitee_id' => $payload['payload']['object']['id'] ,
+            'invitee_id' => $participant['user_id'] ,
         ]);
 
         $activity->left_at = now();
