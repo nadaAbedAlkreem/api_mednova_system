@@ -16,7 +16,6 @@ class ConsultationVideoActivity extends Model
     protected $fillable = [
         'consultation_video_request_id',
         'invitee_id',
-        'role',
         'joined_at',
         'left_at',
         'duration_minutes',
@@ -41,8 +40,5 @@ class ConsultationVideoActivity extends Model
         return $this->belongsTo(ConsultationVideoRequest::class, 'consultation_video_request_id');
     }
 
-    public function invitee()
-    {
-        return $this->belongsTo(Customer::class, 'invitee_id');
-    }
+
 }

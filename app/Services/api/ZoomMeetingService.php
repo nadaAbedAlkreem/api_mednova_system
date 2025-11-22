@@ -196,33 +196,32 @@ class ZoomMeetingService
                 ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
                 ->first();
 
-            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
+//            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
+//
+//            Log::info('zoom consultation: ' . $consultation);
+//
+//            if (!$consultation) return;
+//            Log::info('zoom consultation:  exist');
+//
+//            $participant = $payload['payload']['object']['participant'] ?? [];
+//            $participantEmail = $participant['email'] ?? null;
+//
+//            if (!$participantEmail) {
+//                Log::warning('Zoom participant email missing', $participant);
+//                return;
+//            }
+//            Log::info('zoom consultation:  $participantEmail');
 
-            Log::info('zoom consultation: ' . $consultation);
 
-            if (!$consultation) return;
-            Log::info('zoom consultation:  exist');
-
-            $participant = $payload['payload']['object']['participant'] ?? [];
-            $participantEmail = $participant['email'] ?? null;
-
-            if (!$participantEmail) {
-                Log::warning('Zoom participant email missing', $participant);
-                return;
-            }
-            Log::info('zoom consultation:  $participantEmail');
-
-
-            $user = ($consultation->consultant->email === $participantEmail)
-                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-                : ['id' => $consultation->patient_id, 'role' => 'patient'];
-            Log::info('zoom consultation:  $user' . json_encode($user) );
+//            $user = ($consultation->consultant->email === $participantEmail)
+//                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
+//                : ['id' => $consultation->patient_id, 'role' => 'patient'];
+//            Log::info('zoom consultation:  $user' . json_encode($user) );
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' => $user['id'],
-                'role'       => $user['role'],
-            ]);
+                'invitee_id' => $payload['payload']['object']['id'],
+              ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
 
@@ -251,23 +250,22 @@ class ZoomMeetingService
         if (!$consultation) return;
 
         // Zoom sometimes sends "email" instead of "user_email"
-        $participantEmail = $payload['payload']['object']['participant']['email']
-            ?? $payload['payload']['object']['participant']['user_email']
-            ?? null;
-
-        if (!$participantEmail) {
-            Log::warning('Zoom participant email missing (left event)', $payload);
-            return;
-        }
-
-        $user = ($consultation->consultant->email === $participantEmail)
-            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-            : ['id' => $consultation->patient_id, 'role' => 'patient'];
+//        $participantEmail = $payload['payload']['object']['participant']['email']
+//            ?? $payload['payload']['object']['participant']['user_email']
+//            ?? null;
+//
+//        if (!$participantEmail) {
+//            Log::warning('Zoom participant email missing (left event)', $payload);
+//            return;
+//        }
+//
+//        $user = ($consultation->consultant->email === $participantEmail)
+//            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
+//            : ['id' => $consultation->patient_id, 'role' => 'patient'];
 
         $activity = $consultation->activities()->firstOrNew([
             'consultation_video_request_id' => $consultation->id,
-            'invitee_id' => $user['id'],
-            'role'       => $user['role'],
+            'invitee_id' => $payload['payload']['object']['id'] ,
         ]);
 
         $activity->left_at = now();
