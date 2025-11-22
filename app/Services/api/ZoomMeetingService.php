@@ -229,7 +229,7 @@ class ZoomMeetingService
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' =>$participant['user_id'],
+                'invitee_id' =>$participant['email'],
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
