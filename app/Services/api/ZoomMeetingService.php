@@ -198,13 +198,20 @@ class ZoomMeetingService
 
             Log::info('zoom consultation test: ' . $payload['payload']['object']['id'] . 'maha');
 
-            Log::info('zoom consultation test: ' . $payload['payload']['object']);
+            Log::info('participant: ' . json_encode(data_get($payload, 'payload.object.participant')));
 //
 //            if (!$consultation) return;
 //            Log::info('zoom consultation:  exist');
 //
-            $participant = $payload['payload']['object']['participant'] ?? [];
-//            $participantEmail = $participant['email'] ?? null;
+            $participant = data_get($payload, 'payload.object.participant');
+
+            if(!$participant){
+                Log::warning("Participant missing!");
+                return;
+            }
+
+            Log::info("Participant Data: " . json_encode($participant));
+            //            $participantEmail = $participant['email'] ?? null;
 //
 //            if (!$participantEmail) {
 //                Log::warning('Zoom participant email missing', $participant);
@@ -217,8 +224,8 @@ class ZoomMeetingService
 //                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
 //                : ['id' => $consultation->patient_id, 'role' => 'patient'];
 //            Log::info('zoom consultation:  $user' . json_encode($user) );
-            $participant = $payload['payload']['object']['participant'] ?? [];
-            Log::info('zoom consultation:  $participant' . json_encode($participant) );
+//            $participant = $payload['payload']['object']['participant'] ?? [];
+//            Log::info('zoom consultation:  $participant' . json_encode($participant) );
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
