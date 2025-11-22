@@ -211,25 +211,26 @@ class ZoomMeetingService
             }
 
             Log::info("Participant Data: " . json_encode($participant));
-            //            $participantEmail = $participant['email'] ?? null;
-//
-//            if (!$participantEmail) {
-//                Log::warning('Zoom participant email missing', $participant);
-//                return;
-//            }
-//            Log::info('zoom consultation:  $participantEmail');
+                        $participantEmail = $participant['email'] ?? null;
+
+            if (!$participantEmail) {
+                Log::warning('Zoom participant email missing', $participant);
+                return;
+            }
+            Log::info('zoom consultation:  $participantEmail');
 
 
-//            $user = ($consultation->consultant->email === $participantEmail)
-//                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-//                : ['id' => $consultation->patient_id, 'role' => 'patient'];
-//            Log::info('zoom consultation:  $user' . json_encode($user) );
-//            $participant = $payload['payload']['object']['participant'] ?? [];
-//            Log::info('zoom consultation:  $participant' . json_encode($participant) );
+            $user = ($consultation->consultant->email === $participantEmail)
+                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
+                : ['id' => $consultation->patient_id, 'role' => 'patient'];
+            Log::info('zoom consultation:  $user' . json_encode($user) );
+            $participant = $payload['payload']['object']['participant'] ?? [];
+            Log::info('zoom consultation:  $participant' . json_encode($participant) );
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' =>$participant['email'],
+                'invitee_id' => $user['id'],
+                'role'  => $user['role'],
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
