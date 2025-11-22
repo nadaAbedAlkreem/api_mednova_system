@@ -196,14 +196,14 @@ class ZoomMeetingService
                 ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
                 ->first();
 
-//            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
-//
-//            Log::info('zoom consultation: ' . $consultation);
+            Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
+
+            Log::info('zoom consultation: ' . $consultation);
 //
 //            if (!$consultation) return;
 //            Log::info('zoom consultation:  exist');
 //
-//            $participant = $payload['payload']['object']['participant'] ?? [];
+            $participant = $payload['payload']['object']['participant'] ?? [];
 //            $participantEmail = $participant['email'] ?? null;
 //
 //            if (!$participantEmail) {
@@ -220,7 +220,7 @@ class ZoomMeetingService
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' => $payload['payload']['object']['id'],
+                'invitee_id' =>$participant['participant_uuid'],
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
