@@ -198,7 +198,7 @@ class ZoomMeetingService
 
             Log::info('zoom consultation payload: ' . $payload['payload']['object']['id'] . 'nada');
 
-            Log::info('zoom consultation nada: ' . $payload['payload']['object']['participant']);
+            Log::info('zoom consultation nada: ' . $payload['payload']['object']);
 //
 //            if (!$consultation) return;
 //            Log::info('zoom consultation:  exist');
