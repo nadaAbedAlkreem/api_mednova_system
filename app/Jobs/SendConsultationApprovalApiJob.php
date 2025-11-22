@@ -39,7 +39,7 @@ class SendConsultationApprovalApiJob implements ShouldQueue
     {
         $zoomService = new ZoomMeetingService();
         try {
-            $meetingData = $zoomService->createMeetingLinkZoom($this->dateTime, $this->duration, $this->consultation);
+            $meetingData = $zoomService->createMeetingLinkZoom($this->dateTime,$this->duration, $this->consultation);
             Log::info('zoom '. json_encode($meetingData));
             Log::info('consultation '. json_encode($this->consultation));
             $this->consultation->update(['video_room_link' => $meetingData['join_url'] , 'zoom_meeting_id' => $meetingData['meeting_id']]);

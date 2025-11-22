@@ -68,7 +68,7 @@ class ZoomMeetingService
      * @return array                     بيانات الاجتماع (join_url, start_url, meeting_id, …)
      * @throws \Exception
      */
-    public function createMeetingLinkZoom(\DateTime|string $dateTime,\DateTime|string $endTime  , ConsultationVideoRequest $consultation): array
+    public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
     {
         $accessToken = $this->getAccessToken();
         Log::info('access token zoom: ' . $accessToken);
@@ -80,10 +80,7 @@ class ZoomMeetingService
 
         try {
             $start = Carbon::parse($dateTime);
-            $end   = Carbon::parse($endTime);
-            $duration = $start->diffInMinutes($end);
             $startTimeIso = $start->toIso8601String();
-            $endTimeIso   = $end->toIso8601String();
 
 
         } catch (\Exception $e) {
