@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('consultation_video_activities', function (Blueprint $table) {
-            $table->dropForeign(['invitee_id']);
+            $table->dropForeign(['consultation_video_activities_invitee_id_foreign']);
             $table->dropColumn('role');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('consultation_video_activities', function (Blueprint $table) {
-            $table->foreign('invitee_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('consultation_video_activities_invitee_id_foreign')->references('id')->on('customers')->onDelete('cascade');
             $table->enum('role', ['patient', 'consultant']);
         });
     }
