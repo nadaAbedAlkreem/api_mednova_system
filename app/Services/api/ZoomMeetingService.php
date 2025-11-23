@@ -211,12 +211,7 @@ class ZoomMeetingService
             }
 
             Log::info("Participant Data: " . json_encode($participant));
-                        $participantEmail = $participant['email'] ?? null;
 
-            if (!$participantEmail) {
-                Log::warning('Zoom participant email missing', $participant);
-                return;
-            }
             Log::info('zoom consultation:  $participantEmail');
 
 
@@ -224,12 +219,12 @@ class ZoomMeetingService
 //                ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
 //                : ['id' => $consultation->patient_id, 'role' => 'patient'];
 //            Log::info('zoom consultation:  $user' . json_encode($user) );
-            $participant = $payload['payload']['object']['participant'] ?? [];
-            Log::info('zoom consultation:  $participant' . json_encode($participant) );
+            $participantUuid = $payload['payload']['object']['participant']['participant_uuid'] ?? [];
+            Log::info('zoom consultation:participantUuid' . json_encode($participantUuid));
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' => $participant['user_id'] ,
+                'invitee_id' => $participantUuid ,
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
@@ -254,9 +249,16 @@ class ZoomMeetingService
         $consultation = ConsultationVideoRequest::with(['consultant', 'patient'])
             ->where('zoom_meeting_id', $payload['payload']['object']['id'] ?? null)
             ->first();
+        Log::info('zoom consultation:left' . json_encode($consultation) );
 
         if (!$consultation) return;
-
+        $participant = data_get($payload, 'payload.object.participant');
+        if(!$participant){
+            Log::warning("Participant missing!");
+            return;
+        }
+        Log::info("Participant Data: " . json_encode($participant));
+        Log::info('zoom consultation:  $participantEmail');
         // Zoom sometimes sends "email" instead of "user_email"
 //        $participantEmail = $payload['payload']['object']['participant']['email']
 //            ?? $payload['payload']['object']['participant']['user_email']
@@ -270,11 +272,11 @@ class ZoomMeetingService
 //        $user = ($consultation->consultant->email === $participantEmail)
 //            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
 //            : ['id' => $consultation->patient_id, 'role' => 'patient'];
-        $participant = $payload['payload']['object']['participant'] ?? [];
-        Log::info('zoom consultation:  $participant' . json_encode($participant) );
+        $participantUuid = $payload['payload']['object']['participant']['participant_uuid'] ?? [];
+        Log::info('zoom consultation:participantUuid' . json_encode($participantUuid) );
         $activity = $consultation->activities()->firstOrNew([
             'consultation_video_request_id' => $consultation->id,
-            'invitee_id' => $participant['user_id'] ,
+            'invitee_id' => $participantUuid,
         ]);
 
         $activity->left_at = now();
