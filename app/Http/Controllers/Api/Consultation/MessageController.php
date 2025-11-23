@@ -38,7 +38,7 @@ class MessageController extends Controller
                 ->with(['sender', 'receiver'])
                 ->orderBy('created_at', 'asc')
                 ->cursorPaginate($limit);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), MessageResource::collection($messages), 200);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [MessageResource::collection($messages),'next_cursor' => $messages->nextCursor()?->encode()] , 200);
         }catch (Exception $exception)
         {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
