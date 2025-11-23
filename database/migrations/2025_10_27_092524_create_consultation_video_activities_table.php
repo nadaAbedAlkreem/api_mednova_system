@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('consultation_video_activities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('consultation_video_request_id');
-            $table->foreignId('invitee_id')->constrained('customers')->onDelete('cascade');
-            $table->enum('role', ['patient','consultant']);
+            $table->string('participant_uuid')->index()->nullable();
             $table->timestamp('joined_at')->nullable();
             $table->timestamp('left_at')->nullable();
             $table->integer('duration_minutes')->default(0);

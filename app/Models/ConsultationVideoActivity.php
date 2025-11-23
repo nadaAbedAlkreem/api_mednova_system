@@ -15,7 +15,7 @@ class ConsultationVideoActivity extends Model
 
     protected $fillable = [
         'consultation_video_request_id',
-        'invitee_id',
+        'participant_uuid',
         'joined_at',
         'left_at',
         'duration_minutes',
