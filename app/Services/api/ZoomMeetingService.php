@@ -224,7 +224,7 @@ class ZoomMeetingService
 
             $activity = $consultation->activities()->firstOrNew([
                 'consultation_video_request_id' => $consultation['id'],
-                'invitee_id' => $participantUuid ,
+                'participant_uuid' => $participantUuid ,
               ]);
             Log::info('zoom consultation:  $activity' . json_encode($activity) );
 
@@ -276,8 +276,9 @@ class ZoomMeetingService
         Log::info('zoom consultation:participantUuid' . json_encode($participantUuid) );
         $activity = $consultation->activities()->firstOrNew([
             'consultation_video_request_id' => $consultation->id,
-            'invitee_id' => $participantUuid,
+            'participant_uuid' => $participantUuid,
         ]);
+        Log::info('zoom consultation:$activity' . json_encode($activity) );
 
         $activity->left_at = now();
         if ($activity->joined_at) {
