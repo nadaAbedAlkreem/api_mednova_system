@@ -4,9 +4,13 @@ namespace App\Services\api;
 
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\api\ZoomMeetingService;
+
 class VideoConsultationStatusService
 {
+    protected ZoomMeetingService $zoomMeetingService;
     private const REMINDER_LEVELS = [60, 120, 260];
 
     public function processPending(Carbon $now): void
@@ -87,11 +91,20 @@ class VideoConsultationStatusService
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
 
             if ($now->gte($endTime)) {
+                $this->endApiZoomPlatform($consultation);
                 $this->finalizeActiveSession($consultation);
                 continue;
             }
 
             $this->processActivityReminders($consultation, $now);
+        }
+    }
+    private function endApiZoomPlatform(ConsultationVideoRequest $consultation)
+    {
+        try {
+            $this->zoomMeetingService->endMeetingLinkZoom($consultation);
+        }catch (\Exception $exception){
+            Log::error($exception->getMessage());
         }
     }
 
@@ -153,10 +166,9 @@ class VideoConsultationStatusService
         foreach ($activities as $activity) {
 
             if (!$activity->joined_at) return false;
+             $left = $activity->left_at ?? now();
 
-            $left = $activity->left_at ?? now();
-
-            if (Carbon::parse($activity->joined_at)->diffInMinutes($left) < 5) {
+             if(Carbon::parse($activity->joined_at)->diffInMinutes($left) < 5) {
                 return false;
             }
         }

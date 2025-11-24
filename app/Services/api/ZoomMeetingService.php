@@ -138,7 +138,55 @@ class ZoomMeetingService
         ];
     }
 
+   public function endMeetingLinkZoom(ConsultationVideoRequest $consultation)
+   {
+       try {
+           $accessToken = $this->getAccessToken();
+           Log::info('access token zoom: ' . $accessToken);
+           $hostUserId = config('services.zoom.host_email');
+           if (empty($hostUserId)) {
+               throw new \Exception("Zoom host email is not configured.");
+           }
+           if(!$consultation->zoom_meeting_id)
+           {
+               throw new \Exception("miss meeting id.");
+           }
+           $payload = [
+               'meeting_id' => $consultation->zoom_meeting_id
+           ];
+           $response = Http::withHeaders([
+               'Authorization' => "Bearer {$accessToken}",
+               'Content-Type' => 'application/json',
+           ])->post("{$this->zoomApiBase}/users/{$hostUserId}/meetings/end", $payload);
 
+           // التحقق من الاستجابة
+           if ($response->failed()) {
+               $body = $response->body();
+               $status = $response->status();
+               throw new \Exception("Zoom API request failed with status $status: $body");
+           }
+
+           $data = $response->json();
+           foreach (['id', 'join_url', 'start_url', 'topic', 'start_time', 'duration'] as $field) {
+               if (!isset($data[$field])) {
+                   throw new \Exception("Zoom API response missing field: $field");
+               }
+           }
+
+           return [
+               'meeting_id' => $data['id'],
+               'join_url' => $data['join_url'],
+               'start_url' => $data['start_url'],
+               'topic' => $data['topic'],
+               'start_time' => $data['start_time'],
+               'duration' => $data['duration'],
+           ];
+       }catch (\Exception $exception){
+           throw new \Exception("Zoom API request failed with status: " . $exception->getMessage());
+       }
+
+
+   }
 
     ///////////////
     public function handleEvent(array $payload): void
@@ -212,7 +260,7 @@ class ZoomMeetingService
 
             Log::info("Participant Data: " . json_encode($participant));
 
-            Log::info('zoom consultation:  $participantEmail');
+            Log::info('zoom consultation:participantEmail');
 
 
 //            $user = ($consultation->consultant->email === $participantEmail)
@@ -226,7 +274,7 @@ class ZoomMeetingService
                 'consultation_video_request_id' => $consultation['id'],
                 'participant_uuid' => $participantUuid ,
               ]);
-            Log::info('zoom consultation:  $activity' . json_encode($activity) );
+            Log::info('zoom consultation:activity' . json_encode($activity) );
 
 
 
@@ -278,7 +326,7 @@ class ZoomMeetingService
             'consultation_video_request_id' => $consultation->id,
             'participant_uuid' => $participantUuid,
         ]);
-        Log::info('zoom consultation:$activity' . json_encode($activity) );
+        Log::info('zoom consultation:participantUuid' . json_encode($participantUuid) );
 
         $activity->left_at = now();
         if ($activity->joined_at) {

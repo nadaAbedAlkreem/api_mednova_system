@@ -7,6 +7,7 @@ use App\Http\Requests\api\consultation\StoreConsultationRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
 use App\Http\Resources\Api\Consultation\ConsultationResource;
+use App\Models\ConsultationVideoActivity;
 use App\Models\Customer;
 use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
@@ -15,6 +16,8 @@ use App\Services\api\ConsultationStatusService;
 use App\Services\api\TimezoneService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use function Laravel\Prompts\error;
 
 class ConsultationController extends Controller
 {
@@ -62,8 +65,7 @@ class ConsultationController extends Controller
     public function updateStatusRequest(UpdateConsultationStatusRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-             $consultantNature = $request->input('consultant_nature');
-
+            $consultantNature = $request->input('consultant_nature');
             $consultation = match($consultantNature) {
                 'chat' => $this->consultationChatRequestRepositories->updateAndReturn($request->getData(),$request['id']),
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(),$request['id']),
@@ -90,5 +92,25 @@ class ConsultationController extends Controller
             ], 500);
         }
     }
+
+//    public function start($token): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+//    {
+//        try{
+//            // Find the activity by internal_token
+//            $activity = ConsultationVideoActivity::with('consultationVideoRequest')->where('token', $token)->first();
+//            if (!$activity) {throw new \Exception('Invalid Token');}
+//            $consultation = $activity->consultationVideoRequest; // ensure relation exists
+//            if (!$consultation || !$consultation->zoom_meeting_id) {
+//                return response()->json(['message' => 'Meeting not available'], 400);
+//            }
+//            $videoLink = $activity->consultationVideoRequest->video_room_link ;
+//            if (!$videoLink)
+//            {throw new \Exception('Invalid Link');}
+//            return redirect()->away($videoLink);
+//
+//        } catch (\Exception $e) {
+//            Log::error('Registrant creation failed: ' . $e->getMessage(), ['activity_id' => $activity->id ?? null] );
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);        }
+//    }
 
 }

@@ -19,6 +19,7 @@ class ConsultationVideoActivity extends Model
         'joined_at',
         'left_at',
         'duration_minutes',
+//        'token' ,
 //        'last_reminder_sent_at',
 //        'last_reminder_level',
         'joined_method',
