@@ -216,11 +216,9 @@ class ZoomMeetingService
     {
         $meetingId = $payload['payload']['object']['id'] ?? null;
         if (!$meetingId) return;
-
         $consultation = ConsultationVideoRequest::with(['patient', 'consultant'])
             ->where('zoom_meeting_id', $meetingId)
             ->first();
-
         if (!$consultation) return;
 
         $consultation->update(['status' => 'active']);
@@ -252,6 +250,7 @@ class ZoomMeetingService
 //            Log::info('zoom consultation:  exist');
 //
             $participant = data_get($payload, 'payload.object.participant');
+            Log::info('zoom consultation $participant test 44 : ' . $participant['user_id']);
 
             if(!$participant){
                 Log::warning("Participant missing!");
