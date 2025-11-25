@@ -188,3 +188,4 @@ Route::prefix('zoom-webhook')->group(function ()
 
 });
 
+Route::get('test',[ZoomWebhookController::class, 'test']);

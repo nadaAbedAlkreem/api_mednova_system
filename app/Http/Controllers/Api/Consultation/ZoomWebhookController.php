@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ConsultationVideoRequest;
 use App\Services\api\ZoomMeetingService;
 use App\Traits\ResponseTrait;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -35,5 +36,34 @@ class ZoomWebhookController extends Controller
           return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
         }
+    }
+    public function test()
+    {
+
+        $apiKey = 'kL_CnudqTvKhu4V1PvIfEQ';
+        $apiSecret = 'zGnX01M8kjHJClBeVPk9goCKhjOuWk1w';
+
+        $payload = [
+            'iss' => $apiKey,
+            'exp' => time() + 60 // صلاحية 1 دقيقة
+        ];
+
+        $jwt = JWT::encode($payload, $apiSecret, 'HS256');
+        $userId = '16781312';
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://api.zoom.us/v2/users/{$userId}",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer {$jwt}",
+                "Content-Type: application/json"
+            ]
+        ]);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        $userData = json_decode($response, true);
+         return $userData;
     }
 }
