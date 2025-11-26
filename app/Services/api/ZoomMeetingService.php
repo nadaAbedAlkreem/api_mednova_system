@@ -110,7 +110,7 @@ class ZoomMeetingService
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$accessToken}",
             'Content-Type' => 'application/json',
-        ])->post("{$this->zoomApiBase}/v2/users/{$hostUserId}/meetings", $payload);
+        ])->post("{$this->zoomApiBase}/users/{$hostUserId}/meetings", $payload);
 
         // التحقق من الاستجابة
         if ($response->failed()) {
