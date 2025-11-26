@@ -74,16 +74,21 @@ class ZoomMeetingService
         Log::info('access token zoom: ' . $accessToken);
 
         $hostUserId = config('services.zoom.host_email');
+        Log::info('access token $hostUserId: ' . $hostUserId);
+
         if (empty($hostUserId)) {
+            Log::info('access token $hostUserId: empty');
             throw new \Exception("Zoom host email is not configured.");
         }
 
         try {
             $start = Carbon::parse($dateTime);
             $startTimeIso = $start->toIso8601String();
+            Log::info('access token $start:' . $startTimeIso);
 
 
         } catch (\Exception $e) {
+            Log::info('access token format:' .  $e->getMessage());
             throw new \Exception("Invalid start time format: " . $e->getMessage());
         }
 
@@ -106,7 +111,7 @@ class ZoomMeetingService
 
             ],
         ];
-        Log::info('access token $payload  888 : ' .json_encode($payload));
+        Log::info('access token $response  888 : ' .json_encode($payload));
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$accessToken}",
