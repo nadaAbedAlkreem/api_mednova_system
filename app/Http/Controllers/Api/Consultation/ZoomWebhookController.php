@@ -21,49 +21,55 @@ class ZoomWebhookController extends Controller
         $this->zoomWebhookService = $zoomWebhookService;
     }
 
-    public function handle(Request $request): \Illuminate\Http\JsonResponse
+//    public function handle(Request $request): \Illuminate\Http\JsonResponse
+//    {
+//        Log::info('ZoomWebhook handled' . $request);
+//        try {
+//            if ($request->has('payload') && $request->input('payload.plainToken')) {
+//                Log::info('ZoomWebhook payload' . $request);
+//                $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token_webhook')); // Replace with your actual secret token
+//                Log::info('ZoomWebhook encryptedToken' . $encryptedToken);
+//            }
+////            $this->zoomWebhookService->handleEvent($request->all());
+//          return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [], 200);
+//        }catch (\Exception $exception){
+//          return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//
+//        }
+//    }
+    public function handle(Request $request)
     {
-        Log::info('ZoomWebhook handled' . $request);
-        try {
-            if ($request->has('payload') && $request->input('payload.plainToken')) {
-                Log::info('ZoomWebhook payload' . $request);
-                $encryptedToken = hash_hmac('sha256', $request->input('payload.plainToken'), config('services.zoom.secret_token_webhook')); // Replace with your actual secret token
-                Log::info('ZoomWebhook encryptedToken' . $encryptedToken);
-            }
-//            $this->zoomWebhookService->handleEvent($request->all());
-          return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [], 200);
-        }catch (\Exception $exception){
-          return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+        Log::info('ZoomWebhook Request:', $request->all());
 
+        // URL Validation Step
+        if ($request->event === 'endpoint.url_validation') {
+
+            $plainToken = $request->input('payload.plainToken');
+
+            $encryptedToken = hash_hmac(
+                'sha256',
+                $plainToken,
+                config('services.zoom.secret_token_webhook')
+            );
+
+            Log::info('Returning Zoom Validation Response', [
+                'plainToken' => $plainToken,
+                'encryptedToken' => $encryptedToken
+            ]);
+
+            return response()->json([
+                "plainToken" => $plainToken,
+                "encryptedToken" => $encryptedToken
+            ], 200);
         }
+
+        // After validation: handle real events
+        ////            $this->zoomWebhookService->handleEvent($request->all());
+
+        Log::info('ZoomWebhook Event:', $request->all());
+
+        return response("OK", 200);
     }
-    public function test()
-    {
 
-        $apiKey = 'kL_CnudqTvKhu4V1PvIfEQ';
-        $apiSecret = 'zGnX01M8kjHJClBeVPk9goCKhjOuWk1w';
 
-        $payload = [
-            'iss' => $apiKey,
-            'exp' => time() + 60 // صلاحية 1 دقيقة
-        ];
-
-        $jwt = JWT::encode($payload, $apiSecret, 'HS256');
-        $userId = '16781312';
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => "https://api.zoom.us/v2/users/{$userId}",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                "Authorization: Bearer {$jwt}",
-                "Content-Type: application/json"
-            ]
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        $userData = json_decode($response, true);
-         return $userData;
-    }
 }
