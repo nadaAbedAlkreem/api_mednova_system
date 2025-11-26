@@ -184,7 +184,8 @@ Route::prefix('smart-glove-device')->group(function () {
 
 Route::prefix('zoom-webhook')->group(function ()
 {
-    Route::post('handle',[ZoomWebhookController::class, 'handle']);
+    Route::post('handle', [ZoomWebhookController::class, 'validateWebhook']);
+    Route::post('events', [ZoomWebhookController::class, 'handleEvents']);
 
 });
 
