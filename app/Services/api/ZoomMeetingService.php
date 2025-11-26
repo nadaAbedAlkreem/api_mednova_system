@@ -31,10 +31,12 @@ class ZoomMeetingService
     {
         // نحاول أخذ التوكن من الكاش أولاً
         $token = Cache::get('zoom_access_token');
+        Log::info('access token: ' . $token);
 
         if ($token) {
             return $token;
         }
+        Log::info('access token: ' . $token);
 
         // إذا لم يكن موجود أو انتهت صلاحيته، نولّد توكن جديد
         $response = Http::withBasicAuth(
@@ -44,6 +46,8 @@ class ZoomMeetingService
             'grant_type' => 'account_credentials',
             'account_id' => config('services.zoom.account_id'),
         ]);
+        Log::info('access $response: ' . $response);
+
 
         if ($response->failed()) {
             throw new \Exception("Failed to get Zoom access token: " . $response->body());
@@ -52,6 +56,7 @@ class ZoomMeetingService
         $data = $response->json();
         $token = $data['access_token'];
         $expiresIn = $data['expires_in'] - 60; // نقص دقيقة للأمان
+        Log::info('access $data: ' . $data);
 
         // تخزين التوكن في Cache
         Cache::put('zoom_access_token', $token, $expiresIn);
