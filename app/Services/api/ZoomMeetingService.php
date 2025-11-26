@@ -106,11 +106,13 @@ class ZoomMeetingService
 
             ],
         ];
+        Log::info('access token $payload  888 : ' .json_encode($payload));
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$accessToken}",
             'Content-Type' => 'application/json',
         ])->post("{$this->zoomApiBase}/users/{$hostUserId}/meetings", $payload);
+        Log::info('access token $response  888 : ' .json_encode($response));
 
         // التحقق من الاستجابة
         if ($response->failed()) {
