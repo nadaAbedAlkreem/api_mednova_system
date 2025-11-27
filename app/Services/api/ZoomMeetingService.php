@@ -31,12 +31,12 @@ class ZoomMeetingService
     {
         // نحاول أخذ التوكن من الكاش أولاً
         $token = Cache::get('zoom_access_token');
-        Log::info('access token: ' . $token);
+        Log::info('access token 111: ' . $token);
 
         if ($token) {
             return $token;
         }
-        Log::info('access token: ' . $token);
+        Log::info('access token 111: ' . $token);
 
         // إذا لم يكن موجود أو انتهت صلاحيته، نولّد توكن جديد
         $response = Http::withBasicAuth(
@@ -75,11 +75,13 @@ class ZoomMeetingService
      */
     public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
     {
+        $hostUserId = config('services.zoom.host_email');
+        Log::info('access token $hostUserId: ' . $hostUserId);
+
         $accessToken = $this->getAccessToken();
         Log::info('access token zoom: ' . $accessToken);
 
-        $hostUserId = config('services.zoom.host_email');
-        Log::info('access token $hostUserId: ' . $hostUserId);
+
 
         if (empty($hostUserId)) {
             Log::info('access token $hostUserId: empty');
