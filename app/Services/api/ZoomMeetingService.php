@@ -82,6 +82,7 @@ class ZoomMeetingService
             'Authorization' => "Bearer {$accessToken}",
             'Content-Type' => 'application/json',
         ])->post("{$this->zoomApiBase}report/meetings/85019488958/participants");
+        dd($response->json());
         return $response->json();
     }
     public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
