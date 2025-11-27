@@ -70,6 +70,12 @@ class ZoomWebhookController extends Controller
 
         return response("OK", 200);
     }
+     public function testZoomWebhook()
+     {
+         $test = $this->zoomWebhookService->getPa();
+         return $test;
 
+
+     }
 
 }

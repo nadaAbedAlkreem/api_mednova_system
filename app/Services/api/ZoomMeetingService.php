@@ -73,6 +73,17 @@ class ZoomMeetingService
      * @return array                     بيانات الاجتماع (join_url, start_url, meeting_id, …)
      * @throws \Exception
      */
+    public function getPa()
+    {
+        $accessToken = $this->getAccessToken();
+        Log::info('access token zoom: ' . $accessToken);
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$accessToken}",
+            'Content-Type' => 'application/json',
+        ])->post("{$this->zoomApiBase}report/meetings/85317860688/participants");
+        return $response->json();
+    }
     public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
     {
         $hostUserId = config('services.zoom.host_email');
