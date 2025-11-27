@@ -56,7 +56,7 @@ class ZoomMeetingService
         $data = $response->json();
         $token = $data['access_token'];
         $expiresIn = $data['expires_in'] - 60; // نقص دقيقة للأمان
-        Log::info('access $data: ' . $data);
+        Log::info('access $data: ' . json_encode($data));
 
         // تخزين التوكن في Cache
         Cache::put('zoom_access_token', $token, $expiresIn);
