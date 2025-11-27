@@ -46,7 +46,7 @@ class ZoomMeetingService
             'grant_type' => 'account_credentials',
             'account_id' => config('services.zoom.account_id'),
         ]);
-        Log::info('access $response: ' . $response);
+        Log::info('access $response: ' . json_encode($response));
 
 
         if ($response->failed()) {
@@ -89,8 +89,12 @@ class ZoomMeetingService
         }
 
         try {
+            Log::info('access token $start1: empty');
             $start = Carbon::parse($dateTime);
+            Log::info('access token $start: empty');
             $startTimeIso = $start->toIso8601String();
+            Log::info('access token $startTimeIso: empty');
+
             Log::info('access token $start:' . $startTimeIso);
 
 
