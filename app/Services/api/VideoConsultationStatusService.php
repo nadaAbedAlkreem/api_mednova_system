@@ -91,7 +91,7 @@ class VideoConsultationStatusService
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
 
             if ($now->gte($endTime)) {
-//                $this->endApiZoomPlatform($consultation);
+                $this->endApiZoomPlatform($consultation);
                 $this->finalizeActiveSession($consultation);
                 continue;
             }

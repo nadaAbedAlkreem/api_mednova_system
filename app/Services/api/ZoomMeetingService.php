@@ -73,19 +73,8 @@ class ZoomMeetingService
      * @return array                     بيانات الاجتماع (join_url, start_url, meeting_id, …)
      * @throws \Exception
      */
-    public function getPa()
-    {
-        $accessToken = $this->getAccessToken();
-        Log::info('access token zoom: ' . $accessToken);
 
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$accessToken}",
-            'Content-Type' => 'application/json',
-        ])->post("{$this->zoomApiBase}report/meetings/85019488958/participants");
-        dd($response->json());
-        return $response->json();
-    }
-    public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
+   public function createMeetingLinkZoom(\DateTime|string $dateTime, int $duration, ConsultationVideoRequest $consultation): array
     {
         $hostUserId = config('services.zoom.host_email');
         Log::info('access token $hostUserId: ' . $hostUserId);
@@ -168,7 +157,7 @@ class ZoomMeetingService
         ];
     }
 
-   public function endMeetingLinkZoom(ConsultationVideoRequest $consultation)
+   public function endMeetingLinkZoom(ConsultationVideoRequest $consultation): array
    {
        try {
            $accessToken = $this->getAccessToken();
@@ -197,20 +186,46 @@ class ZoomMeetingService
            }
 
            $data = $response->json();
-           foreach (['id', 'join_url', 'start_url', 'topic', 'start_time', 'duration'] as $field) {
-               if (!isset($data[$field])) {
-                   throw new \Exception("Zoom API response missing field: $field");
-               }
+           $meetingData = $response->json();
+
+           // 2️⃣ ننتظر قليلاً حتى يصبح التقرير جاهز
+           sleep(10); // من 10 إلى 30 ثانية حسب سرعة زووم
+
+           // 3️⃣ طلب تقرير المشاركين
+           $reportResponse = Http::withHeaders([
+               'Authorization' => "Bearer {$accessToken}",
+           ])->get("{$this->zoomApiBase}/report/meetings/{$consultation->zoom_meeting_id}/participants");
+
+           if ($reportResponse->failed()) {
+               throw new \Exception("Failed getting meeting report: " . $reportResponse->body());
            }
 
+           $participants = $reportResponse->json()['participants'] ?? [];
+
+           // 4️⃣ إعادة البيانات
            return [
-               'meeting_id' => $data['id'],
-               'join_url' => $data['join_url'],
-               'start_url' => $data['start_url'],
-               'topic' => $data['topic'],
-               'start_time' => $data['start_time'],
-               'duration' => $data['duration'],
+               'meeting' => [
+                   'meeting_id' => $meetingData['id'],
+                   'topic'      => $meetingData['topic'],
+                   'start_time' => $meetingData['start_time'],
+                   'duration'   => $meetingData['duration'],
+               ],
+               'participants_report' => $participants,
            ];
+//           foreach (['id', 'join_url', 'start_url', 'topic', 'start_time', 'duration'] as $field) {
+//               if (!isset($data[$field])) {
+//                   throw new \Exception("Zoom API response missing field: $field");
+//               }
+//           }
+//
+//           return [
+//               'meeting_id' => $data['id'],
+//               'join_url' => $data['join_url'],
+//               'start_url' => $data['start_url'],
+//               'topic' => $data['topic'],
+//               'start_time' => $data['start_time'],
+//               'duration' => $data['duration'],
+//           ];
        }catch (\Exception $exception){
            throw new \Exception("Zoom API request failed with status: " . $exception->getMessage());
        }
