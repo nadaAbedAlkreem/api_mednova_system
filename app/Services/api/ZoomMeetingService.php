@@ -199,7 +199,7 @@ class ZoomMeetingService
            // 3️⃣ طلب تقرير المشاركين
            $reportResponse = Http::withHeaders([
                'Authorization' => "Bearer {$accessToken}",
-           ])->get("{$this->zoomApiBase}/report/meetings/{$consultation->zoom_meeting_id}/participants");
+           ])->put("{$this->zoomApiBase}/report/meetings/{$consultation->zoom_meeting_id}/participants");
 
            if ($reportResponse->failed()) {
                throw new \Exception("Failed getting meeting report: " . $reportResponse->body());
