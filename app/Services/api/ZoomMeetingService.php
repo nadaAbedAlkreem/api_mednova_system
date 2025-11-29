@@ -168,6 +168,7 @@ class ZoomMeetingService
                throw new \Exception("Zoom host email is not configured.");
            }
            $zoomMeetingId = $consultation->zoom_meeting_id;
+           Log::info('access token $zoomMeetingId: empty'. $zoomMeetingId);
            if(!$zoomMeetingId)
            {
                throw new \Exception("miss meeting id.");
