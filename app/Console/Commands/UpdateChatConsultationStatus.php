@@ -121,7 +121,7 @@ class UpdateChatConsultationStatus extends Command
             $message,
             'cancelled_by_system'
         ));
-        $consultation->delete();
+//        $consultation->delete();
     }
 
     private function completeConsultation($consultation)
@@ -141,7 +141,7 @@ class UpdateChatConsultationStatus extends Command
             $message,
             'completed'
         ));
-        $consultation->delete();
+//        $consultation->delete();
 
     }
 

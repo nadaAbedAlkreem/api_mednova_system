@@ -4,9 +4,7 @@ namespace App\Services\api;
 
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Services\api\ZoomMeetingService;
 
 class VideoConsultationStatusService
 {
@@ -212,7 +210,7 @@ class VideoConsultationStatusService
         ));
 
         optional($consultation->appointmentRequest)->delete();
-        $consultation->delete();
+//        $consultation->delete();
     }
 
 
@@ -229,6 +227,6 @@ class VideoConsultationStatusService
             'completed'
         ));
 
-        $consultation->delete();
+//        $consultation->delete();
     }
 }

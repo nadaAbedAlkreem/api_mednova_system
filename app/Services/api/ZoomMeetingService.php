@@ -7,7 +7,6 @@ use App\Events\ConsultationRequested;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -81,8 +80,6 @@ class ZoomMeetingService
 
         $accessToken = $this->getAccessToken();
         Log::info('access token zoom: ' . $accessToken);
-
-
 
         if (empty($hostUserId)) {
             Log::info('access token $hostUserId: empty');
