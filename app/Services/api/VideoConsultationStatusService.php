@@ -13,6 +13,11 @@ class VideoConsultationStatusService
     protected ZoomMeetingService $zoomMeetingService;
     private const REMINDER_LEVELS = [60, 120, 260];
 
+    public function __construct(ZoomMeetingService $zoomMeetingService)
+    {
+        $this->zoomMeetingService = $zoomMeetingService;
+    }
+
     public function processPending(Carbon $now): void
     {
         $consultations = ConsultationVideoRequest::with(['patient', 'consultant'])
