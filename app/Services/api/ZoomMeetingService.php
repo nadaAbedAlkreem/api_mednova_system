@@ -170,17 +170,18 @@ class ZoomMeetingService
                Log::info('access token $hostUserId: empty');
                throw new \Exception("Zoom host email is not configured.");
            }
-           if(!$consultation->zoom_meeting_id)
+           $zoomMeetingId = $consultation->zoom_meeting_id;
+           if(!$zoomMeetingId)
            {
                throw new \Exception("miss meeting id.");
            }
            $payload = [
-               'meeting_id' => $consultation->zoom_meeting_id
+               "action" => "end"
            ];
            $response = Http::withHeaders([
                'Authorization' => "Bearer {$accessToken}",
                'Content-Type' => 'application/json',
-           ])->post("{$this->zoomApiBase}/users/{$hostUserId}/meetings/end", $payload);
+           ])->post("{$this->zoomApiBase}/meetings/{$zoomMeetingId}/status", $payload);
 
            // التحقق من الاستجابة
            if ($response->failed()) {
