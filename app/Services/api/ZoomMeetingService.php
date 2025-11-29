@@ -160,10 +160,14 @@ class ZoomMeetingService
    public function endMeetingLinkZoom(ConsultationVideoRequest $consultation): array
    {
        try {
-           $accessToken = $this->getAccessToken();
-           Log::info('access token zoom end%%: ' . $accessToken);
            $hostUserId = config('services.zoom.host_email');
+           Log::info('access token $hostUserId end-zoom-nada88: ' . $hostUserId);
+
+           $accessToken = $this->getAccessToken();
+           Log::info('access token zoom: ' . $accessToken);
+
            if (empty($hostUserId)) {
+               Log::info('access token $hostUserId: empty');
                throw new \Exception("Zoom host email is not configured.");
            }
            if(!$consultation->zoom_meeting_id)
