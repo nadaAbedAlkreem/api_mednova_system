@@ -161,7 +161,7 @@ class ZoomMeetingService
    {
        try {
            $accessToken = $this->getAccessToken();
-           Log::info('access token zoom: ' . $accessToken);
+           Log::info('access token zoom end%%: ' . $accessToken);
            $hostUserId = config('services.zoom.host_email');
            if (empty($hostUserId)) {
                throw new \Exception("Zoom host email is not configured.");
@@ -185,8 +185,10 @@ class ZoomMeetingService
                throw new \Exception("Zoom API request failed with status $status: $body");
            }
 
-           $data = $response->json();
+//           $data = $response->json();
            $meetingData = $response->json();
+           Log::info('meetingData end%%: ' . json_encode($meetingData));
+
 
            // 2️⃣ ننتظر قليلاً حتى يصبح التقرير جاهز
            sleep(10); // من 10 إلى 30 ثانية حسب سرعة زووم
@@ -201,6 +203,7 @@ class ZoomMeetingService
            }
 
            $participants = $reportResponse->json()['participants'] ?? [];
+           Log::info('participants end%%: ' . json_encode($participants));
 
            // 4️⃣ إعادة البيانات
            return [

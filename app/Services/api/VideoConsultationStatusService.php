@@ -96,6 +96,7 @@ class VideoConsultationStatusService
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
 
             if ($now->gte($endTime)) {
+                Log::info('end-api-zoom-platform go to end meeting end%% ' . json_encode($consultation));
                 $this->endApiZoomPlatform($consultation);
                 $this->finalizeActiveSession($consultation);
                 continue;
@@ -107,6 +108,7 @@ class VideoConsultationStatusService
     private function endApiZoomPlatform(ConsultationVideoRequest $consultation)
     {
         try {
+            Log::info('end-api-zoom-platform' . json_encode($consultation));
             $this->zoomMeetingService->endMeetingLinkZoom($consultation);
         }catch (\Exception $exception){
             Log::error($exception->getMessage());
