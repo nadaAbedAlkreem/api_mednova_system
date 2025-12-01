@@ -118,10 +118,14 @@ class VideoConsultationStatusService
         $consultations = ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant', 'activities'])
             ->where('status', 'active')
             ->get();
+        Log::info('processActive  : nada99 ' . json_encode($consultations));
 
         foreach ($consultations as $consultation) {
+            Log::info('processActive  : nada99 ' . json_encode($consultation));
 
-            if (!$consultation->appointmentRequest) continue;
+            if (!$consultation->appointmentRequest)
+            {Log::info('appointmentRequest  : nada99 ' . json_encode($consultation));
+            continue;}
 
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
 
@@ -151,13 +155,15 @@ class VideoConsultationStatusService
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
             $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
             $seconds = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-            Log::info('$timeBecameActive' . json_encode($timeBecameActive));
+            Log::info('$seconds' .$seconds);
+
+            Log::info('$timeBecameActive' . $timeBecameActive);
             foreach (self::REMINDER_LEVELS as $level) {
                 if ($seconds >= $level && $consultation->last_reminder_level < $level) {
                     $doctorName = $consultation->doctor->name ?? 'المستشار';
                     $patientName = $consultation->patient->name ?? 'المريض';
                     $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
-                    Log::info('$timeBecameActive -- $message' . json_encode($message));
+                    Log::info('$timeBecameActive -- $message' . $message);
 
                     $this->sendReminder($consultation, $message);
 
