@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\api\VideoConsultationStatusService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UpdateVideoConsultationStatus extends Command
 {
@@ -24,6 +25,7 @@ class UpdateVideoConsultationStatus extends Command
 
     public function handle(VideoConsultationStatusService $service)
     {
+        Log::info('7777: ');
         $now = Carbon::now();
         $service->processPending($now);
         $service->processAccepted($now);

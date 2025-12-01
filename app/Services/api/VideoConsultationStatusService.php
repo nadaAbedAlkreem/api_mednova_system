@@ -23,6 +23,7 @@ class VideoConsultationStatusService
         $consultations = ConsultationVideoRequest::with(['patient', 'consultant'])
             ->where('status', 'pending')
             ->get();
+        Log::info("consultations-pending: ." .$consultations);
 
         if ($consultations->isEmpty()) {
             Log::info("No pending consultations to process.");
@@ -148,28 +149,29 @@ class VideoConsultationStatusService
     private function processActivityReminders($consultation, Carbon $now): void
     {
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
-            {
-                $timeBecameActive = $now;
-                $timeNow = Carbon::now();
-                $diff = $timeBecameActive->gte($timeNow);
-                foreach (self::REMINDER_LEVELS as $level) {
-                    if ($diff >= $level && $consultation->last_reminder_level < $level) {
-                        $doctorName = $consultation->doctor->name ?? 'المستشار';
-                        $patientName = $consultation->patient->name ?? 'المريض';
-                        $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
-                        $this->sendReminder($consultation, $message);
+            $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
+            $seconds = Carbon::parse($timeBecameActive)->diffInSeconds($now);
+            Log::info('$timeBecameActive' . json_encode($timeBecameActive));
+            foreach (self::REMINDER_LEVELS as $level) {
+                if ($seconds >= $level && $consultation->last_reminder_level < $level) {
+                    $doctorName = $consultation->doctor->name ?? 'المستشار';
+                    $patientName = $consultation->patient->name ?? 'المريض';
+                    $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
+                    Log::info('$timeBecameActive -- $message' . json_encode($message));
 
-                        $consultation->update([
-                            'last_reminder_level' => $level,
-                            'last_reminder_sent_at' => now(),
-                        ]);
+                    $this->sendReminder($consultation, $message);
 
-                        break;
-                    }
+                    $consultation->update([
+                        'last_reminder_level' => $level,
+                        'last_reminder_sent_at' => now(),
+                    ]);
+
+                    break;
                 }
             }
         }
     }
+
 //        foreach ($consultation->activities as $activity)
 //        {
 //
