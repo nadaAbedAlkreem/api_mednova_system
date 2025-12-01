@@ -4,7 +4,9 @@ namespace App\Services\api;
 
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\api\ZoomMeetingService;
 
 class VideoConsultationStatusService
 {
@@ -94,7 +96,7 @@ class VideoConsultationStatusService
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
 
             if ($now->gte($endTime)) {
-                Log::info('end-api-zoom-platform go to end meeting end%% ' . json_encode($consultation));
+                Log::info('end-api-zoom-platform go to ' . json_encode($consultation));
                 $this->endApiZoomPlatform($consultation);
                 $this->finalizeActiveSession($consultation);
                 continue;
@@ -209,7 +211,7 @@ class VideoConsultationStatusService
             'cancelled_by_system'
         ));
 
-        optional($consultation->appointmentRequest)->delete();
+//        optional($consultation->appointmentRequest)->delete();
 //        $consultation->delete();
     }
 
