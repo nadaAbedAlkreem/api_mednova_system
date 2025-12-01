@@ -31,6 +31,14 @@ class VideoConsultationStatusService
 
         foreach ($consultations as $consultation) {
             $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
+            Log::info('pending-check', [
+                'consultation_id' => $consultation->id,
+                'status' => $consultation->status,
+                'created_at' => (string)$consultation->created_at,
+                'now' => (string)$now,
+                'seconds' => $seconds,
+                'last_reminder_level' => $consultation->last_reminder_level,
+            ]);
 
             $this->handlePendingReminders($consultation, $seconds );
 
@@ -46,6 +54,14 @@ class VideoConsultationStatusService
     private function handlePendingReminders($consultation, int $seconds ): void
     {
         foreach (self::REMINDER_LEVELS as $level) {
+            Log::info('pending-check', [
+                'consultation_id' => $consultation->id,
+                'status' => $consultation->status,
+                'created_at' => (string)$consultation->created_at,
+                'seconds' => $seconds,
+                'last_reminder_level' => $consultation->last_reminder_level,
+            ]);
+
             if ($seconds >= $level && $consultation->last_reminder_level < $level) {
                 $this->sendReminder($consultation, "يوجد الاستشارة في حالة انتظار الموافقة منذ {$seconds}  يجب عليك توجه اما قبول او رفضها ثانية" , 'requested');
 
@@ -53,9 +69,22 @@ class VideoConsultationStatusService
                     'last_reminder_level' => $level,
                     'last_reminder_sent_at' => now(),
                 ]);
-
+                Log::info('pending-check', [
+                    'consultation_id' => $consultation->id,
+                    'status' => $consultation->status,
+                    'created_at' => (string)$consultation->created_at,
+                    'seconds' => $seconds,
+                    'last_reminder_level' => $consultation->last_reminder_level,
+                ]);
                 break;
             }
+            Log::info('pending-check', [
+                'consultation_id' => $consultation->id,
+                'status' => $consultation->status,
+                'created_at' => (string)$consultation->created_at,
+                'seconds' => $seconds,
+                'last_reminder_level' => $consultation->last_reminder_level,
+            ]);
         }
     }
 
