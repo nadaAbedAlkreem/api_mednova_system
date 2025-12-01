@@ -118,40 +118,64 @@ class VideoConsultationStatusService
 
     private function processActivityReminders($consultation, Carbon $now): void
     {
-        foreach ($consultation->activities as $activity) {
+        if ($consultation->activities == null || $consultation->activities->count() == 0) {
+            {
+                $timeBecameActive = $now;
+                $timeNow = Carbon::now();
+                $diff = $timeBecameActive->gte($timeNow);
+                foreach (self::REMINDER_LEVELS as $level) {
+                    if ($diff >= $level && $consultation->last_reminder_level < $level) {
+                        $doctorName = $consultation->doctor->name ?? 'المستشار';
+                        $patientName = $consultation->patient->name ?? 'المريض';
+                        $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
+                        $this->sendReminder($consultation, $message);
 
-            if ($activity->status !== 'joined') {
-                continue;
-            }
+                        $consultation->update([
+                            'last_reminder_level' => $level,
+                            'last_reminder_sent_at' => now(),
+                        ]);
 
-            $seconds = $activity->joined_at
-                ? Carbon::parse($activity->joined_at)->diffInSeconds($now)
-                : null;
-
-            if (!$seconds) continue;
-
-            foreach (self::REMINDER_LEVELS as $level) {
-                if ($seconds >= $level && $activity->last_reminder_level < $level) {
-
-                    $this->sendReminder(
-                        $consultation,
-                        "{$activity->role} لم يتفاعل خلال {$level} ثانية"
-                    );
-
-                    $consultation->update([
-                        'last_reminder_level' => $level,
-                        'last_reminder_sent_at' => now(),
-                    ]);
-
-                    break;
+                        break;
+                    }
                 }
-            }
-
-            if ($seconds >= 3600) {
-                $this->cancel($consultation, "عدم تفاعل {$activity->role} خلال ساعة");
             }
         }
     }
+//        foreach ($consultation->activities as $activity)
+//        {
+//
+//            if ($activity->status !== 'joined') {
+//                continue;
+//            }
+//
+//            $seconds = $activity->joined_at
+//                ? Carbon::parse($activity->joined_at)->diffInSeconds($now)
+//                : null;
+//
+//            if (!$seconds) continue;
+//
+//            foreach (self::REMINDER_LEVELS as $level) {
+//                if ($seconds >= $level && $activity->last_reminder_level < $level) {
+//
+//                    $this->sendReminder(
+//                        $consultation,
+//                        "{$activity->role} لم يتفاعل خلال {$level} ثانية"
+//                    );
+//
+//                    $consultation->update([
+//                        'last_reminder_level' => $level,
+//                        'last_reminder_sent_at' => now(),
+//                    ]);
+//
+//                    break;
+//                }
+//            }
+//
+//            if ($seconds >= 3600) {
+//                $this->cancel($consultation, "عدم تفاعل {$activity->role} خلال ساعة");
+//            }
+//        }
+
 
 
     private function finalizeActiveSession($consultation): void
