@@ -92,10 +92,7 @@ class ZoomMeetingService
             Log::info('access token $start: empty');
             $startTimeIso = $start->toIso8601String();
             Log::info('access token $startTimeIso: empty');
-
             Log::info('access token $start:' . $startTimeIso);
-
-
         } catch (\Exception $e) {
             Log::info('access token format:' .  $e->getMessage());
             throw new \Exception("Invalid start time format: " . $e->getMessage());
@@ -181,7 +178,7 @@ class ZoomMeetingService
            $response = Http::withHeaders([
                'Authorization' => "Bearer {$accessToken}",
                'Content-Type' => 'application/json',
-           ])->post("{$this->zoomApiBase}/meetings/{$zoomMeetingId}/status", $payload);
+           ])->put("{$this->zoomApiBase}/meetings/{$zoomMeetingId}/status", $payload);
 
            // التحقق من الاستجابة
            if ($response->failed()) {
@@ -245,9 +242,7 @@ class ZoomMeetingService
     public function handleEvent(array $payload): void
     {
         $event = $payload['event'] ?? null;
-        Log::info('event: ' . $event);
         if (!$event) return;
-
         switch ($event) {
             case 'meeting.started':
                 Log::info('started: ');

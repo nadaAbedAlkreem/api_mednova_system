@@ -160,8 +160,8 @@ class VideoConsultationStatusService
             Log::info('$timeBecameActive' . $timeBecameActive);
             foreach (self::REMINDER_LEVELS as $level) {
                 if ($seconds >= $level && $consultation->last_reminder_level < $level) {
-                    $doctorName = $consultation->doctor->name ?? 'المستشار';
-                    $patientName = $consultation->patient->name ?? 'المريض';
+                    $doctorName = $consultation->consultant->full_name ?? 'المستشار';
+                    $patientName = $consultation->patient->full_name ?? 'المريض';
                     $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
                     Log::info('$timeBecameActive -- $message' . $message);
 
