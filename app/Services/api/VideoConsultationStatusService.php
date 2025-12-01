@@ -138,7 +138,7 @@ class VideoConsultationStatusService
                         "{$activity->role} لم يتفاعل خلال {$level} ثانية"
                     );
 
-                    $activity->update([
+                    $consultation->update([
                         'last_reminder_level' => $level,
                         'last_reminder_sent_at' => now(),
                     ]);
