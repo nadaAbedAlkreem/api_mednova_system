@@ -112,8 +112,8 @@ class ZoomMeetingService
                 'host_video' => false,
                 'participant_video' => false,
                 'mute_upon_entry' => true,
-                'authentication_option' => 'zoom_account', // أو 'sign_in_to_zoom'
-                'authentication_domains' => '', // إذا بدك تحدد دومين معين
+//                'authentication_option' => 'zoom_account', // أو 'sign_in_to_zoom'
+//                'authentication_domains' => '', // إذا بدك تحدد دومين معين
 
             ],
         ];
