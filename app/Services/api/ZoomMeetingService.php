@@ -106,7 +106,7 @@ class ZoomMeetingService
             'timezone' => 'UTC',
             'password' => null,
             'settings' => [
-                'join_before_host' => false,
+                'join_before_host' => true,
                 'approval_type' => 0,
                 'waiting_room' => false,
                 'host_video' => false,
