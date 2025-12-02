@@ -155,6 +155,11 @@ return [
     'uppercase'              => 'يجب أن يحتوي الحقل :attribute على حروف كبيرة.',
     'url'                    => 'صيغة رابط حقل :attribute غير صحيحة.',
     'uuid'                   => 'حقل :attribute يجب أن يكون بصيغة UUID سليمة.',
+
+    'custom' => [
+        'patient_not_linked' => 'هذا المريض غير مرتبط بهذه الاستشارة.',
+        'consultant_not_linked' => 'هذا المستشار غير مرتبط بهذه الاستشارة.',
+    ],
     'attributes' => [
         'name' => 'الاسم',
         'full_name' => 'الاسم كامل',
@@ -249,7 +254,8 @@ return [
         'date' => 'تاريخ' ,
         'timezone' => 'المنطقة الزمنية' ,
         'device_id'=> 'جهاز القفاز الذكي ',
-        'attachment' => 'المرفق'
+        'attachment' => 'المرفق' ,
+        'consultation_id' => 'الاستشارة',
 
 
 

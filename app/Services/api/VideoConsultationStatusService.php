@@ -132,14 +132,14 @@ class VideoConsultationStatusService
             if ($now->gte($endTime)) {
                 Log::info('end-api-zoom-platform go to ' . json_encode($consultation));
                 $this->endApiZoomPlatform($consultation);
-                $this->finalizeActiveSession($consultation);
+                $this->endMeeting($consultation);
                 continue;
             }
 
             $this->processActivityReminders($consultation, $now);
         }
     }
-    private function endApiZoomPlatform(ConsultationVideoRequest $consultation)
+    private function endApiZoomPlatform(ConsultationVideoRequest $consultation): void
     {
         try {
             Log::info('end-api-zoom-platform' . json_encode($consultation));
@@ -215,14 +215,14 @@ class VideoConsultationStatusService
 
 
 
-    private function finalizeActiveSession($consultation): void
-    {
-        if ($this->bothParticipantsInteracted($consultation)) {
-            $this->complete($consultation);
-        } else {
-            $this->cancel($consultation, "لم يتفاعل الطرفان بشكل كافٍ قبل انتهاء الوقت");
-        }
-    }
+//    private function finalizeActiveSession($consultation): void
+//    {
+//        if ($this->bothParticipantsInteracted($consultation)) {
+//            $this->complete($consultation);
+//        } else {
+//            $this->cancel($consultation, "لم يتفاعل الطرفان بشكل كافٍ قبل انتهاء الوقت");
+//        }
+//    }
 
 
     private function bothParticipantsInteracted($consultation): bool
@@ -257,6 +257,33 @@ class VideoConsultationStatusService
     }
 
 
+    public function endMeeting($consultation): void
+    {
+        $consultation->appointmentRequest->update([
+            'is_finished' =>true,
+            'ended_at' => now(),
+        ]);
+
+        $consultation->appointmentRequest->update([
+            'status' =>'end',
+        ]);
+
+        $patient  = $consultation->patient->full_name  ?? 'patient';
+        $consultant  =  $consultation->consultant->full_name ?? 'consultant'; ;
+        event(new \App\Events\ConsultationRequested(
+            $consultation,
+            "تم انهاء جلسة الفيديو بين: {$patient}  ,$consultant}",
+            'cancelled_by_system'
+        ));
+
+//        optional($consultation->appointmentRequest)->delete();
+//        $consultation->delete();
+    }
+
+
+
+
+
     public function cancel($consultation, string $reason): void
     {
         $consultation->update([
@@ -275,21 +302,21 @@ class VideoConsultationStatusService
 //        optional($consultation->appointmentRequest)->delete();
 //        $consultation->delete();
     }
-
-
-    public function complete($consultation): void
-    {
-        $consultation->update([
-            'status' => 'completed',
-            'ended_at' => now(),
-        ]);
-
-        event(new \App\Events\ConsultationRequested(
-            $consultation,
-            "تم اكتمال جلسة الفيديو",
-            'completed'
-        ));
-
-//        $consultation->delete();
-    }
+//
+//
+//    public function complete($consultation): void
+//    {
+//        $consultation->update([
+//            'status' => 'completed',
+//            'ended_at' => now(),
+//        ]);
+//
+//        event(new \App\Events\ConsultationRequested(
+//            $consultation,
+//            "تم اكتمال جلسة الفيديو",
+//            'completed'
+//        ));
+//
+////        $consultation->delete();
+//    }
 }

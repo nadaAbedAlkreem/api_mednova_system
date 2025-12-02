@@ -20,6 +20,8 @@ class AppointmentRequest extends Model
         'type_appointment',
         'confirmed_end_time',
         'session_duration' ,
+        'is_finished' ,
+        'finished_at',
         'created_at',
         'updated_at',
     ];

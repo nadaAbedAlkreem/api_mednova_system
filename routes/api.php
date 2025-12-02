@@ -98,7 +98,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
         Route::prefix('video')->group(function ()
         {
-          Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
+            Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
+            Route::post('/approved-consultation', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
         });
 //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 

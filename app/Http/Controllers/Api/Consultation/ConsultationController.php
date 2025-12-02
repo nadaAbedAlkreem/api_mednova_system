@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\api\consultation\CheckDependenciesDataRequest;
 use App\Http\Requests\api\consultation\StoreConsultationRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
@@ -40,7 +41,7 @@ class ConsultationController extends Controller
         try {
              $type = $request['consultant_nature'];
              $consultation = $this->consultantService->createConsultationByType($request->getData(), $type);
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201,);
+            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
@@ -92,6 +93,22 @@ class ConsultationController extends Controller
             ], 500);
         }
     }
+
+    public function approvedConsultationBetweenCustomer(CheckDependenciesDataRequest $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+//            $typeAccount =  ;
+            $this->consultationVideoRequestRepositories->update([] , $request['consultation_id']);
+
+            return $this->successResponse(__('messages.approved_consultation_success'),[], 200);
+        }catch (\Exception $exception){
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+        }
+    }
+
+
+
+
 
 //    public function start($token): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
 //    {

@@ -23,6 +23,8 @@ class ConsultationVideoRequest extends Model
       'video_room_link',
       'action_by',
       'action_reason' ,
+      'consultant_approved',
+      'patient_approved',
       'session_duration_hours' ,
       'last_reminder_sent_at',
       'last_reminder_level' ,
