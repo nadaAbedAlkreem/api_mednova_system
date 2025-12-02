@@ -90,6 +90,36 @@ class StoreConsultationRequest extends FormRequest
                         $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
                     }
 
+
+                    // وقت الآن حسب منطقة المريض
+                    $nowPatientTime = Carbon::now($patientTimezone);
+
+                    try {
+                        $requestedAt = Carbon::parse($this['requested_time']);
+                    } catch (\Exception $e) {
+                        $validator->errors()->add(
+                            'requested_time',
+                            'صيغة التاريخ/الوقت غير صحيحة.'
+                        );
+                        return;
+                    }
+                    // ❌ منع حجز تاريخ سابق
+                    if ($requestedAt->lt($nowPatientTime)) {
+                        $validator->errors()->add(
+                            'requested_time',
+                            'لا يمكن حجز موعد بتاريخ سابق. الرجاء اختيار وقت لاحق.'
+                        );
+                    }
+
+                    // التحقق أن اليوم يطابق التاريخ
+                    $actualDay = $requestedAt->format('l');
+                    if ($actualDay !== $this['requested_day']) {
+                        $validator->errors()->add(
+                            'requested_day',
+                            "اليوم المدخل ({$this['requested_day']}) لا يطابق اليوم الفعلي لتاريخ الاستشارة ($actualDay)."
+                        );
+                    }
+
                 }
 
         });
