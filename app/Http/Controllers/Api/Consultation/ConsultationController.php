@@ -97,9 +97,8 @@ class ConsultationController extends Controller
     public function approvedConsultationBetweenCustomer(CheckDependenciesDataRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-//            $typeAccount =  ;
-            $this->consultationVideoRequestRepositories->update([] , $request['consultation_id']);
-
+            $typeAccount =($request['customer_type'] =='patient' )? 'patient_approved' : 'consultant_approved' ;
+            $this->consultationVideoRequestRepositories->update([$typeAccount => $request['is_approved']] , $request['consultation_id']);
             return $this->successResponse(__('messages.approved_consultation_success'),[], 200);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

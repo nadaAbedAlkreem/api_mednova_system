@@ -26,6 +26,7 @@ class CheckDependenciesDataRequest extends FormRequest
             'consultation_id' => 'required|integer|exists:consultation_video_requests,id,deleted_at,NULL',
             'customer_id' => 'required|integer|exists:customers,id,deleted_at,NULL',
             'customer_type' => 'required|in:patient,therapist,rehabilitation_center',
+            'is_approved' => 'required|boolean',
         ];
     }
     public function withValidator($validator)
@@ -68,6 +69,9 @@ class CheckDependenciesDataRequest extends FormRequest
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.consultation_id')]),
             'type_account.required' => __('validation.required', ['attribute' => __('validation.attributes.type_account')]),
             'type_account.in' => __('validation.in', ['attribute' => __('validation.attributes.type_account')]),
+            'is_approved.required' => __('validation.required', ['attribute' => __('validation.attributes.is_approved')]),
+            'is_approved.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_approved')]),
+
         ];
     }
 }

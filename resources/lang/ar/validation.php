@@ -256,6 +256,7 @@ return [
         'device_id'=> 'جهاز القفاز الذكي ',
         'attachment' => 'المرفق' ,
         'consultation_id' => 'الاستشارة',
+        'is_approved' => 'اعتماد',
 
 
 
