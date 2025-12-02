@@ -26,26 +26,41 @@ class MessageController extends Controller
         try {
             $user = auth('api')->user();
             $limit = $request->query('limit') ?? 20;
+            $cursor = $request->query('next_cursor'); // هذا الـ cursor الجديد
 
             if (!$user instanceof Customer) {
                 throw new \Exception('Get Current User Failed');
             }
-            $chat = ConsultationChatRequest::where(function ($q) use ($user) {$q->where('patient_id', $user->id)->orWhere('consultant_id', $user->id);})->findOrFail($chatRequestId);
-            if (!$chat instanceof ConsultationChatRequest ) {
-                throw new \Exception('Get chat consultation Request Failed');
-            }
-            $messages = Message::where('chat_request_id', $chatRequestId)
+
+            $chat = ConsultationChatRequest::where(function ($q) use ($user) {
+                $q->where('patient_id', $user->id)
+                    ->orWhere('consultant_id', $user->id);
+            })->findOrFail($chatRequestId);
+
+            $messagesQuery = Message::where('chat_request_id', $chatRequestId)
                 ->with(['sender', 'receiver'])
                 ->orderBy('created_at', 'asc')
-                ->orderBy('id', 'asc')
-                ->cursorPaginate($limit);
+                ->orderBy('id', 'asc');
+
+            // إذا كان هناك cursor موجود، استخدمه
+            $messages = $messagesQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
+
             $nextCursor = $messages->nextCursor()?->encode();
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), [MessageResource::collection($messages),'next_cursor' => $nextCursor] , 200);
-        }catch (Exception $exception)
-        {
+
+            return $this->successResponse(
+                __('messages.DATA_RETRIEVED_SUCCESSFULLY'),
+                [
+                    'messages' => MessageResource::collection($messages),
+                    'next_cursor' => $nextCursor
+                ],
+                200
+            );
+
+        } catch (Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
+
 
     public function sendMessage(StoreMessageRequest $request): \Illuminate\Http\JsonResponse
     {
