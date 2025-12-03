@@ -104,7 +104,17 @@ class ConsultationController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
+  public function hasPendingApprovedConsultations(): \Illuminate\Http\JsonResponse
+  {
+      try {
+          $pending = $this->consultationVideoRequestRepositories->checkPendingApprovals();
+          if ($pending) {return $this->successResponse('PENDING_APPROVAL',ConsultationResource::collection($pending));}
+          return $this->successResponse('NO_PENDING_APPROVAL', []);
+      }catch (\Exception $exception){
+          return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+      }
 
+  }
 
 
 

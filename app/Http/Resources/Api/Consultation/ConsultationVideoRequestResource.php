@@ -24,6 +24,8 @@ class ConsultationVideoRequestResource extends JsonResource
                 'consultant_type' => $this->consultant_type ,
                 'appointment'=> new AppointmentResource($this->whenLoaded('appointmentRequest')),
                 'status' => $this->status ,
+                'consultant_approved' => $this->consultant_approved ,
+                'patient_approved' => $this->patient_approved ,
                 'duration_minutes' => $this->duration_minutes ?? 10 ,
                 'video_room_link' => $this->video_room_link ,
                 'session_duration_hours' => $this->session_duration_hours  ?? 1,

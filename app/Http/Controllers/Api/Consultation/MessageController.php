@@ -39,8 +39,8 @@ class MessageController extends Controller
 
             $messagesQuery = Message::where('chat_request_id', $chatRequestId)
                 ->with(['sender', 'receiver'])
-                ->orderBy('created_at', 'desc')
-                ->orderBy('id', 'desc');
+                ->orderBy('created_at', 'asc')
+                ->orderBy('id', 'asc');
 
             // إذا كان هناك cursor موجود، استخدمه
             $messages = $messagesQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
