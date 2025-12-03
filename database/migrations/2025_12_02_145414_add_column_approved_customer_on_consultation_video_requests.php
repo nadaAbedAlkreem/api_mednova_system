@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('consultation_video_requests', function (Blueprint $table) {
-            $table->enum('status',['pending','accepted','active' , 'disputed', 'end','completed','cancelled'])->default('pending')->after('consultant_type');
+            $table->enum('status',['pending','accepted','active' , 'disputed', 'end','completed','cancelled'])->default('pending')->after('consultant_type')->change();
             $table->boolean('consultant_approved')->default(false); // هل اعتمد المستشار الاستشارة
             $table->boolean('patient_approved')->default(false);    // هل اعتمد المريض الاستشارة
         });
