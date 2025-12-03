@@ -39,7 +39,7 @@ class MessageController extends Controller
 
             $messagesQuery = Message::where('chat_request_id', $chatRequestId)
                 ->with(['sender', 'receiver'])
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'desc');
 //                ->orderBy('id', 'desc');
 
             // إذا كان هناك cursor موجود، استخدمه
