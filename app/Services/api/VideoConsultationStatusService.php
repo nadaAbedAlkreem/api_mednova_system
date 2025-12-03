@@ -264,7 +264,7 @@ class VideoConsultationStatusService
             'ended_at' => now(),
         ]);
 
-        $consultation->appointmentRequest->update([
+        $consultation->update([
             'status' =>'end',
         ]);
 
