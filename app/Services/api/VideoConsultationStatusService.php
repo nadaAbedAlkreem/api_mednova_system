@@ -261,7 +261,7 @@ class VideoConsultationStatusService
     {
         $consultation->appointmentRequest->update([
             'is_finished' =>true,
-            'ended_at' => now(),
+            'finished_at' => now(),
         ]);
 
         $consultation->update([

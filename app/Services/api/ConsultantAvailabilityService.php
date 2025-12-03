@@ -42,8 +42,7 @@ class ConsultantAvailabilityService
             ->firstOrFail();
          $availableSlots = $this->mergeAllSlots($schedule, $date);
          $bookedTimes = $this->getBookedTimes($consultantId, $day, $date , $typeAppointment);
-
-        $freeSlotsUtc = $availableSlots->diff($bookedTimes)->values();
+         $freeSlotsUtc = $availableSlots->diff($bookedTimes)->values();
 //        dd($freeSlotsUtc);
 //        $patient = $this->customerRepositories->findOrFail($patientId);
 //        $patientTimezone = $patient->timezone ?? config('app.timezone');

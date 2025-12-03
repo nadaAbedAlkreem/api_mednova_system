@@ -99,7 +99,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('video')->group(function ()
         {
             Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
-            Route::post('/approved-consultation', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
+            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
             Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
         });
 //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
