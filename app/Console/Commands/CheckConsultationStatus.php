@@ -105,6 +105,7 @@ class CheckConsultationStatus extends Command
     private function determineStatus($consultant, $patient, $duration)
     {
         // الطرفان وافقا
+        Log::info('NADA HERE 777' , compact('consultant', 'patient'));
          if ($consultant === true && $patient === true) {
             return ['completed', 'Both parties approved.'];
         }
