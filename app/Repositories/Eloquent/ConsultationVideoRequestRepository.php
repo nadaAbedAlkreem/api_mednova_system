@@ -19,25 +19,22 @@ class ConsultationVideoRequestRepository  extends BaseRepository implements ICon
         if (!$user instanceof Customer) {
             return null;
         }
-
-        $query = ConsultationVideoRequest::with(['consultant'  , 'patient' , 'appointmentRequest'])->query()
-            ->where('status', 'end') // جلسة منتهية
+        $query = ConsultationVideoRequest::with(['consultant', 'patient', 'appointmentRequest'])
+            ->where('status', 'end')
             ->where(function ($q) use ($user) {
                 $q->where('patient_id', $user->id)
                     ->orWhere('consultant_id', $user->id);
             });
-
-        // إذا كان مريض
         if ($user->type === 'patient') {
             $query->where('patient_approved', null);
         }
 
-        // إذا كان مختص
         if (in_array($user->type, ['therapist', 'rehabilitation_center'])) {
             $query->where('consultant_approved', null);
         }
 
-        return $query->get(); // إن وجد استشارة غير معتمدة، نعيدها
+        return $query->get();
+
     }
 
 }
