@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\CustomerFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
+#[UseFactory(CustomerFactory::class)]
 class Customer extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use HasApiTokens, HasFactory, SoftDeletes;
+    use HasApiTokens, SoftDeletes;
     protected $fillable = [
         'full_name',
         'email',
