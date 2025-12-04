@@ -20,7 +20,7 @@ class ConsultationVideoRequestRepository  extends BaseRepository implements ICon
             return null;
         }
 
-        $query = ConsultationVideoRequest::query()
+        $query = ConsultationVideoRequest::with(['consultant'  , 'patient' , 'appointmentRequest'])->query()
             ->where('status', 'end') // جلسة منتهية
             ->where(function ($q) use ($user) {
                 $q->where('patient_id', $user->id)
