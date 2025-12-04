@@ -4,6 +4,7 @@ namespace App\Services\api;
 
 
 use App\Events\ConsultationRequested;
+use App\Models\ConsultationVideoReport;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -198,14 +199,15 @@ class ZoomMeetingService
            // 3️⃣ طلب تقرير المشاركين
            $reportResponse = Http::withHeaders([
                'Authorization' => "Bearer {$accessToken}",
-           ])->get("{$this->zoomApiBase}/report/meetings/{$consultation->zoom_meeting_id}/participants");
+           ])->get("{$this->zoomApiBase}/report/meetings/{$consultation->zoom_meeting_id}/participants"); // يجب يتم تفعيل
 
            if ($reportResponse->failed()) {
                throw new \Exception("Failed getting meeting report: " . $reportResponse->body());
            }
 
            $participants = $reportResponse->json()['participants'] ?? [];
-           Log::info('participants end%%: ' . json_encode($participants));
+           Log::info('participants end%%: ' . json_encode($participants)); // يجب تفعيل عملية الحساب  المدفوع في الحساب
+//           $participantsReport = ConsultationVideoReport::create($participants);
 
            // 4️⃣ إعادة البيانات
            return [

@@ -69,4 +69,9 @@ class ConsultationVideoRequest extends Model
         return $this->hasMany(ConsultationVideoActivity::class, 'consultation_video_request_id');
     }
 
+    public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ConsultationVideoReport::class, 'consultation_video_request_id');
+    }
+
 }

@@ -11,3 +11,5 @@ Schedule::command('consultations:update-status')->everyFiveSeconds();
 Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 //Schedule::command('app:check-pairing-of-smart-glove')->everyFiveSeconds();
 //Schedule::command('app:check-pending-glove-commands')->everyFiveSeconds();
+//Schedule::command('consultations:check-status')->hourly(); in production
+Schedule::command('consultations:check-status')->everyMinute();
