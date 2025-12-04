@@ -106,12 +106,12 @@ class CheckConsultationStatus extends Command
     {
         // الطرفان وافقا
         Log::info('NADA HERE 777' , compact('consultant', 'patient'));
-         if ($consultant === 1 && $patient === 1) {
+         if ($consultant == 1 && $patient == 1) {
             return ['completed', 'Both parties approved.'];
         }
 
         // الطرفان رفضا
-        if ($consultant === 0 && $patient === 0) {
+        if ($consultant == 0 && $patient == 0) {
             // الجلسة تمت؟
 //            if ($duration > 5) {
 //                return ['completed', 'No response from both parties, session completed.'];
@@ -120,8 +120,8 @@ class CheckConsultationStatus extends Command
         }
 
         // اختلاف الآراء
-        if (($consultant === 1 && $patient === 0) ||
-            ($consultant === 0 && $patient === 1)) {
+        if (($consultant == 1 && $patient == 0) ||
+            ($consultant == 0 && $patient == 1)) {
             return ['disputed', 'Approval disagreement.'];
         }
 
