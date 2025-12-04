@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('consultation_video_request_id');
             $table->integer('duration')->default(0);
-            $table->string('id')->nullable();
+            $table->string('zoom_id')->nullable();
             $table->integer('join_time')->default(0);
             $table->integer('leave_time')->default(0);
             $table->string('name')->nullable();
