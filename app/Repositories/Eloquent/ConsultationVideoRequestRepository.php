@@ -13,7 +13,7 @@ class ConsultationVideoRequestRepository  extends BaseRepository implements ICon
     {
         $this->model = new ConsultationVideoRequest();
     }
-    public function checkPendingApprovals(): ?ConsultationVideoRequest
+    public function checkPendingApprovals(): ?\Illuminate\Database\Eloquent\Collection
     {
         $user = auth('api')->user();
         if (!$user instanceof Customer) {
@@ -37,7 +37,7 @@ class ConsultationVideoRequestRepository  extends BaseRepository implements ICon
             $query->where('consultant_approved', null);
         }
 
-        return $query->first(); // إن وجد استشارة غير معتمدة، نعيدها
+        return $query->get(); // إن وجد استشارة غير معتمدة، نعيدها
     }
 
 }
