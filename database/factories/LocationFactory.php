@@ -19,8 +19,8 @@ class LocationFactory extends Factory
     {
         return [
             'customer_id' => Customer::factory(),
-            'latitude' => $this->faker->latitude(),
-            'longitude' => $this->faker->longitude(),
+            'latitude' => fake()->latitude(),
+            'longitude' => fake()->longitude(),
             'formatted_address' => $this->faker->address(),
             'country' => $this->faker->country(),
             'region' => $this->faker->state(),
