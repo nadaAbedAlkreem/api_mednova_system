@@ -14,7 +14,6 @@ class CheckConsultationStatus extends Command
 
     public function handle()
     {
-        $this->info("Checking consultations...");
         ConsultationVideoRequest::where('status', 'end')
 //            ->where('updated_at', '<', Carbon::now()->subHours(72)) in prod
             ->where('updated_at', '<', Carbon::now()->subSecond(5))
@@ -106,9 +105,7 @@ class CheckConsultationStatus extends Command
     private function determineStatus($consultant, $patient, $duration)
     {
         // الطرفان وافقا
-        Log::info('7878C' ,$consultant);
-        Log::info('7878P' ,$patient);
-        if ($consultant === true && $patient === true) {
+         if ($consultant === true && $patient === true) {
             return ['completed', 'Both parties approved.'];
         }
 
