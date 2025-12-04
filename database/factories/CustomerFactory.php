@@ -17,7 +17,7 @@ class CustomerFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['therapist', 'rehabilitation_center', 'patient']);
+//        $type = $this->faker->randomElement(['therapist', 'rehabilitation_center', 'patient']);
 
         return [
             'full_name' => $this->faker->name(),
@@ -34,7 +34,7 @@ class CustomerFactory extends Factory
             'is_online' => $this->faker->boolean(),
             'last_active_at' => now(),
             'is_banned' => false,
-            'type_account' => $type,
+            'type_account' => 'therapist',
             'status' => 'active',
         ];
     }
