@@ -29,12 +29,12 @@ class ConsultationVideoRequestRepository  extends BaseRepository implements ICon
 
         // إذا كان مريض
         if ($user->type === 'patient') {
-            $query->where('patient_approved', false);
+            $query->where('patient_approved', null);
         }
 
         // إذا كان مختص
         if (in_array($user->type, ['therapist', 'rehabilitation_center'])) {
-            $query->where('consultant_approved', false);
+            $query->where('consultant_approved', null);
         }
 
         return $query->first(); // إن وجد استشارة غير معتمدة، نعيدها
