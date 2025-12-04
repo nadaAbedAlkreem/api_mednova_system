@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CheckConsultationStatus extends Command
 {
@@ -105,6 +106,8 @@ class CheckConsultationStatus extends Command
     private function determineStatus($consultant, $patient, $duration)
     {
         // الطرفان وافقا
+        Log::info('7878C' ,$consultant);
+        Log::info('7878P' ,$patient);
         if ($consultant === true && $patient === true) {
             return ['completed', 'Both parties approved.'];
         }
@@ -112,9 +115,9 @@ class CheckConsultationStatus extends Command
         // الطرفان رفضا
         if ($consultant === false && $patient === false) {
             // الجلسة تمت؟
-            if ($duration > 5) {
-                return ['completed', 'No response from both parties, session completed.'];
-            }
+//            if ($duration > 5) {
+//                return ['completed', 'No response from both parties, session completed.'];
+//            }
             return ['cancelled', 'Session did not happen (duration <= 5 minutes).'];
         }
 
