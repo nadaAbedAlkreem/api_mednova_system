@@ -2,14 +2,17 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Customer;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
  */
 class CustomerFactory extends Factory
 {
+    protected $model = Customer::class; // <-- أضف هذا السطر
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +20,7 @@ class CustomerFactory extends Factory
      */
     public function definition(): array
     {
-//        $type = $this->faker->randomElement(['therapist', 'rehabilitation_center', 'patient']);
+        $type = $this->faker->randomElement(['therapist', 'rehabilitation_center', 'patient']);
 
         return [
             'full_name' => $this->faker->name(),
@@ -34,7 +37,7 @@ class CustomerFactory extends Factory
             'is_online' => $this->faker->boolean(),
             'last_active_at' => now(),
             'is_banned' => false,
-            'type_account' => 'therapist',
+            'type_account' => $type,
             'status' => 'active',
         ];
     }
