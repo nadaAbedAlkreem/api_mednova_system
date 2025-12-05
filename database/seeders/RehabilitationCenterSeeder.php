@@ -18,7 +18,7 @@ class RehabilitationCenterSeeder extends Seeder
     public function run(): void
     {
         // ملف الاكسل
-        $filePath = storage_path('app/rehab.xlsx');
+        $filePath = storage_path('app/public/rehab.xlsx');
 
         // قراءة البيانات
         $rows = Excel::toCollection((object)null, $filePath)[0]; // أول شيت
