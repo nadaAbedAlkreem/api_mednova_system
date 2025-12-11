@@ -257,11 +257,19 @@ return [
         'attachment' => 'المرفق' ,
         'consultation_id' => 'الاستشارة',
         'is_approved' => 'اعتماد',
+        'title' => 'العنوان',
+        'description' => 'الوصف',
+        'reporter_id' => 'المبلّغ',
+        'reported_user_id' => 'المبلّغ عنه',
+        'type_report' => 'نوع البلاغ',
+        'priority' => 'الأولوية',
+        'attachments' => 'المرفقات',
+        'contact_email' => 'البريد الإلكتروني',
+        'contact_phone' => 'رقم الهاتف',
+        'custom_category' => 'فئة مخصصة' ,
+        'custom_subcategory' => 'فئة فرعية مخصصة' ,
+        'category' => 'فئة' ,
+        'subcategory' => 'فئة فرعية' ,
 
-
-
-
-
-
-     ],
+    ],
 ];

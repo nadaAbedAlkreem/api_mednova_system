@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Consultation\ConsultationVideoRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
 use App\Http\Controllers\Api\Consultation\ZoomWebhookController;
+use App\Http\Controllers\Api\Customer\ReportController;
 use App\Http\Controllers\Api\Device\DeviceController;
 use App\Http\Controllers\Api\Device\DeviceRequestController;
 use App\Http\Controllers\Api\Device\GloveCommandController;
@@ -51,6 +52,8 @@ Route::prefix('auth')->group(function ()
             Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
         });
         Route::get('programs/show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
+        Route::post('consultation-request/video/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
+
         Route::prefix('customer')->group(function ()
         {
             Route::get('/service-provider/search', [CustomerController::class, 'searchOfServiceProvider']);
@@ -98,7 +101,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
         Route::prefix('video')->group(function ()
         {
-            Route::post('/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
             Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
             Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
         });
@@ -171,7 +173,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('smart-glove-device')->group(function () {
         Route::post('send-command', [GloveCommandController::class, 'sendCommand']);
-     });
+    });
+    Route::prefix('reports')->group(function () {
+        Route::get('enums', [ReportController::class, 'reportEnums']);
+        Route::post('store', [ReportController::class, 'store']);
+
+    });
 
 });
 //Route::middleware(VerifyDeviceToken::class)->prefix('smart-glove-device-simulation')->group(function () {

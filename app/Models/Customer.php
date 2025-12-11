@@ -33,76 +33,15 @@ class Customer extends Authenticatable
         'timezone',
         'email_verified_at',
     ];
-    protected static function boot()
+
+    public function complainantReport(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        parent::boot();
+        return $this->hasMany(Customer::class, 'customer_id');
+    }
 
-        static::deleting(function ($customer) {
-            $customer->location()->each(function ($location) {
-                $location->delete();
-            });
-
-            $customer->therapist()->each(function ($therapist) {
-                $therapist->delete();
-            });
-            $customer->rehabilitationCenter()->each(function ($rehabilitationCenter) {
-                $rehabilitationCenter->delete();
-            });
-            $customer->patient()->each(function ($patient) {
-                $patient->delete();
-            });
-
-            $customer->schedules()->each(function ($schedules) {
-                $schedules->delete();
-            });
-
-            $customer->appointmentRequests()->each(function ($appointmentRequests) {
-                $appointmentRequests->delete();
-            });
-
-            $customer->consultationVideoRequests()->each(function ($consultationVideoRequests) {
-                $consultationVideoRequests->delete();
-            });
-
-            $customer->consultationVideoRequests()->each(function ($consultationVideoRequests) {
-                $consultationVideoRequests->delete();
-            });
-            $customer->userPackages()->each(function ($userPackages) {
-                $userPackages->delete();
-            });
-            $customer->programEnrollments()->each(function ($programEnrollments) {
-                $programEnrollments->delete();
-            });
-            $customer->programEnrollments()->each(function ($programEnrollments) {
-                $programEnrollments->delete();
-            });
-            //medicalSpecialties
-            $customer->medicalSpecialties()->each(function ($medicalSpecialties) {
-                $medicalSpecialties->delete();
-            });
-
-            $customer->programs()->each(function ($programs) {
-                $programs->delete();
-            });
-
-            $customer->notifications()->each(function ($notifications) {
-                $notifications->delete();
-            });
-
-            $customer->ratingReviewer()->each(function ($reviewer) {
-                $reviewer->delete();
-            });
-
-            $customer->ratings()->each(function ($reviewee) {
-                $reviewee->delete();
-            });
-            $customer->schedule()->each(function ($schedule) {
-                $schedule->delete();
-            });
-            $customer->deviceRequests()->each(function ($deviceRequests) {
-                $deviceRequests->delete();
-            });
-        });
+    public function reported(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Customer::class, 'reported_customers_id');
     }
     public function senderMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -196,6 +135,77 @@ class Customer extends Authenticatable
     }
 
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($customer) {
+            $customer->location()->each(function ($location) {
+                $location->delete();
+            });
+
+            $customer->therapist()->each(function ($therapist) {
+                $therapist->delete();
+            });
+            $customer->rehabilitationCenter()->each(function ($rehabilitationCenter) {
+                $rehabilitationCenter->delete();
+            });
+            $customer->patient()->each(function ($patient) {
+                $patient->delete();
+            });
+
+            $customer->schedules()->each(function ($schedules) {
+                $schedules->delete();
+            });
+
+            $customer->appointmentRequests()->each(function ($appointmentRequests) {
+                $appointmentRequests->delete();
+            });
+
+            $customer->consultationVideoRequests()->each(function ($consultationVideoRequests) {
+                $consultationVideoRequests->delete();
+            });
+
+            $customer->consultationVideoRequests()->each(function ($consultationVideoRequests) {
+                $consultationVideoRequests->delete();
+            });
+            $customer->userPackages()->each(function ($userPackages) {
+                $userPackages->delete();
+            });
+            $customer->programEnrollments()->each(function ($programEnrollments) {
+                $programEnrollments->delete();
+            });
+            $customer->programEnrollments()->each(function ($programEnrollments) {
+                $programEnrollments->delete();
+            });
+            //medicalSpecialties
+            $customer->medicalSpecialties()->each(function ($medicalSpecialties) {
+                $medicalSpecialties->delete();
+            });
+
+            $customer->programs()->each(function ($programs) {
+                $programs->delete();
+            });
+
+            $customer->notifications()->each(function ($notifications) {
+                $notifications->delete();
+            });
+
+            $customer->ratingReviewer()->each(function ($reviewer) {
+                $reviewer->delete();
+            });
+
+            $customer->ratings()->each(function ($reviewee) {
+                $reviewee->delete();
+            });
+            $customer->schedule()->each(function ($schedule) {
+                $schedule->delete();
+            });
+            $customer->deviceRequests()->each(function ($deviceRequests) {
+                $deviceRequests->delete();
+            });
+        });
+    }
 
 
 
