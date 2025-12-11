@@ -28,10 +28,10 @@ class NotificationsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getNotificationsForCurrentUser(Request $request ): \Illuminate\Http\JsonResponse
+    public function getNotificationsForCurrentUser(Request $request): \Illuminate\Http\JsonResponse
     {
-        try {
-            $user = $request->user();
+         try {
+            $user = auth('api')->user();
             $limit = $request->get('limit', config('app.pagination_limit'));
             if(!$user)
             {throw new \Exception('Get Current User  Failed');}
