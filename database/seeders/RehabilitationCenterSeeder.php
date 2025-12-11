@@ -29,7 +29,7 @@ class RehabilitationCenterSeeder extends Seeder
             $data = array_combine($headers, $row);
 
             // استخراج البيانات من ملف الإكسل
-            $centerName  = $data['Provider Name'] ?? 'Rehab Center ' . Str::random(4);
+            $centerName  = $data['Provider Name Arabic'] ?? 'Rehab Center ' . Str::random(4);
             $email       = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
             $address     = $data['Provider Address'] ?? 'Unknown Address';
 
@@ -42,6 +42,7 @@ class RehabilitationCenterSeeder extends Seeder
                 'password' => bcrypt('password123'),
                 'birth_date' => now()->subYears(10),
                 'type_account' => 'rehabilitation_center',
+                'image' => 'https://demoapplication.jawebhom.com/storage/patient_profile_images/5d8f71ad-0d97-4e0e-95c3-07f1a16ecb32.jpg',
                 'status' => 'active',
                 'is_online' => false,
                 'last_active_at' => now(),
