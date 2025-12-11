@@ -4,9 +4,6 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Events\MessageRead;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreNotificationsRequest;
-use App\Http\Requests\UpdateNotificationsRequest;
-use App\Http\Resources\Api\Consultation\NotificationsResource;
 use App\Models\Notification;
 use App\Repositories\INotificationRepositories;
 use App\Traits\ResponseTrait;
