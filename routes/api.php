@@ -140,9 +140,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //        Route::get('/', [ProgramReviewRequestController::class, 'all']);           // قائمة كل طلبات المراجعة
 //        Route::patch('{request}', [ProgramReviewRequestController::class, 'update']); // الموافقة أو الرفض
 //    });
+    Route::get('/test', [NotificationsController::class, 'getNotificationsForCurrentUser']);
+
     Route::prefix('notification')->group(function ()
     {
-        Route::get('/test', [NotificationsController::class, 'getNotificationsForCurrentUser']);
         Route::get('mark-as-read', [NotificationsController::class, 'markAsRead']);
 
     });
