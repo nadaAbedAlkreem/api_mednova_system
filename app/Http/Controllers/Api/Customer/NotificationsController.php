@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Events\MessageRead;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Consultation\NotificationsResource;
 use App\Models\Notification;
 use App\Repositories\INotificationRepositories;
 use App\Traits\ResponseTrait;
@@ -28,14 +29,13 @@ class NotificationsController extends Controller
     public function getNotificationsForCurrentUser(Request $request): \Illuminate\Http\JsonResponse
     {
          try {
-             dd('aa');
-//            $user = auth('api')->user();
-//            $limit = $request->get('limit', config('app.pagination_limit'));
-//            if(!$user)
-//            {throw new \Exception('Get Current User  Failed');}
-//            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $user->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
-//            $nextCursor = $notifications->nextCursor()?->encode();
-//            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
+            $user = auth('api')->user();
+            $limit = $request->get('limit', config('app.pagination_limit')) ?? 10;
+            if(!$user)
+            {throw new \Exception('Get Current User  Failed');}
+            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $user->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
+            $nextCursor = $notifications->nextCursor()?->encode();
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
