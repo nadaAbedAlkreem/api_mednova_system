@@ -341,6 +341,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
 
+    public function cursorPaginateWhereWith(array $data, array $with, $orderBy = ['column' => 'id', 'dir' => 'DESC'], $limit = 10)
+    {
+        return $this->model->with($with)->where($data)->orderBy($orderBy['column'], $orderBy['dir'])->cursorPaginate($limit);
+    }
+
+
     /**
      * retrieve the model paginated
      * @params OPTIONAL $orderBy with the column name && dir

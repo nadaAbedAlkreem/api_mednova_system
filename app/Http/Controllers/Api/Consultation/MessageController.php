@@ -114,7 +114,7 @@ class MessageController extends Controller
     public function markAsRead($senderId): \Illuminate\Http\JsonResponse
     {
         try{
-         $receiverId = auth()->id();
+         $receiverId = auth('api')->id();
             if (!Customer::find($senderId)) {
                 throw new \Exception('sender not found');
           }

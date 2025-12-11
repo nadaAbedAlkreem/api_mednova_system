@@ -143,6 +143,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('notification')->group(function ()
     {
         Route::get('/', [NotificationsController::class, 'getNotificationsForCurrentUser']);
+        Route::get('mark-as-read', [NotificationsController::class, 'markAsRead']);
+
     });
     Route::prefix('messages')->group(function ()
     {
