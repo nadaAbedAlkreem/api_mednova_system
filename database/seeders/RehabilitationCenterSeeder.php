@@ -30,13 +30,14 @@ class RehabilitationCenterSeeder extends Seeder
             $centerName  = $data['Provider Name Arabic'] ?? 'Rehab Center ' . Str::random(4);
             $centerImage = $this->getCenterImage($centerName);
             $email       = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
-            $address     = $data['Provider Address'] ?? 'Unknown Address';
+            $address     = $data['Provider Willayat'] ?? 'Unknown Address';
+            $phone       = $data['Phone Number'] ??  '9' . rand(10000000, 99999999);
             // 1) إنشاء المستخدم Customer
             Log::info($centerImage);
             $customer = Customer::create([
                 'full_name' => $centerName,
                 'email' => $email,
-                'phone' => '9' . rand(10000000, 99999999),
+                'phone' => $phone,
                 'gender' => 'Female',
                 'password' => bcrypt('password123'),
                 'birth_date' => now()->subYears(10),
