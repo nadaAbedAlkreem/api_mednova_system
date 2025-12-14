@@ -27,19 +27,19 @@ class DatabaseSeeder extends Seeder
 //           DeviceSeeder::class,
          ]);
         // جلب التخصصات التي تم إنشاؤها
-//        $specialties = MedicalSpecialtie::all();
+        $specialties = MedicalSpecialtie::all();
 ////
 ////        // 🔹 أنشئ عملاء من نوع (Therapist)
-//        Customer::factory(10)->create([
-//            'type_account' => 'therapist',
-//        ])->each(function ($customer) use ($specialties) {
-//            Therapist::factory()->create([
-//                'customer_id' => $customer->id,
-//                'medical_specialties_id' => $specialties->random()->id,
-//            ]);
-//
-//            Location::factory()->create(['customer_id' => $customer->id]);
-//        });
+        Customer::factory(10)->create([
+            'type_account' => 'therapist',
+        ])->each(function ($customer) use ($specialties) {
+            Therapist::factory()->create([
+                'customer_id' => $customer->id,
+                'medical_specialties_id' => $specialties->random()->id,
+            ]);
+
+            Location::factory()->create(['customer_id' => $customer->id]);
+        });
 //
 //        // 🔹 أنشئ عملاء من نوع (Rehabilitation Center)
 //        Customer::factory(5)->create([
@@ -75,8 +75,9 @@ class DatabaseSeeder extends Seeder
 //        });
 //
 //        // 🔹 تقييمات تجريبية
-//        $this->call([ProgramSeeder::class , RatingSeeder::class]);
-        $this->call([RehabilitationCenterSeeder::class]);
+//        $this->call([ProgramSeeder::class, RatingSeeder::class]);
+        $this->call([RatingSeeder::class]);
+//        $this->call([RehabilitationCenterSeeder::class]);
 
     }
 }

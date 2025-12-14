@@ -28,8 +28,7 @@ class UpdateTimeZoneRequest extends FormRequest
             'timezone' => [
                 'required',
                 Rule::in(\DateTimeZone::listIdentifiers()), // تتحقق من أن القيمة موجودة ضمن المناطق الزمنية المدعومة
-            ],
-
+             ],
             ];
     }
 

@@ -6,9 +6,7 @@ use App\Models\Customer;
 use App\Models\Location;
 use App\Models\RehabilitationCenter;
 use App\Models\Schedule;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,19 +18,14 @@ class RehabilitationCenterSeeder extends Seeder
     public function run(): void
     {
         $filePath = storage_path('app/public/rehab.xlsx');
-
         $rows = Excel::toArray([], $filePath)[0];
         $headers = array_map('trim', $rows[0]);
-
         foreach (array_slice($rows, 1) as $row) {
-
             $data = array_combine($headers, $row);
-
             // استخراج البيانات من ملف الإكسل
             $centerName  = $data['Provider Name Arabic'] ?? 'Rehab Center ' . Str::random(4);
             $email       = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
             $address     = $data['Provider Address'] ?? 'Unknown Address';
-
             // 1) إنشاء المستخدم Customer
             $customer = Customer::create([
                 'full_name' => $centerName,
