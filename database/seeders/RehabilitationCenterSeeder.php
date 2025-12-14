@@ -7,6 +7,9 @@ use App\Models\Location;
 use App\Models\RehabilitationCenter;
 use App\Models\Schedule;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,13 +23,16 @@ class RehabilitationCenterSeeder extends Seeder
         $filePath = storage_path('app/public/rehab.xlsx');
         $rows = Excel::toArray([], $filePath)[0];
         $headers = array_map('trim', $rows[0]);
+
         foreach (array_slice($rows, 1) as $row) {
             $data = array_combine($headers, $row);
             // استخراج البيانات من ملف الإكسل
             $centerName  = $data['Provider Name Arabic'] ?? 'Rehab Center ' . Str::random(4);
+            $centerImage = $this->getCenterImage($centerName);
             $email       = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
             $address     = $data['Provider Address'] ?? 'Unknown Address';
             // 1) إنشاء المستخدم Customer
+            Log::info($centerImage);
             $customer = Customer::create([
                 'full_name' => $centerName,
                 'email' => $email,
@@ -35,7 +41,8 @@ class RehabilitationCenterSeeder extends Seeder
                 'password' => bcrypt('password123'),
                 'birth_date' => now()->subYears(10),
                 'type_account' => 'rehabilitation_center',
-                'image' => 'https://demoapplication.jawebhom.com/storage/patient_profile_images/5d8f71ad-0d97-4e0e-95c3-07f1a16ecb32.jpg',
+                'image' => $centerImage,
+//                'image' => 'https://demoapplication.jawebhom.com/storage/patient_profile_images/5d8f71ad-0d97-4e0e-95c3-07f1a16ecb32.jpg',
                 'status' => 'active',
                 'is_online' => false,
                 'last_active_at' => now(),
@@ -81,6 +88,32 @@ class RehabilitationCenterSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
-
     }
+    private function getCenterImage(string $centerName): ?string
+    {
+        $imagesPath = storage_path('app/public/rehab_images');
+
+        foreach (File::files($imagesPath) as $file) {
+
+            // اسم الصورة بدون الامتداد
+            $imageName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
+
+            // إذا اسم الصورة = اسم المركز
+            if ($imageName === trim($centerName)) {
+
+                $newName = Str::uuid() . '.' . $file->getExtension();
+                $path = 'rehabilitation_centers/logos/' . $newName;
+
+                Storage::disk('public')->put(
+                    $path,
+                    File::get($file->getPathname())
+                );
+
+                return Storage::url($path);
+            }
+        }
+
+        return null;
+    }
+
 }
