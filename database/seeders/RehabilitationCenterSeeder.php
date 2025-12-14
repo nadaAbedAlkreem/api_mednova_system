@@ -26,14 +26,24 @@ class RehabilitationCenterSeeder extends Seeder
 
         foreach (array_slice($rows, 1) as $row) {
             $data = array_combine($headers, $row);
-            // استخراج البيانات من ملف الإكسل
-            $centerName  = $data['Provider Name Arabic'] ?? 'Rehab Center ' . Str::random(4);
-            $centerImage =  asset($this->getCenterImage($centerName));
-            $email       = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
-            $address     = $data['Provider Willayat'] ?? 'Unknown Address';
-            $phone       = $data['Phone Number'] ??  '9' . rand(10000000, 99999999);
+
+            $centerName = $data['Provider Name Arabic'] ?? null;
+            if (!$centerName) {
+                continue;
+            }
+            $centerImagePath = $this->getCenterImage($centerName);
+            if (!$centerImagePath) {
+                Log::warning("Center skipped (no image): {$centerName}");
+                continue;
+            }
+
+            $centerImage = asset($centerImagePath);
+
+            $email   = $data['Provider Email'] ?? 'center' . rand(1000,9999) . '@example.com';
+            $address = $data['Provider Willayat'] ?? 'Unknown Address';
+            $phone   = $data['Phone Number'] ?? '9' . rand(10000000, 99999999);
             // 1) إنشاء المستخدم Customer
-            Log::info($centerImage);
+            Log::info($data);
             $customer = Customer::create([
                 'full_name' => $centerName,
                 'email' => $email,
