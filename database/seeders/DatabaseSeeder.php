@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
 //        // 🔹 تقييمات تجريبية
 //        $this->call([ProgramSeeder::class, RatingSeeder::class]);
         $this->call([RatingSeeder::class]);
-//        $this->call([RehabilitationCenterSeeder::class]);
+        $this->call([RehabilitationCenterSeeder::class]);
 
     }
 }

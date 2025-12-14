@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRehabilitationCenterRequest extends FormRequest
 {
@@ -32,7 +33,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'specialty_id' => 'required|array',
             'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
-
+            'timezone' => ['required',Rule::in(\DateTimeZone::listIdentifiers())],
 
             'year_establishment' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
             'license_number' => 'required|string|max:100',
@@ -182,6 +183,8 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'formatted_address.required' => __('validation.required', ['attribute' => __('validation.attributes.formatted_address')]),
             'city.required' => __('validation.required', ['attribute' => __('validation.attributes.city')]),
             'country.required' => __('validation.required', ['attribute' => __('validation.attributes.country')]),
+            'timezone.required' => __('validation.required', ['attribute' => __('validation.attributes.timezone')]),
+
         ];
     }
     public function getData()

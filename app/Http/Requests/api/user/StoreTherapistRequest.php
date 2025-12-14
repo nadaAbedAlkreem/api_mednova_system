@@ -7,6 +7,7 @@ use App\Services\api\TimezoneService;
 use App\Services\api\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use function Symfony\Component\Translation\t;
 
 class StoreTherapistRequest extends FormRequest
@@ -41,6 +42,7 @@ class StoreTherapistRequest extends FormRequest
             'license_authority' => 'required|string|max:255',
             'license_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'bio' => 'required|string',
+            'timezone' => ['required',  Rule::in(\DateTimeZone::listIdentifiers())],
             //location
             'formatted_address'=>'required',
             'country' => 'required',
@@ -183,7 +185,9 @@ class StoreTherapistRequest extends FormRequest
             'formatted_address.required' => __('validation.required', ['attribute' => __('validation.attributes.formatted_address')]),
             'city.required' => __('validation.required', ['attribute' => __('validation.attributes.city')]),
             'country.required' => __('validation.required', ['attribute' => __('validation.attributes.country')]),
-         ];
+            'timezone.required' => __('validation.required', ['attribute' => __('validation.attributes.timezone')]),
+
+        ];
     }
 
 
