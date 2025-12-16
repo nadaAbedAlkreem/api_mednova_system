@@ -11,7 +11,7 @@ use App\Services\api\ZoomMeetingService;
 class VideoConsultationStatusService
 {
     protected ZoomMeetingService $zoomMeetingService;
-    private const REMINDER_LEVELS = [60, 120, 260];
+    private const REMINDER_LEVELS = [200, 300, 700];
 
     public function __construct(ZoomMeetingService $zoomMeetingService)
     {
