@@ -30,7 +30,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'full_name' => 'string|max:255',
 //            'email' => 'string|email|max:255',
-            'phone' => ['string', 'unique:customers,phone' . $this->customer_id,'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
+            'phone' => ['string', 'unique:customers,phone,' . $this->customer_id,'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
 
             'specialty_id' => 'array',
             'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
