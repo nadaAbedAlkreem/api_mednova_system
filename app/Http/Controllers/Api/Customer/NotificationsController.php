@@ -36,12 +36,11 @@ class NotificationsController extends Controller
 //            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $customer->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
 //            $nextCursor = $notifications->nextCursor()?->encode();
              $notificationsQuery = Notification::where('notifiable_id',  $customer->id)
-                 ->with(['notifiable'])
-                 ->orderBy('created_at', 'desc')
-                ->orderBy('id', 'desc');
+                 ->with(['notifiable']);
+//                 ->orderBy('created_at', 'desc')
+//                ->orderBy('id', 'desc');
               // إذا كان هناك cursor موجود، استخدمه
              $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
-             dd($notifications);
              $nextCursor = $notifications->nextCursor()?->encode();
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
         }catch (\Exception $exception){
