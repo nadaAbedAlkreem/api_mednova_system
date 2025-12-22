@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('available_balance', 15, 3)->default(0);
             $table->decimal('pending_balance', 15, 3)->default(0);
             $table->decimal('frozen_balance', 15, 3)->default(0);
-
             $table->timestamps();
             $table->softDeletes();
         });

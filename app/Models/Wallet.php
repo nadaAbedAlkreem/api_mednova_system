@@ -21,7 +21,7 @@ class Wallet extends Model
     ];
 
     /**
-     * Polymorphic owner (Customer | Admin | Consultant | Platform)
+     * Polymorphic owner (Customer | Admin)
      */
     public function owner(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {

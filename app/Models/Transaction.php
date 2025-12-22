@@ -30,11 +30,18 @@ class Transaction extends Model
     ];
 
     /**
-     * Polymorphic reference (Consultation | Subscription | Course | etc.)
+     * Polymorphic reference (Consultation | ProgramEnrollment | PackageFeature | etc.)
      */
+    /* ================= Relations ================= */
+
     public function reference(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function gatewayPayment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(GatewayPayment::class);
     }
 
     /**
@@ -44,4 +51,8 @@ class Transaction extends Model
     {
         return $this->belongsTo(Wallet::class);
     }
+    /**
+     * العلاقة مع جدول GatewayPayment
+     */
+
 }

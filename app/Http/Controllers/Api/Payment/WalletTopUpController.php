@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Http\Controllers\Api\Payment;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\api\payment\WalletTopUpRequest;
+use App\Repositories\Eloquent\BankAccountRepository;
+use App\Repositories\Eloquent\CardRepository;
+use App\Repositories\Eloquent\GatewayPaymentRepository;
+use App\Repositories\Eloquent\TransactionRepository;
+use App\Repositories\Eloquent\WalletRepository;
+use App\Services\api\AmwalPayService;
+use Illuminate\Support\Facades\DB;
+
+class WalletTopUpController extends Controller
+{
+    public function __construct(
+        protected WalletRepository $wallets,
+        protected TransactionRepository $transactions,
+        protected GatewayPaymentRepository $gatewayPayments,
+        protected CardRepository $cards,
+        protected BankAccountRepository $bankAccounts,
+        protected AmwalPayService $amwalPay
+    ) {}
+
+    /**
+     * Wallet Top-up (Patient)
+     */
+    public function store(WalletTopUpRequest $request)
+    {
+        $patient = $request->user();
+
+        /** @var \App\Models\Wallet $wallet */
+        $wallet = $this->wallets->getByOwner($patient);
+
+        /**
+         * 1️⃣ Create checkout session with Amwal Pay
+         * (NO DB RECORDS YET)
+         */
+        $checkout = $this->amwalPay->createCheckoutSession([
+            'amount' => $request->amount,
+            'currency' => 'OMR',
+            'payment_method' => $request->payment_method] ,   [
+                'id' => $patient->id,
+                'email' => $patient->email,
+                'name' => $patient->name,
+            ],
+        );
+
+        if (! $checkout->isSuccessful()) {
+            return response()->json([
+                'message' => __('payment.failed_to_initialize'),
+            ], 422);
+        }
+
+        /**
+         * 2️⃣ Payment succeeded immediately (as per your rule)
+         * Now we open DB transaction
+         */
+        DB::transaction(function () use ($request, $wallet, $checkout) {
+
+            /**
+             * A️⃣ Create Transaction
+             */
+            $transaction = $this->transactions->create([
+                'reference_type' => get_class($wallet->owner),
+                'reference_id' => $wallet->owner->id,
+
+                'transaction_type' => 'wallet_top_up',
+                'entry_type' => 'credit',
+                'wallet_id' => $wallet->id,
+
+                'gross_amount' => $request->amount,
+                'platform_commission' => 0,
+                'vat_amount' => 0,
+                'net_amount' => $request->amount,
+
+                'currency' => 'OMR',
+
+                // Amount is AVAILABLE immediately
+                'status' => 'available',
+
+                'meta' => [
+                    'gateway' => 'amwal',
+                ],
+            ]);
+
+            /**
+             * B️⃣ Update Wallet Balances
+             */
+            $this->wallets->increaseAvailableBalance(
+                $wallet,
+                $transaction->net_amount
+            );
+
+            /**
+             * C️⃣ Save Card / Bank (if needed)
+             */
+            $cardId = null;
+            $bankAccountId = null;
+
+            if ($request->payment_method === 'card') {
+                $card = $this->cards->storeFromGateway(
+                    $wallet->owner,
+                    $checkout->card
+                );
+                $cardId = $card->id;
+            }
+
+            if ($request->payment_method === 'bank') {
+                $bank = $this->bankAccounts->storeFromGateway(
+                    $wallet->owner,
+                    $checkout->bank
+                );
+                $bankAccountId = $bank->id;
+            }
+
+            /**
+             * D️⃣ Create Gateway Payment Record
+             */
+            $this->gatewayPayments->create([
+                'transaction_id' => $transaction->id,
+                'gateway' => 'amwal',
+
+                'gateway_transaction_id' => $checkout->transaction_id,
+                'gateway_reference' => $checkout->reference,
+
+                'payment_method' => $request->payment_method,
+                'card_id' => $cardId,
+                'bank_account_id' => $bankAccountId,
+
+                'amount' => $transaction->gross_amount,
+                'currency' => 'OMR',
+                'country' => $checkout->country ?? 'OM',
+
+                // Gateway status only
+                'status' => 'captured',
+
+                'response_code' => $checkout->response_code,
+                'response_message' => $checkout->response_message,
+                'payload' => $checkout->raw(),
+            ]);
+        });
+
+        /**
+         * 3️⃣ Return success
+         */
+        return response()->json([
+            'message' => __('wallet.top_up_success'),
+            'redirect_url' => $checkout->redirect_url,
+        ]);
+    }
+}

@@ -21,6 +21,9 @@ class Therapist extends Model
         'certificate_file' ,
         'license_number' ,
         'license_authority' ,
+        'video_consultation_price' ,
+        'chat_consultation_price' ,
+        'currency' ,
         'bio' ,
         'license_file' ,
 

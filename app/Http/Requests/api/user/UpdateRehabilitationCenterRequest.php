@@ -47,6 +47,10 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'commercial_registration_file' => 'required_if:has_commercial_registration,true|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'commercial_registration_authority' => 'required_if:has_commercial_registration,true|string|max:255',
 
+            'video_consultation_price' => ['required', 'numeric', 'min:0'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:0'],
+            'currency' => ['required', 'string', 'size:3'],
+
         ];
     }
 
@@ -151,6 +155,16 @@ class UpdateRehabilitationCenterRequest extends FormRequest
 
             'is_have_evening_time.required' => __('validation.required', ['attribute' => __('validation.attributes.is_have_evening_time')]),
             'is_have_evening_time.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_have_evening_time')]),
+
+            'video_consultation_price.required' => __('validation.required', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'video_consultation_price.numeric' => __('validation.numeric', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'video_consultation_price.min' => __('validation.min.numeric', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'chat_consultation_price.required' => __('validation.required', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'chat_consultation_price.numeric' => __('validation.numeric', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'chat_consultation_price.min' =>  __('validation.min.numeric', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'currency.required' => __('validation.required', ['attribute' => __('validation.attributes.currency')]),
+            'currency.string' =>__('validation.string', ['attribute' => __('validation.attributes.currency')]),
+            'currency.size' =>__('validation.size.string', ['attribute' => __('validation.attributes.currency')]),
         ];
     }
     public function getData(): array

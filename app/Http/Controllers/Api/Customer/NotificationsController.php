@@ -29,13 +29,21 @@ class NotificationsController extends Controller
     public function getNotificationsForCurrentUser(Request $request): \Illuminate\Http\JsonResponse
     {
          try {
-            $user = auth('api')->user();
+            $customer = auth('api')->user();
             $limit = $request->get('limit', config('app.pagination_limit')) ?? 10;
-            if(!$user)
-            {throw new \Exception('Get Current User  Failed');}
-            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $user->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
-            $nextCursor = $notifications->nextCursor()?->encode();
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
+            $cursor = $request->query('next_cursor'); // هذا الـ cursor الجديد
+             if(!$customer) {throw new \Exception('Get Current User  Failed');}
+//            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $customer->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
+//            $nextCursor = $notifications->nextCursor()?->encode();
+             $notificationsQuery = Notification::where('notifiable_id',  $customer->id)
+                 ->with(['notifiable'])
+                 ->orderBy('created_at', 'desc');
+//                ->orderBy('id', 'desc');
+
+             // إذا كان هناك cursor موجود، استخدمه
+             $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
+             $nextCursor = $notifications->nextCursor()?->encode();
+             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }

@@ -94,6 +94,9 @@ class StoreTherapistRequest extends FormRequest
                     }
                 }
             ],
+            'video_consultation_price' => ['required', 'numeric', 'min:0'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:0'],
+            'currency' => ['required', 'string', 'size:3'],
            ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
@@ -187,6 +190,15 @@ class StoreTherapistRequest extends FormRequest
             'country.required' => __('validation.required', ['attribute' => __('validation.attributes.country')]),
             'timezone.required' => __('validation.required', ['attribute' => __('validation.attributes.timezone')]),
 
+            'video_consultation_price.required' => __('validation.required', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'video_consultation_price.numeric' => __('validation.numeric', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'video_consultation_price.min' => __('validation.min.numeric', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'chat_consultation_price.required' => __('validation.required', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'chat_consultation_price.numeric' => __('validation.numeric', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'chat_consultation_price.min' =>  __('validation.min.numeric', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+            'currency.required' => __('validation.required', ['attribute' => __('validation.attributes.currency')]),
+            'currency.string' =>__('validation.string', ['attribute' => __('validation.attributes.currency')]),
+            'currency.size' =>__('validation.size.string', ['attribute' => __('validation.attributes.currency')]),
         ];
     }
 

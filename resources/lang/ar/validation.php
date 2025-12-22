@@ -270,6 +270,20 @@ return [
         'custom_subcategory' => 'فئة فرعية مخصصة' ,
         'category' => 'فئة' ,
         'subcategory' => 'فئة فرعية' ,
-
+        'video_consultation_price' => 'سعر الاستشارة المرئية',
+        'chat_consultation_price'  => 'سعر الاستشارة النصية',
+        'currency'                 => 'العملة',
+        'amount' => 'المبلغ',
+        'payment_method' => 'طريقة الدفع',
+        'card_token' => 'البطاقة',
+        'bank_account_id' => 'الحساب البنكي',
     ],
+
+    'values' => [
+        'payment_method' => [
+            'card' => 'بطاقة',
+            'bank' => 'تحويل بنكي',
+        ],
+    ],
+
 ];

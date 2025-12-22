@@ -134,7 +134,15 @@ class Customer extends Authenticatable
         return $this->hasMany(ProgramEnrollment::class);
     }
 
+    public function cards(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Card::class, 'owner');
+    }
 
+    public function bankAccounts(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(bankAccount::class, 'owner');
+    }
     protected static function boot()
     {
         parent::boot();
