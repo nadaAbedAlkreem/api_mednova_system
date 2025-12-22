@@ -37,8 +37,8 @@ class NotificationsController extends Controller
 //            $nextCursor = $notifications->nextCursor()?->encode();
              $notificationsQuery = Notification::where('notifiable_id',  $customer->id)
                  ->with(['notifiable'])
-                 ->orderBy('created_at', 'desc');
-//                ->orderBy('id', 'desc');
+                 ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc');
 
              // إذا كان هناك cursor موجود، استخدمه
              $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
