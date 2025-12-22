@@ -39,9 +39,9 @@ class NotificationsController extends Controller
                  ->with(['notifiable'])
                  ->orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc');
-              dd($notificationsQuery);
-             // إذا كان هناك cursor موجود، استخدمه
+              // إذا كان هناك cursor موجود، استخدمه
              $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
+             dd($notifications);
              $nextCursor = $notifications->nextCursor()?->encode();
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
         }catch (\Exception $exception){
