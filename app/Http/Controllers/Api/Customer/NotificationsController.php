@@ -39,7 +39,7 @@ class NotificationsController extends Controller
                  ->with(['notifiable'])
                  ->orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc');
-
+              dd($notificationsQuery);
              // إذا كان هناك cursor موجود، استخدمه
              $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
              $nextCursor = $notifications->nextCursor()?->encode();
