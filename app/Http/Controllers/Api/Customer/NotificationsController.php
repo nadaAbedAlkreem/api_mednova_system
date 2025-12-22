@@ -35,9 +35,11 @@ class NotificationsController extends Controller
              if(!$customer) {throw new \Exception('Get Current User  Failed');}
 //            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $customer->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
 //            $nextCursor = $notifications->nextCursor()?->encode();
-             $notificationsQuery = Notification::where('notifiable_id',  $customer->id)
-                 ->with(['notifiable']);
-//                 ->orderBy('created_at', 'desc')
+             $notificationsQuery = Notification::query()
+                 ->select('notifications.*') // ← مهم جدًا
+                 ->where('notifiable_id', $customer->id)
+                 ->orderBy('created_at', 'desc')
+                 ->orderBy('id', 'desc');
 //                ->orderBy('id', 'desc');
               // إذا كان هناك cursor موجود، استخدمه
              $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
