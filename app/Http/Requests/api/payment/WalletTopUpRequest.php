@@ -24,8 +24,9 @@ class WalletTopUpRequest extends FormRequest
         return [
             'amount' => ['required', 'numeric', 'min:1'],
             'payment_method' => ['required', 'in:card,apple_pay,bank'],
-            'card_token' => ['required_if:payment_method,card'],
-            'bank_account_id' => ['required_if:payment_method,bank'],
+
+//            'card_token' => ['required_if:payment_method,card'],
+//            'bank_account_id' => ['required_if:payment_method,bank'],
         ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
@@ -59,7 +60,9 @@ class WalletTopUpRequest extends FormRequest
             'card_token.required_if' => __('validation.required_if', ['attribute' => __('validation.attributes.card_token'), 'other' => __('validation.attributes.payment_method'), 'value' => __('validation.values.payment_method.card'),]),
             // bank_account_id
             'bank_account_id.required_if' => __('validation.required_if', ['attribute' => __('validation.attributes.bank_account_id'), 'other' => __('validation.attributes.payment_method'), 'value' => __('validation.values.payment_method.bank'),]),
-        ];
+
+
+            ];
     }
 
 

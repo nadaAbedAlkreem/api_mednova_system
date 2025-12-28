@@ -21,8 +21,7 @@ class WalletTopUpService
         private WalletRepository         $wallets,
         private AmwalPayService          $amwalPay,
         CardRepository                   $cards,
-        BaseRepository                   $bank
-    )
+        BaseRepository                   $bank)
     {
     }
 

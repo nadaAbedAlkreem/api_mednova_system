@@ -17,14 +17,13 @@ class WalletRepository  extends BaseRepository implements IWalletRepositories
     {
         return Wallet::where('owner_id', $owner->id)
             ->where('owner_type', get_class($owner))
-            ->lockForUpdate() // 🔒 مهم جداً للعمليات المالية
-            ->firstOrCreate();
+            ->lockForUpdate()
+            ->firstOrCreate(['owner_id'   => $owner->id, 'owner_type' => get_class($owner)]);
     }
     public function increaseAvailableBalance(Wallet $wallet, float $amount): Wallet
     {
         $wallet->available_balance += $amount;
         $wallet->save();
-
         return $wallet;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 
 use App\Models\BankAccount;
+use App\Models\GatewayPayment;
 use App\Repositories\IGatewayPaymentRepositories;
 
 
@@ -11,6 +12,6 @@ class GatewayPaymentRepository extends BaseRepository implements  IGatewayPaymen
 {
     public function __construct()
     {
-        $this->model = new BankAccount();
+        $this->model = new GatewayPayment();
     }
 }

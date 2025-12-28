@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveDeviceController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
+use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
 use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
 use App\Http\Controllers\Api\Program\ProgramVideosController;
@@ -184,6 +185,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
+    Route::prefix('payment-gateway')->group(function () {
+        Route::post('create-link-payment', [WalletTopUpController::class, 'store']);
+
+    });
+
 });
 //Route::middleware(VerifyDeviceToken::class)->prefix('smart-glove-device-simulation')->group(function () {
 //    Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
@@ -199,6 +205,9 @@ Route::prefix('zoom-webhook')->group(function ()
 {
     Route::post('handle',[ZoomWebhookController::class, 'handle']);
 
+
 });
+
+Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
 
 Route::get('test',[ZoomWebhookController::class, 'testZoomWebhook']);
