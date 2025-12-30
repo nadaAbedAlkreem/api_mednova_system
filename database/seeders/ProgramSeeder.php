@@ -56,7 +56,7 @@ class ProgramSeeder extends Seeder
                     'title_en' => "Training Program #$i",
                     'description_ar' => "هذا وصف تجريبي للبرنامج رقم $i.",
                     'description_en' => "This is a sample description for program #$i.",
-                    'cover_image' => 'https://via.placeholder.com/600x400.png?text=Program+' . $i,
+                    'cover_image' => 'https://mednovacare.com/storage/therapist_profile_images/therapist_profile/ee7d30ad-ce3a-4076-a1a1-14303f0ed4d3.jpg',
                     'price' => rand(100, 500),
                     'status' => 'published',
                     'is_approved' => true,

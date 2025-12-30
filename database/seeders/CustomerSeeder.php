@@ -21,6 +21,7 @@ class CustomerSeeder extends Seeder
                 'email' => 'customer@gmail.com',
                 'gender' => 'male',
                 'phone' => '0598188846',
+                'image' =>  'https://mednovacare.com/storage/therapist_profile_images/therapist_profile/aa69e132-5165-4d5d-a1f1-37b5091319b4.jpg',
                 'password' => Hash::make('123456789'), // Ensure password is hashed
                 'created_at' => now(),
                 'updated_at' => now(),
