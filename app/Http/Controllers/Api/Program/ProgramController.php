@@ -11,7 +11,7 @@ use App\Models\Program;
 use App\Repositories\IProgramRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
