@@ -29,7 +29,7 @@ class ProgramController extends Controller
     {
         try {
             $limit = $request->get('limit', config('app.pagination_limit'));
-            $programs = $this->programRepositories->paginateWhereWith(['is_approved'=>1] ,['creator'] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit );
+            $programs = $this->programRepositories->paginateWhereWith(['is_approved' => 1], ['creator'], ['notifiable'], [['column' => 'id', 'dir' => 'DESC']], $limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
 
         }catch (\Exception $e){
