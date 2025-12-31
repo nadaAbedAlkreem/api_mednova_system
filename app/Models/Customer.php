@@ -14,6 +14,12 @@ class Customer extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasApiTokens, HasFactory,  SoftDeletes;
+    const TYPE_PATIENT = 'patient';
+    const TYPE_THERAPIST = 'therapist';
+    const TYPE_CENTER = 'rehabilitation_center';
+
+    const STATUS_PENDING = 'pending';
+    const STATUS_ACTIVE = 'active';
     protected $fillable = [
         'full_name',
         'email',
@@ -33,6 +39,7 @@ class Customer extends Authenticatable
         'timezone',
         'email_verified_at',
     ];
+
 
     public function complainantReport(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -213,6 +220,12 @@ class Customer extends Authenticatable
                 $deviceRequests->delete();
             });
         });
+    }
+    public static function resolveDefaultStatus(string $type): string
+    {
+        return $type === self::TYPE_PATIENT
+            ? self::STATUS_ACTIVE
+            : self::STATUS_PENDING;
     }
 
 
