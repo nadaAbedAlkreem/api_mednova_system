@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Api;
+namespace App\Services\api;
 
 use App\Jobs\ExecuteGloveExercise;
 use App\Models\Device;
