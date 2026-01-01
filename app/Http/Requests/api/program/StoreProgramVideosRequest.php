@@ -93,7 +93,7 @@ class StoreProgramVideosRequest extends FormRequest
                         'public',
                         'videos'
                     );
-                    $data['videos'][$index]['video_path'] = asset('public/storage/' . $path);
+                    $data['videos'][$index]['video_path'] = asset('storage/' . $path);
                 }
             }
         }
