@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
        $this->call([
-//                AdminSeeder::class,
+                AdminSeeder::class,
 //           MedicalSpecialtieSeeder::class,
 //           DeviceSeeder::class,
          ]);
@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
 //        // 🔹 تقييمات تجريبية
 //        $this->call([ProgramSeeder::class, RatingSeeder::class]);
 //        $this->call([RatingSeeder::class]);
-        $this->call([RehabilitationCenterSeeder::class]);
+//        $this->call([RehabilitationCenterSeeder::class]);
 
     }
 }
