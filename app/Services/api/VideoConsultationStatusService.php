@@ -266,7 +266,7 @@ class VideoConsultationStatusService
         ]);
 
         $consultation->update([
-            'status' =>'cancelled',
+            'status' =>'end',
         ]);
 
         $patient  = $consultation->patient->full_name  ?? 'patient';
