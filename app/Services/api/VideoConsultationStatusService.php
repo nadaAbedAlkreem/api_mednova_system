@@ -261,6 +261,7 @@ class VideoConsultationStatusService
     public function endMeeting($consultation): void
     {
         $consultation->appointmentRequest->update([
+            'status' => 'completed',
             'is_finished' =>true,
             'finished_at' => now(),
         ]);
@@ -287,6 +288,12 @@ class VideoConsultationStatusService
 
     public function cancel($consultation, string $reason): void
     {
+        $consultation->appointmentRequest->update([
+            'status' => 'cancelled',
+            'is_finished' =>true,
+            'finished_at' => now(),
+        ]);
+
         $consultation->update([
             'status' => 'cancelled',
             'ended_at' => now(),
@@ -300,24 +307,6 @@ class VideoConsultationStatusService
             'cancelled_by_system'
         ));
 
-//        optional($consultation->appointmentRequest)->delete();
-//        $consultation->delete();
     }
 //
-//
-//    public function complete($consultation): void
-//    {
-//        $consultation->update([
-//            'status' => 'completed',
-//            'ended_at' => now(),
-//        ]);
-//
-//        event(new \App\Events\ConsultationRequested(
-//            $consultation,
-//            "تم اكتمال جلسة الفيديو",
-//            'completed'
-//        ));
-//
-////        $consultation->delete();
-//    }
 }

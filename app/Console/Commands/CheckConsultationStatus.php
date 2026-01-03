@@ -38,29 +38,27 @@ class CheckConsultationStatus extends Command
 
     private function determineStatus($consultant, $patient, $duration)
     {
-        // الطرفان وافقا
-        Log::info('NADA HERE 777' , compact('consultant', 'patient'));
-         if ($consultant == 1 && $patient == 1) {
+        if (is_null($consultant) || is_null($patient)) {
+            return ['pending_review', 'No response from one or both parties.'];
+        }
+
+        if ($consultant === 1 && $patient === 1) {
             return ['completed', 'Both parties approved.'];
         }
 
-        // الطرفان رفضا
-        if ($consultant == 0 && $patient == 0) {
-            // الجلسة تمت؟
-//            if ($duration > 5) {
-//                return ['completed', 'No response from both parties, session completed.'];
-//            }
-            return ['cancelled', 'Session did not happen (duration <= 5 minutes).'];
+        if ($consultant === 0 && $patient === 0) {
+            return ['cancelled', 'Both parties declined the consultation.'];
         }
 
-        // اختلاف الآراء
-        if (($consultant == 1 && $patient == 0) ||
-            ($consultant == 0 && $patient == 1)) {
+        if (
+            ($consultant === 1 && $patient === 0) ||
+            ($consultant === 0 && $patient === 1)
+        ) {
             return ['disputed', 'Approval disagreement.'];
         }
 
-        // حالات غير واضحة
-        return ['disputed', 'Unclear condition, flagged for manual review.'];
+        // أي حالة غريبة
+        return ['pending_review', 'Unclear condition, flagged for manual review.'];
     }
 
 }

@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'active', 'rejected'])->change();
+        Schema::table('consultation_video_requests', function (Blueprint $table) {
+            $table->enum('status',['pending','accepted','active','completed','cancelled' , 'pending_review'])->default('pending')->change();
+
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customer', function (Blueprint $table) {
+        Schema::table('consultation_video_requests', function (Blueprint $table) {
             //
         });
     }
