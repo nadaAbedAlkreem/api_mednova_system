@@ -356,19 +356,6 @@ class ZoomMeetingService
         }
         Log::info("Participant Data: " . json_encode($participant));
         Log::info('zoom consultation:  $participantEmail');
-        // Zoom sometimes sends "email" instead of "user_email"
-//        $participantEmail = $payload['payload']['object']['participant']['email']
-//            ?? $payload['payload']['object']['participant']['user_email']
-//            ?? null;
-//
-//        if (!$participantEmail) {
-//            Log::warning('Zoom participant email missing (left event)', $payload);
-//            return;
-//        }
-//
-//        $user = ($consultation->consultant->email === $participantEmail)
-//            ? ['id' => $consultation->consultant_id, 'role' => 'consultant']
-//            : ['id' => $consultation->patient_id, 'role' => 'patient'];
         $participantUuid = $payload['payload']['object']['participant']['participant_uuid'] ?? [];
         Log::info('zoom consultation:participantUuid' . json_encode($participantUuid) );
         $activity = $consultation->activities()->firstOrNew([

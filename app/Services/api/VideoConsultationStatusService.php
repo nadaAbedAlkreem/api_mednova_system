@@ -139,12 +139,13 @@ class VideoConsultationStatusService
             $this->processActivityReminders($consultation, $now);
         }
     }
+
     private function endApiZoomPlatform(ConsultationVideoRequest $consultation): void
     {
         try {
             Log::info('end-api-zoom-platform' . json_encode($consultation));
             $this->zoomMeetingService->endMeetingLinkZoom($consultation);
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
     }
@@ -265,7 +266,7 @@ class VideoConsultationStatusService
         ]);
 
         $consultation->update([
-            'status' =>'end',
+            'status' =>'cancelled',
         ]);
 
         $patient  = $consultation->patient->full_name  ?? 'patient';

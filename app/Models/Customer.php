@@ -154,6 +154,11 @@ class Customer extends Authenticatable
     {
         parent::boot();
 
+        static::creating(function ($customer) {
+            if (empty($customer->status) && !empty($customer->type_account)) {
+                $customer->status = self::resolveDefaultStatus($customer->type_account);
+            }
+        });
         static::deleting(function ($customer) {
             $customer->location()->each(function ($location) {
                 $location->delete();
@@ -221,6 +226,9 @@ class Customer extends Authenticatable
             });
         });
     }
+
+
+
     public static function resolveDefaultStatus(string $type): string
     {
         return $type === self::TYPE_PATIENT

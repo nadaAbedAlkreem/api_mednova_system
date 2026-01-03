@@ -20,7 +20,7 @@ class EnrollmentService
 
         $topEnrolled = ProgramEnrollment::with([
            'program' => function ($query) {
-            $query->withAvg('ratings', 'rating')
+            $query->where(['is_approved' => 1])->withAvg('ratings', 'rating')
             ->withCount('ratings');
            }
            ])

@@ -101,6 +101,7 @@ class RegisterUserRequest extends FormRequest
             $data['password'] = Hash::make($data['password']);
         }
 
+
         return $data;
     }
 
