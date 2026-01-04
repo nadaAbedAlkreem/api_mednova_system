@@ -13,7 +13,8 @@ class SearchServiceProviderService
 
     public function searchServiceProviders($filters): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $query = Customer::query();
+//        $query = Customer::query();
+        $query = Customer::specialistsAndCenters();
         $limit = $filters['limit'] ?? 5;
 
         // البحث حسب نوع الحساب

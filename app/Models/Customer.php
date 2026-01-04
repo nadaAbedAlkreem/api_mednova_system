@@ -3,13 +3,11 @@
 namespace App\Models;
 
 use App\Models\Scopes\ActiveVerifiedCustomerScope;
-use Database\Factories\CustomerFactory;
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Builder;
 
 class Customer extends Authenticatable
 {
@@ -237,6 +235,12 @@ class Customer extends Authenticatable
             : self::STATUS_PENDING;
     }
 
-
+    public function scopeSpecialistsAndCenters(Builder $query): Builder
+    {
+        return $query->whereIn('type_account', [
+            self::TYPE_THERAPIST,
+            self::TYPE_CENTER,
+        ]);
+    }
 
 }
