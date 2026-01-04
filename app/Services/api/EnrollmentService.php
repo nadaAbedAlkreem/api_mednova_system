@@ -20,7 +20,8 @@ class EnrollmentService
 
         $topEnrolled = ProgramEnrollment::query()
             ->whereHas('program', function ($query) {
-                $query->where('is_approved', 1);
+                $query->where('is_approved', 1)
+                    ->where('status', 'published');
             })
             ->with([
                 'program' => function ($query) {
