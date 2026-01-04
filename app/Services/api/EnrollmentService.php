@@ -18,24 +18,32 @@ class EnrollmentService
     {
         $limit = $request->get('limit', config('app.pagination_limit')) ;
 
-        $topEnrolled = ProgramEnrollment::with([
-           'program' => function ($query) {
-            $query->where(['is_approved' => 1])->withAvg('ratings', 'rating')
-            ->withCount('ratings');
-           }
-           ])
+        $topEnrolled = ProgramEnrollment::query()
+            ->whereHas('program', function ($query) {
+                $query->where('is_approved', 1);
+            })
+            ->with([
+                'program' => function ($query) {
+                    $query
+                        ->withAvg('ratings', 'rating')
+                        ->withCount('ratings');
+                }
+            ])
             ->select('program_id')
             ->selectRaw('COUNT(*) as enrollments_count')
             ->groupBy('program_id')
             ->orderByDesc('enrollments_count')
             ->paginate($limit);
 
-        $data = $topEnrolled->map(function ($enrolled) {
+        $data = $topEnrolled->getCollection()->map(function ($enrolled) {
             $program = $enrolled->program;
             $program->enrollments_count = $enrolled->enrollments_count;
             return $program;
         });
-        return $data;
+
+        $topEnrolled->setCollection($data);
+
+        return $topEnrolled;
 
     }
 
