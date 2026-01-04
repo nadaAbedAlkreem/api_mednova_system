@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveVerifiedCustomerScope;
 use Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -153,7 +154,7 @@ class Customer extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-
+        static::addGlobalScope(new ActiveVerifiedCustomerScope);
         static::creating(function ($customer) {
             if (empty($customer->status) && !empty($customer->type_account)) {
                 $customer->status = self::resolveDefaultStatus($customer->type_account);
