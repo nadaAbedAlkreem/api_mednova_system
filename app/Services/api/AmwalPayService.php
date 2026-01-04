@@ -160,7 +160,13 @@ class AmwalPayService
 //                'gateway_transaction_id' => $payload['transaction_id'],
 //                'gateway_reference' => $payload['billerRefNumber'],
 //                'payload' => $payload['raw'],
+//                'status' => 'captured',
 //            ]);
+        // create method payment by back or card if get it
+        //create notification
+        //if failed payment transaction what is behaver us should do it
+
+
 
 
 //         }    باقي تحديث قيمة  البلانس

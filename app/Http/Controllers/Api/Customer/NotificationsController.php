@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Consultation\NotificationsResource;
 use App\Models\Notification;
 use App\Repositories\INotificationRepositories;
+use App\Services\api\TimezoneService;
 use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ use Illuminate\Http\Request;
 class NotificationsController extends Controller
 {
 
-    use ResponseTrait ;
+    use ResponseTrait;
+
     protected INotificationRepositories $notificationRepositories;
 
     public function __construct(INotificationRepositories $notificationRepositories)
@@ -28,31 +30,36 @@ class NotificationsController extends Controller
      */
     public function getNotificationsForCurrentUser(Request $request): \Illuminate\Http\JsonResponse
     {
-         try {
+        try {
             $customer = auth('api')->user();
             $limit = $request->get('limit', config('app.pagination_limit')) ?? 10;
             $cursor = $request->query('next_cursor'); // هذا الـ cursor الجديد
-             if(!$customer) {throw new \Exception('Get Current User  Failed');}
+            if (!$customer) {
+                throw new \Exception('Get Current User  Failed');
+            }
 //            $notifications = $this->notificationRepositories->cursorPaginateWhereWith(['notifiable_id' => $customer->id] , ['notifiable'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
 //            $nextCursor = $notifications->nextCursor()?->encode();
-             $notificationsQuery = Notification::query()
-                 ->select('notifications.*') // ← مهم جدًا
-                 ->where('notifiable_id', $customer->id)
-                 ->orderBy('created_at', 'desc')
-                 ->orderBy('id', 'desc');
+            $notificationsQuery = Notification::query()
+                ->select('notifications.*') // ← مهم جدًا
+                ->where('notifiable_id', $customer->id)
+                ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc');
+
 //                ->orderBy('id', 'desc');
-              // إذا كان هناك cursor موجود، استخدمه
-             $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
-             $nextCursor = $notifications->nextCursor()?->encode();
-             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' =>NotificationsResource::collection($notifications) ,'next_cursor' => $nextCursor], 200);
-        }catch (\Exception $exception){
+            // إذا كان هناك cursor موجود، استخدمه
+            $notifications = $notificationsQuery->cursorPaginate($limit, ['*'], 'cursor', $cursor);
+            $nextCursor = $notifications->nextCursor()?->encode();
+//            $notifications['created_at'] = TimezoneService::toUserTimezone(
+//                $notifications['created_at'], $customer['timezone'] ?? config('app.timezone'), 'Y-m-d H:i');
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['notification' => NotificationsResource::collection($notifications), 'next_cursor' => $nextCursor], 200);
+        } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
 
     public function markAsRead(): \Illuminate\Http\JsonResponse
     {
-        try{
+        try {
             $currentUserID = auth('api')->id();
             if (!$currentUserID) {
                 throw new \Exception('current not found');
@@ -60,9 +67,11 @@ class NotificationsController extends Controller
             $updated = Notification::where('notifiable_id', $currentUserID)
                 ->where('read_at', null)
                 ->update(['read_at' => now()]);
-            if($updated){ event(new MessageRead($currentUserID,  $currentUserID));}
+            if ($updated) {
+                event(new MessageRead($currentUserID, $currentUserID));
+            }
             return $this->successResponse(__('messages.UPDATE_SUCCESS'));
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()]);
         }
     }
