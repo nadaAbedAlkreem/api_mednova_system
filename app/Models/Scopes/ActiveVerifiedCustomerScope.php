@@ -14,9 +14,9 @@ class ActiveVerifiedCustomerScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-//        $builder
-//            ->where('status', Customer::STATUS_ACTIVE)
-//            ->whereNotNull('email_verified_at')
-//            ->where('is_banned', false);
+        $builder
+            ->where('status', Customer::STATUS_ACTIVE)
+            ->whereNotNull('email_verified_at')
+            ->where('is_banned', false);
     }
 }
