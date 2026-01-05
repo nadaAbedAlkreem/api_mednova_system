@@ -80,6 +80,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
             'consultation_type' => ($this->consultation instanceof \App\Models\ConsultationVideoRequest) ? 'video' : 'chat',
             'video_room_link' => $this->consultation instanceof \App\Models\ConsultationVideoRequest ? $this->consultation->video_room_link : null,
             'message' => $this->message,
+            'created_at' => $this->consultation->created_at,
         ];
     }
 }
