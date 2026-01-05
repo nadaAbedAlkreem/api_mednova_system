@@ -152,7 +152,6 @@ class Customer extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-        static::addGlobalScope(new ActiveVerifiedCustomerScope);
         static::creating(function ($customer) {
             if (empty($customer->status) && !empty($customer->type_account)) {
                 $customer->status = self::resolveDefaultStatus($customer->type_account);
@@ -242,5 +241,13 @@ class Customer extends Authenticatable
             self::TYPE_CENTER,
         ]);
     }
+    public function scopeActiveVerified($query)
+    {
+        return $query
+            ->where('status', self::STATUS_ACTIVE)
+            ->whereNotNull('email_verified_at')
+            ->where('is_banned', false);
+    }
+
 
 }

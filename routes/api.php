@@ -50,7 +50,7 @@ Route::prefix('auth')->group(function ()
         Route::prefix('medical-specialties')->group(function ()
         {
             Route::get('', [MedicalSpecialtieController::class, 'getAll']);
-            Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
+//            Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
         });
         Route::get('programs/show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
         Route::post('consultation-request/video/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
