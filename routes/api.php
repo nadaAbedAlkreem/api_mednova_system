@@ -208,5 +208,5 @@ Route::prefix('zoom-webhook')->group(function ()
 
 });
 
+Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
 
-Route::get('test',[ZoomWebhookController::class, 'testZoomWebhook']);
