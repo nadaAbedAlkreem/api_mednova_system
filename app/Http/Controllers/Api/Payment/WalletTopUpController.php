@@ -4,18 +4,12 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\payment\WalletTopUpRequest;
-use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
-use App\Repositories\Eloquent\BankAccountRepository;
-use App\Repositories\Eloquent\CardRepository;
-use App\Repositories\Eloquent\GatewayPaymentRepository;
-use App\Repositories\Eloquent\TransactionRepository;
-use App\Repositories\Eloquent\WalletRepository;
 use App\Repositories\IWalletRepositories;
 use App\Services\api\AmwalPayService;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class WalletTopUpController extends Controller
 {

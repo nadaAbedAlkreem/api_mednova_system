@@ -9,7 +9,7 @@ use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class AmwalPayService
 {
