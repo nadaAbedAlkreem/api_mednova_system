@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\api;
 
+use App\Models\Customer;
 use App\Repositories\Eloquent\TransactionRepository;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\ITransactionRepositories;
@@ -48,6 +49,7 @@ class AmwalPayService
 
 
 
+
            $payload = [
                'billerRefNumber' => uniqid('wallet_'),
                'payerName' => $data['customer']->full_name,
@@ -81,19 +83,38 @@ class AmwalPayService
            if (!($response->successful() && ($response->json('success') === true))) {
                throw new \Exception(__('messages.failed_to_initialize'));
            }
+//           $transaction = $this->transactionRepository->create([
+//               'reference_type' => Customer::class,
+//               'reference_id'   =>  $data['customer']->id,
+//               'transaction_type' => 'wallet_top_up',
+//               'entry_type' => 'credit',
+//               'wallet_id' => $wallet->id,
+//
+//               'gross_amount' => $amount,
+//               'platform_commission' => 0,
+//               'vat_amount' => 0,
+//               'net_amount' => $amount,
+//
+//               'currency' => 'OMR',
+//               'status' => 'pending',
+//
+//               'meta' => [
+//                   'user_id' => $user->id,
+//               ],
+//           ]);
 
-           $this->gatewayPaymentRepository->create([
-               'transaction_id'         => null,
-               'gateway'                => 'amwal',
-               'gateway_transaction_id' => null,
-               'gateway_reference'      => $response['billerRefNumber'] ?? null,
-               'payment_method'         => $data['payment_method'],
-               'amount'                 => $data['amount'],
-               'currency'               => 'OMR',
-               'status'                 => 'initiated',
-               'response_message'       => $response['message'] ?? null,
-               'payload'                => $response, // JSON column ممتاز
-           ]);
+//           $this->gatewayPaymentRepository->create([
+//               'transaction_id'         => null,
+//               'gateway'                => 'amwal',
+//               'gateway_transaction_id' => null,
+//               'gateway_reference'      => $response['billerRefNumber'] ?? null,
+//               'payment_method'         => $data['payment_method'],
+//               'amount'                 => $data['amount'],
+//               'currency'               => 'OMR',
+//               'status'                 => 'initiated',
+//               'response_message'       => $response['message'] ?? null,
+//               'payload'                => $response, // JSON column ممتاز
+//           ]);
 
            return (object)[
                'success' => $response->successful() && ($response->json('success') === true),
@@ -125,26 +146,21 @@ class AmwalPayService
         Log::info('AmwalPay Webhook:', $request->all());
 //
 //         2. تحقق من الـ secure hash (للتأكد من أن الطلب أصلي)
-//        $payload = $request->all();
-//        $receivedHash = $payload['secureHashValue'] ?? null;
+        $payload = $request->all();
+        $receivedHash = $payload['secureHashValue'] ?? null;
 //
 //        // استخدم نفس الدالة generateSecureHash لتأكيد صحة البيانات
-//        $calculatedHash = $this->generateSecureHash($payload);
-//
-//        if ($receivedHash !== $calculatedHash) {
-//            return response()->json(['message' => 'Invalid secure hash'], 401);
-//        }
+        $calculatedHash = $this->generateSecureHash($payload);
+
+        if ($receivedHash !== $calculatedHash) {
+            return response()->json(['message' => 'Invalid secure hash'], 401);
+        }
 //
 //        // 3. معالجة الدفع حسب نوع الحدث
 //        // مثال: تحديث حالة الدفع في جدول المدفوعات
-//        $transactionId = $payload['billerRefNumber'] ?? null;
-//        $status = $payload['status'] ?? null; // تحقق من الوثائق الدقيقة للحقول
+        $transactionId = $payload['billerRefNumber'] ?? null;
+        $status = $payload['status'] ?? null; // تحقق من الوثائق الدقيقة للحقول
 //        if ($transactionId && $status) {
-//            $wallet = $this->wallets->getByOwner($customer);
-//            if(!$wallet)
-//            {
-//                throw new \Exception('Invalid wallent id');
-//            }
 //            $this->transactions->create([
 //                'reference_type' => User::class,
 //                'reference_id' => $customer->id,
@@ -162,6 +178,11 @@ class AmwalPayService
 //                'payload' => $payload['raw'],
 //                'status' => 'captured',
 //            ]);
+//            $wallet = $this->walletRepository->getByOwner();
+//            if(!$wallet)
+            {
+                throw new \Exception('Invalid wallent id');
+            }
         // create method payment by back or card if get it
         //create notification
         //if failed payment transaction what is behaver us should do it
