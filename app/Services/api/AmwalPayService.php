@@ -119,7 +119,7 @@ class AmwalPayService
 
         return hash_hmac('sha256', $baseString, $binaryKey);
     }
-    public function handleWebhook(Request $request ): \Illuminate\Http\JsonResponse
+    public function handleWebhook($request ): \Illuminate\Http\JsonResponse
     {
         // 1. سجل البيانات القادمة للتحقق
         Log::info('AmwalPay Webhook:', $request->all());
