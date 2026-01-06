@@ -14,6 +14,7 @@ use App\Repositories\Eloquent\WalletRepository;
 use App\Repositories\IWalletRepositories;
 use App\Services\api\AmwalPayService;
 use App\Traits\ResponseTrait;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
 class WalletTopUpController extends Controller
@@ -44,7 +45,9 @@ class WalletTopUpController extends Controller
              * 1️⃣ Create checkout session with Amwal Pay
              * (NO DB RECORDS YET)
              */
-            $paymentLink = $this->amwalPayService->createPaymentLinkByAmwalPay(['amount' => $request->amount, 'currency' => 'OMR', 'payment_method' => $request->payment_method, 'customer' => $customer]);
+             Log::info('AmwalPay Webhook test  in store:');
+
+             $paymentLink = $this->amwalPayService->createPaymentLinkByAmwalPay(['amount' => $request->amount, 'currency' => 'OMR', 'payment_method' => $request->payment_method, 'customer' => $customer]);
 
              return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
         } catch (\Exception $exception) {
@@ -61,6 +64,8 @@ class WalletTopUpController extends Controller
 //            if (!$customer instanceof Customer) {
 //                throw new \Exception('Get Current Customer  Failed');
 //            }
+            Log::info('AmwalPay Webhook test :');
+
             $paymentLink = $this->amwalPayService->handleWebhook($request);
 
             return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
