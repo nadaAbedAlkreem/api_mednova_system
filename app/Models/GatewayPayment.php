@@ -15,6 +15,8 @@ class GatewayPayment extends Model
 
     protected $fillable = [
         'transaction_id',
+        'reference_type',
+        'reference_id',
         'gateway',
         'gateway_transaction_id',
         'gateway_reference',
@@ -42,6 +44,10 @@ class GatewayPayment extends Model
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
+    }
+    public function reference(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo();
     }
 
     public function card(): \Illuminate\Database\Eloquent\Relations\BelongsTo

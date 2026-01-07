@@ -54,14 +54,8 @@ class WalletTopUpController extends Controller
     public function captureDataViaWebhook(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-//            $customer = $request->user();
-//            if (!$customer instanceof Customer) {
-//                throw new \Exception('Get Current Customer  Failed');
-//            }
             Log::info('AmwalPay Webhook test :');
-
             $paymentLink = $this->amwalPayService->handleWebhook($request);
-
             return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

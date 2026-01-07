@@ -13,5 +13,12 @@ class TransactionRepository  extends BaseRepository implements ITransactionRepos
     {
         $this->model = new Transaction();
     }
+    public function findByMeta(string $key, $value): ?Transaction
+    {
+        return $this->model
+            ->newQuery()
+            ->whereJsonContains("meta->$key", $value)
+            ->first();
+    }
 
 }

@@ -108,6 +108,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $item->update($data);
         return $item; // إعادة العنصر بعد التحديث
     }
+    public function updateReturnWhere(array $data, array $data2)
+    {
+        $item = $this->model->where($data)->first();
+        $item->update($data2);
+        return $item; // إعادة العنصر بعد التحديث
+    }
 
 
     public function getAllActive($orderBy = ['column' => 'id', 'dir' => 'DESC'])

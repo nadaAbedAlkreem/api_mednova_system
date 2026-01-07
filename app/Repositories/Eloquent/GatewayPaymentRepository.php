@@ -14,4 +14,12 @@ class GatewayPaymentRepository extends BaseRepository implements  IGatewayPaymen
     {
         $this->model = new GatewayPayment();
     }
+
+    public function findByReference(string $reference): ?GatewayPayment
+    {
+        return $this->model
+            ->where('gateway_reference', $reference)
+            ->lockForUpdate()
+            ->first();
+    }
 }
