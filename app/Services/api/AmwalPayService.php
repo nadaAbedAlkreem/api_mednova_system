@@ -218,7 +218,7 @@ class AmwalPayService
 
     private function generateSecureHash(array $payload): string
     {
-        unset($payload['secureHashValue']);
+        unset($payload['SecureHash']);
 
         ksort($payload);
 
