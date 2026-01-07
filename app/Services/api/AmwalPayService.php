@@ -236,29 +236,34 @@ class AmwalPayService
 
     private function generateSecureHashForWebhook(array $payload): string
     {
-        // حذف الـ SecureHash نفسه
+        // 1️⃣ إزالة SecureHash
         unset($payload['SecureHash']);
 
-        // إزالة القيم null تمامًا بدل تحويلها إلى empty string
-        $payload = array_map(fn($v) => is_array($v) || is_object($v) ? json_encode($v) : (string)$v, $payload);
+        // 2️⃣ تحويل القيم إلى string (null => empty)
+        $payload = array_map(
+            fn ($v) => $v === null ? '' : (string) $v,
+            $payload
+        );
 
-         if (isset($payload['AmountOMR'])) {
-            $payload['AmountOMR'] = number_format((float)$payload['AmountOMR'], 2, '.', '');
-        }
-        if (isset($payload['Amount'])) {
-            $payload['Amount'] = number_format((float)$payload['Amount'], 0, '.', '');
-        }
-        // ترتيب alphabetically
+        // 3️⃣ ترتيب Alphabetically
         ksort($payload);
 
-        // تحويل إلى key=value
-        $baseString = implode('&', array_map(fn($k, $v) => "$k=$v", array_keys($payload), $payload));
+        // 4️⃣ إنشاء baseString
+        $baseString = implode('&', array_map(
+            fn ($k, $v) => "{$k}={$v}",
+            array_keys($payload),
+            $payload
+        ));
 
-        $binaryKey = hex2bin(config('amwal.secure_key'));
+        // 5️⃣ إضافة الـ secret key في النهاية (NOT HMAC)
+        $secretKey = config('amwal.secure_key'); // hex string
+        $finalString = $baseString . $secretKey;
 
-        Log::info('Webhook baseString final: '.$baseString); // سجل للتحقق
+        Log::info('Webhook baseString final: ' . $baseString);
+        Log::info('Webhook string with key: ' . $finalString);
 
-        return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
+        // 6️⃣ SHA-256 فقط
+        return strtoupper(hash('sha256', $finalString));
     }
 
 
