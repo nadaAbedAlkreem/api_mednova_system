@@ -120,7 +120,7 @@ class AmwalPayService
 
         // 2⃣ تحقق من الـ secure hash
         $receivedHash = $payload['SecureHash'] ?? null;
-        $calculatedHash = $this->generateSecureHash($payload);
+        $calculatedHash = $this->generateSecureHashForWebhook($payload);
 
         if ($receivedHash !== $calculatedHash) {
             Log::warning('Invalid secure hash on webhook', $payload);
@@ -233,6 +233,27 @@ class AmwalPayService
 
         return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
+
+    private function generateSecureHashForWebhook(array $payload): string
+    {
+        // حذف الـ SecureHash نفسه
+        unset($payload['SecureHash']);
+
+        // تحويل كل value إلى string كما هو، null تصبح empty
+        $payload = array_map(fn($v) => is_null($v) ? '' : (string)$v, $payload);
+
+        // ترتيب alphabetically
+        ksort($payload);
+
+        // تحويل إلى key=value
+        $baseString = implode('&', array_map(fn($k, $v) => "$k=$v", array_keys($payload), $payload));
+        Log::info('Webhook baseString: '.$baseString);
+
+        $binaryKey = hex2bin(config('amwal.secure_key'));
+
+        return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
+    }
+
 
 
 
