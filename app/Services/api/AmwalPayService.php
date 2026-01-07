@@ -239,17 +239,18 @@ class AmwalPayService
         // حذف الـ SecureHash نفسه
         unset($payload['SecureHash']);
 
-        // تحويل كل value إلى string كما هو، null تصبح empty
-        $payload = array_map(fn($v) => is_null($v) ? '' : (string)$v, $payload);
+        // إزالة القيم null تمامًا بدل تحويلها إلى empty string
+        $payload = array_filter($payload, fn($v) => !is_null($v));
 
         // ترتيب alphabetically
         ksort($payload);
 
         // تحويل إلى key=value
         $baseString = implode('&', array_map(fn($k, $v) => "$k=$v", array_keys($payload), $payload));
-        Log::info('Webhook baseString: '.$baseString);
 
         $binaryKey = hex2bin(config('amwal.secure_key'));
+
+        Log::info('Webhook baseString final: '.$baseString); // سجل للتحقق
 
         return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
