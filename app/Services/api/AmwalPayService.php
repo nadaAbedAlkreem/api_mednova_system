@@ -237,7 +237,6 @@ class AmwalPayService
 
     private function generateSecureHashForWebhook(array $payload): string
     {
-        // الحقول المسموح بها فقط حسب الدوكمنت
         $allowedKeys = [
             'MerchantId',
             'TerminalId',
@@ -253,32 +252,26 @@ class AmwalPayService
             'CurrencyId',
         ];
 
-        // 1️⃣ فلترة payload
+        // 1️⃣ فلترة
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
 
         // 2️⃣ null → empty string
-        $filtered = array_map(
-            fn ($v) => $v === null ? '' : (string)$v,
-            $filtered
-        );
+        $filtered = array_map(fn ($v) => $v === null ? '' : (string)$v, $filtered);
 
         // 3️⃣ ترتيب أبجدي
         ksort($filtered);
 
-        // 4️⃣ baseString
-        $baseString = implode('&', array_map(
-            fn ($k, $v) => "{$k}={$v}",
-            array_keys($filtered),
-            $filtered
-        ));
+        // 4️⃣ base string
+        $baseString = collect($filtered)
+            ->map(fn($v, $k) => "{$k}={$v}")
+            ->implode('&');
 
-        // 5️⃣ append secret key (NOT HMAC)
-        $finalString = $baseString . config('amwal.secure_key');
+        Log::info('Webhook baseString: ' . $baseString);
 
-        Log::info('Webhook baseString final: ' . $baseString);
-        Log::info('Webhook string with key: ' . $finalString);
+        // 5️⃣ HMAC SHA256 (IMPORTANT)
+        $binaryKey = hex2bin(config('amwal.secure_key'));
 
-        return strtoupper(hash('sha256', $finalString));
+        return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
 
 
