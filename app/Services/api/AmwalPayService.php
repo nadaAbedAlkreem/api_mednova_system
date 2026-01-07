@@ -51,9 +51,10 @@ class AmwalPayService
                 throw new \Exception('Invalid payment method');
             }
 
+            $billerRef = Str::uuid()->toString();
 
             $payload = [
-                'billerRefNumber' =>Str::uuid()->toString(),
+                'billerRefNumber' => $billerRef,
                 'payerName' => $data['customer']->full_name,
                 'amount' => number_format($data['amount'], 3, '.', ''),
                 'currency' => $currency,
@@ -92,7 +93,7 @@ class AmwalPayService
                 'reference_id' => $data['customer']->id,
                 'gateway' => 'amwal',
                 'gateway_transaction_id' => null,
-                'gateway_reference' => $response['billerRefNumber'] ?? null,
+                'gateway_reference' => $billerRef,
                 'payment_method' => $data['payment_method'],
                 'amount' => $data['amount'],
                 'currency' => 'OMR',
