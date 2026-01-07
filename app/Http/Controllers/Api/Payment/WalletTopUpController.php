@@ -34,7 +34,7 @@ class WalletTopUpController extends Controller
                 throw new \Exception('Get Current Customer  Failed');
             }
              /** @var \App\Models\Wallet $wallet */
-            $wallet = $this->walletRepository->getByOwner($customer);
+            $wallet = $this->walletRepository->getByOwner($customer->id);
             /**
              * 1️⃣ Create checkout session with Amwal Pay
              * (NO DB RECORDS YET)
