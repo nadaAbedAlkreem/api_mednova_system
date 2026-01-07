@@ -17,7 +17,7 @@ class WalletRepository  extends BaseRepository implements IWalletRepositories
     public function getByOwner($ownerId): Wallet
     {
         return Wallet::where('owner_id',$ownerId )
-            ->where('owner_type', get_class($ownerId))
+            ->where('owner_type', Customer::class)
             ->lockForUpdate()
             ->firstOrCreate(['owner_id'   => $ownerId, 'owner_type' => Customer::class]);
     }
