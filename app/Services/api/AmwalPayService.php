@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AmwalPayService
 {
@@ -52,7 +53,7 @@ class AmwalPayService
 
 
             $payload = [
-                'billerRefNumber' => uniqid('wallet_'),
+                'billerRefNumber' =>Str::uuid()->toString(),
                 'payerName' => $data['customer']->full_name,
                 'amount' => number_format($data['amount'], 3, '.', ''),
                 'currency' => $currency,
@@ -218,18 +219,21 @@ class AmwalPayService
 
     private function generateSecureHash(array $payload): string
     {
-        unset($payload['SecureHash']);
+        unset($payload['SecureHash'], $payload['secureHashValue']);
 
+        // ترتيب المفتاح alphabetically
         ksort($payload);
 
+        // تحويل كل القيمة إلى string صريح
         $baseString = collect($payload)
-            ->map(fn($value, $key) => "{$key}={$value}")
+            ->map(fn($value, $key) => $value === null ? "{$key}=" : "{$key}={$value}")
             ->implode('&');
 
         $binaryKey = hex2bin(config('amwal.secure_key'));
 
-        return hash_hmac('sha256', $baseString, $binaryKey);
+        return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
+
 
 
 }
