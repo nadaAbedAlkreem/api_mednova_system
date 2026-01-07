@@ -240,8 +240,14 @@ class AmwalPayService
         unset($payload['SecureHash']);
 
         // إزالة القيم null تمامًا بدل تحويلها إلى empty string
-        $payload = array_filter($payload, fn($v) => !is_null($v));
+        $payload = array_map(fn($v) => is_array($v) || is_object($v) ? json_encode($v) : (string)$v, $payload);
 
+         if (isset($payload['AmountOMR'])) {
+            $payload['AmountOMR'] = number_format((float)$payload['AmountOMR'], 2, '.', '');
+        }
+        if (isset($payload['Amount'])) {
+            $payload['Amount'] = number_format((float)$payload['Amount'], 0, '.', '');
+        }
         // ترتيب alphabetically
         ksort($payload);
 
