@@ -195,12 +195,12 @@ class AmwalPayService
 //                            ],
                     ]);
                     // 6️⃣ حدّث GatewayPayment
-                    $this->gatewayPaymentRepository->update($gatewayPayment->id, [
+                    $this->gatewayPaymentRepository->update([
                         'transaction_id' => $transaction->id,
                         'gateway_transaction_id' => $systemReference,
                         'status' => $paymentStatus,
                         'payload' => $payload,
-                    ]);
+                    ],$gatewayPayment->id);
                     // تحديث رصيد الـ Wallet
                     $wallet->increment('balance', $amountOMR);
                     $wallet->increment('available_balance', $amountOMR);
