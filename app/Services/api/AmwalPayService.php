@@ -210,6 +210,9 @@ class AmwalPayService
         } catch (\Exception $e) {
             Log::error('Error processing AmwalPay webhook', [
                 'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
                 'payload' => $payload
             ]);
 
