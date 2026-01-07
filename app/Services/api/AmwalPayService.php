@@ -75,6 +75,7 @@ class AmwalPayService
 
             // Generate secure hash
             $payload['secureHashValue'] = $this->generateSecureHash($payload);
+            Log::error('secureHashValue in  payment link : ' .  $payload['secureHashValue']);
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -236,35 +237,50 @@ class AmwalPayService
 
     private function generateSecureHashForWebhook(array $payload): string
     {
-        // 1️⃣ إزالة SecureHash
-        unset($payload['SecureHash']);
+        // الحقول المسموح بها فقط حسب الدوكمنت
+        $allowedKeys = [
+            'MerchantId',
+            'TerminalId',
+            'AuthorizationDateTime',
+            'DateTimeLocalTrxn',
+            'ResponseCode',
+            'TxnType',
+            'PaidThrough',
+            'SystemReference',
+            'Message',
+            'MerchantReference',
+            'Amount',
+            'CurrencyId',
+        ];
 
-        // 2️⃣ تحويل القيم إلى string (null => empty)
-        $payload = array_map(
-            fn ($v) => $v === null ? '' : (string) $v,
-            $payload
+        // 1️⃣ فلترة payload
+        $filtered = array_intersect_key($payload, array_flip($allowedKeys));
+
+        // 2️⃣ null → empty string
+        $filtered = array_map(
+            fn ($v) => $v === null ? '' : (string)$v,
+            $filtered
         );
 
-        // 3️⃣ ترتيب Alphabetically
-        ksort($payload);
+        // 3️⃣ ترتيب أبجدي
+        ksort($filtered);
 
-        // 4️⃣ إنشاء baseString
+        // 4️⃣ baseString
         $baseString = implode('&', array_map(
             fn ($k, $v) => "{$k}={$v}",
-            array_keys($payload),
-            $payload
+            array_keys($filtered),
+            $filtered
         ));
 
-        // 5️⃣ إضافة الـ secret key في النهاية (NOT HMAC)
-        $secretKey = config('amwal.secure_key'); // hex string
-        $finalString = $baseString . $secretKey;
+        // 5️⃣ append secret key (NOT HMAC)
+        $finalString = $baseString . config('amwal.secure_key');
 
         Log::info('Webhook baseString final: ' . $baseString);
         Log::info('Webhook string with key: ' . $finalString);
 
-        // 6️⃣ SHA-256 فقط
         return strtoupper(hash('sha256', $finalString));
     }
+
 
 
 
