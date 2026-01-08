@@ -26,6 +26,7 @@ class ProgramResource extends JsonResource
                 'cover_image' => $this->cover_image ,
                 'videos'=> VideoResource::collection($this->whenLoaded('videos')),
                 'price' => $this->price ,
+                'currency' => $this->currency,
                 'status'=>$this->status ,
                 'rating'=>RatingResource::collection($this->whenLoaded('ratings')),
                 'is_approved'=> $this->is_approved ,

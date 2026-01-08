@@ -21,6 +21,7 @@ class Program extends Model
         'description_en',
         'cover_image',
         'price',
+        'currency',
         'status',
         'is_approved'
     ];
