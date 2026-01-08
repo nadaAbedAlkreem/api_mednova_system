@@ -29,13 +29,10 @@ class ProgramController extends Controller
     {
         try {
             $limit = $request->get('limit', config('app.pagination_limit'));
-            $programs = Program::with( ['creator' , 'ratings'])->withAvg('ratings', 'rating')->withCount('ratings')->withCount('enrollments')->orderBy( 'id',  'DESC')->paginate($limit);
-            //            $programs = $this->programRepositories->paginateWhereWith(['is_approved' => 1], ['creator'], ['column' => 'id', 'dir' => 'DESC'], $limit);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
-
-        }catch (\Exception $e){
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
-
+            $programs = $this->programRepositories->paginateWithDetails($limit);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ProgramResource::collection($programs), 200);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'),['error' => $e->getMessage()],500);
         }
     }
     public function getAllProgramsForCurrentProvider(): \Illuminate\Http\JsonResponse
@@ -94,16 +91,13 @@ class ProgramController extends Controller
     public function show($programId): \Illuminate\Http\JsonResponse
     {
         try {
-            $program = $this->programRepositories->findOne($programId);
-            if (! $program) {return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);}
-            $program = $program->loadCount('ratings', 'enrollments')
-                ->loadAvg('ratings', 'rating')
-                ->load(['creator', 'videos']);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($program), 201);
-        }catch (\Exception $exception)
-        {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-
+            $program = $this->programRepositories->findWithDetails($programId);
+            if (! $program) {
+                return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
+            }
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($program), 200);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
 

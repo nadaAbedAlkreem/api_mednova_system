@@ -12,5 +12,27 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
     {
         $this->model = new Program();
     }
+    public function baseQuery()
+    {
+        return Program::query()
+            ->with(['creator'])
+            ->withAvg('ratings', 'rating')
+            ->withCount('ratings')
+            ->withCount('enrollments');
+    }
+
+    public function findWithDetails(int $id)
+    {
+        return $this->baseQuery()
+            ->with(['videos'])
+            ->find($id);
+    }
+
+    public function paginateWithDetails(int $limit)
+    {
+        return $this->baseQuery()
+            ->orderBy('id', 'DESC')
+            ->paginate($limit);
+    }
 
 }
