@@ -24,6 +24,7 @@ class RatingResource extends JsonResource
                 'reviewee' => $resource,
                 'reviewee_type' =>  $this->reviewee_type  ,
                 'rating' => $this->rating ,
+                'comment' => $this->comment
              ] ;
     }
 }
