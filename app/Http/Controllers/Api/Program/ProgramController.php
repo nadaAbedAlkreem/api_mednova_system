@@ -28,7 +28,7 @@ class ProgramController extends Controller
     public function getAll(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $limit = $request->get('limit', config('app.pagination_limit'));
+            $limit = $request->get('limit', config('app.pagination_limit'))  ??  5 ;
             $programs = $this->programRepositories->paginateWithDetails($limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ProgramResource::collection($programs), 200);
         } catch (\Exception $e) {
