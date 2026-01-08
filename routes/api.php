@@ -52,7 +52,13 @@ Route::prefix('auth')->group(function ()
             Route::get('', [MedicalSpecialtieController::class, 'getAll']);
 //            Route::get('/filter', [MedicalSpecialtieController::class, 'getServiceProviderDependMedicalSpecialties']); // not work
         });
-        Route::get('programs/show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
+        Route::prefix('programs')->group(function ()
+        {
+            Route::get('show/get-top-enrolled-program', [ProgramEnrollmentController::class, 'getTopEnrolledProgram']);        // نشر البرنامج done
+            Route::get('', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
+            Route::get('{id}', [ProgramController::class, 'show']);
+        });
+
         Route::post('consultation-request/video/check-available-slots', [AppointmentRequestController::class, 'checkAvailableSlots']);
 
         Route::prefix('customer')->group(function ()
@@ -110,10 +116,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 //    Route::post('/zoom/webhooks', [ZoomWebhookController::class, 'handle']);
     Route::prefix('programs')->group(function () {
-        Route::get('/', [ProgramController::class, 'getAll']);  //done get all programs for every one service provider
-//        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
+ //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
         Route::post('/', [ProgramController::class, 'store']);
-        Route::get('{id}', [ProgramController::class, 'show']);
         Route::post('program/update', [ProgramController::class, 'update']);
         Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
         Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
