@@ -30,7 +30,6 @@ class ProgramController extends Controller
         try {
             $limit = $request->get('limit', config('app.pagination_limit'));
             $programs = Program::with( ['creator' , 'ratings'])->withAvg('ratings', 'rating')->withCount('ratings')->withCount('enrollments')->orderBy( 'id',  'DESC')->paginate($limit);
-            dd($programs);
             //            $programs = $this->programRepositories->paginateWhereWith(['is_approved' => 1], ['creator'], ['column' => 'id', 'dir' => 'DESC'], $limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
 
