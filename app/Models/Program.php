@@ -55,22 +55,22 @@ class Program extends Model
         return $this->morphMany(Rating::class, 'reviewee');
     }
 
-    public function creator()
+    public function creator(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
 
-    public function videos()
+    public function videos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProgramVideos::class);
     }
-    public function reviewRequests()
+    public function reviewRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProgramReviewRequests::class);
     }
 
 
-    public function enrollments()
+    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProgramEnrollment::class);
     }

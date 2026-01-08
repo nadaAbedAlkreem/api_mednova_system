@@ -29,7 +29,8 @@ class ProgramController extends Controller
     {
         try {
             $limit = $request->get('limit', config('app.pagination_limit'));
-            $programs = $this->programRepositories->paginateWhereWith(['is_approved' => 1], ['creator'], ['column' => 'id', 'dir' => 'DESC'], $limit);
+            $programs = Program::with( ['creator'])->withAvg('ratings', 'rating')->withCount('ratings')->withCount('enrollments')->orderBy(['column' => 'id', 'dir' => 'DESC'])->paginate($limit);
+//            $programs = $this->programRepositories->paginateWhereWith(['is_approved' => 1], ['creator'], ['column' => 'id', 'dir' => 'DESC'], $limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),  ProgramResource::collection($programs), 201);
 
         }catch (\Exception $e){
