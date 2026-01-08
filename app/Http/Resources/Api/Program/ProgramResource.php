@@ -31,7 +31,8 @@ class ProgramResource extends JsonResource
                 'is_approved'=> $this->is_approved ,
                 'enrollments_count' => $this->enrollments_count,
                 "ratings_avg_rating" => $this->ratings_avg_rating,
-                "ratings_count" =>  $this->ratings_count
+                "ratings_count" =>  $this->ratings_count ,
+                "total_duration_minutes" => $this->total_duration_minutes
              ] ;
     }
 }
