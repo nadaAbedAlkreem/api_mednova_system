@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\Program;
 
 use App\Http\Resources\Api\Customer\AdminResource;
+use App\Http\Resources\Api\Customer\RatingResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,6 +27,7 @@ class ProgramResource extends JsonResource
                 'videos'=> VideoResource::collection($this->whenLoaded('videos')),
                 'price' => $this->price ,
                 'status'=>$this->status ,
+                'rating'=>RatingResource::collection($this->whenLoaded('rating')),
                 'is_approved'=> $this->is_approved ,
                 'enrollments_count' => $this->enrollments_count,
                 "ratings_avg_rating" => $this->ratings_avg_rating,
