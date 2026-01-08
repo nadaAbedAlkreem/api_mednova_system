@@ -24,6 +24,9 @@ class Program extends Model
         'status',
         'is_approved'
     ];
+    protected $appends = [
+        'total_duration_minutes',
+    ];
 
     protected $casts = [
         'price' => 'float',
@@ -33,6 +36,11 @@ class Program extends Model
         return $query->where('status', 'published')
             ->where('is_approved', true);
     }
+    public function getTotalDurationMinutesAttribute(): int
+    {
+        return (int) $this->videos->sum('duration_minute');
+    }
+
     protected static function boot()
     {
         parent::boot();
