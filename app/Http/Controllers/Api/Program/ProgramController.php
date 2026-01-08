@@ -92,6 +92,7 @@ class ProgramController extends Controller
     {
         try {
             $program = $this->programRepositories->findWithDetails($programId);
+            dd($program);
             if (! $program) {
                 return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
             }
