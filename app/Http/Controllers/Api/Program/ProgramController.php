@@ -95,11 +95,13 @@ class ProgramController extends Controller
     {
         try {
             $program = $this->programRepositories->findOne($programId);
-            if (!$program) {
+
+            if (! $program) {
                 return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
             }
-            $program->load(['creator' , 'videos' ]);
-            $program->withAvg('ratings', 'rating')->withCount('ratings')->withCount('enrollments');
+            $program = $program->loadCount('ratings', 'enrollments')
+                ->loadAvg('ratings', 'rating')
+                ->load(['creator', 'videos']);
 //            $programDetails = $this->programRepositories->findWith($programId ,['videos']);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($program), 201);
 
