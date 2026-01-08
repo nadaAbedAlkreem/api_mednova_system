@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Program extends Model
 {
@@ -27,8 +28,11 @@ class Program extends Model
     protected $casts = [
         'price' => 'float',
     ];
-
-
+    public function scopePublic(Builder $query): Builder
+    {
+        return $query->where('status', 'published')
+            ->where('is_approved', true);
+    }
     protected static function boot()
     {
         parent::boot();

@@ -15,6 +15,7 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
     public function baseQuery()
     {
         return Program::query()
+            ->public()
             ->with(['creator'])
             ->withAvg('ratings', 'rating')
             ->withCount('ratings')
