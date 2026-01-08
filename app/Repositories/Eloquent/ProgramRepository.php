@@ -29,7 +29,7 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
             ->find($id);
     }
 
-    public function paginateWithDetails($limit)
+    public function paginateWithDetails(int $limit = 5)
     {
         return $this->baseQuery()
             ->orderBy('id', 'DESC')
