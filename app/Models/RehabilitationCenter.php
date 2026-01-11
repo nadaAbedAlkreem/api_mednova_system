@@ -12,6 +12,7 @@ class RehabilitationCenter extends Model
     use HasFactory , softDeletes;
     protected $table = 'rehabilitation_centers';
     protected $fillable = [
+        'name_center',
         'customer_id',
         'year_establishment' ,
         'license_number' ,

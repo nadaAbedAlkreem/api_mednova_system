@@ -277,6 +277,7 @@ return [
         'payment_method' => 'طريقة الدفع',
         'card_token' => 'البطاقة',
         'bank_account_id' => 'الحساب البنكي',
+        'name_center' => 'الاسم التعريفي لمركز '
 
     ],
 

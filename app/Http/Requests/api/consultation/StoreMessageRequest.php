@@ -73,7 +73,7 @@ class StoreMessageRequest extends FormRequest
             'receiver_id' => 'required|exists:customers,id,deleted_at,NULL',
             'sender_id' => '',
             'message' => 'nullable|string|required_without:attachment',
-            'attachment' => 'nullable|mimes:pdf,jpg,jpeg,png,gif|max:5120|required_without:message',
+            'attachment' => 'nullable|max:5120|required_without:message',
             'status' => '',
             ];
     }

@@ -34,7 +34,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'specialty_id' => 'required|array',
             'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
             'timezone' => ['required', Rule::in(\DateTimeZone::listIdentifiers())],
-
+            'name_center' => 'required|string',
             'year_establishment' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
             'license_number' => 'required|string|max:100',
             'license_authority' => 'required|string|max:255',
@@ -154,7 +154,8 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'commercial_registration_number.string' => __('validation.string', ['attribute' => __('validation.attributes.commercial_registration_number')]),
             'commercial_registration_number.max' => __('validation.max.string', ['attribute' => __('validation.attributes.commercial_registration_number'), 'max' => 100]),
 
-            'commercial_registration_file.required' => __('validation.required', ['attribute' => __('validation.attributes.commercial_registration_file')]),
+            'name_center.required' => __('validation.required', ['attribute' => __('validation.attributes.name_center')]), 'commercial_registration_file.required' => __('validation.required', ['attribute' => __('validation.attributes.name_center')]),
+
             'commercial_registration_file.file' => __('validation.file', ['attribute' => __('validation.attributes.commercial_registration_file')]),
             'commercial_registration_file.mimes' => __('validation.mimes', ['attribute' => __('validation.attributes.commercial_registration_file')]),
             'commercial_registration_file.max' => __('validation.max.file', ['attribute' => __('validation.attributes.commercial_registration_file'), 'max' => 2048]),
