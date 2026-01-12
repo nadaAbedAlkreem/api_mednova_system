@@ -228,7 +228,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
         $data = collect($data);
         $dataCustomer = $data->only(['customer_id', 'gender', 'birth_date', 'image']);
         $dataLocation = $data->only(['customer_id', 'formatted_address', 'city', 'country']);
-        $dataRehabilitation_centers = $data->only(['customer_id', 'year_establishment', 'license_number', 'license_authority', 'license_file', 'bio', 'has_commercial_registration', 'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority']);
+        $dataRehabilitation_centers = $data->only(['name_center','customer_id', 'year_establishment', 'license_number', 'license_authority', 'license_file', 'bio', 'has_commercial_registration', 'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority']);
         $data['consultant_id'] = $data['customer_id'];
         $data['consultant_type'] = 'rehabilitation_center';
         $data['day_of_week'] = json_encode($data['day_of_week']);
