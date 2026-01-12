@@ -42,31 +42,31 @@ class ZoomWebhookController extends Controller
         Log::info('ZoomWebhook Request:', $request->all());
 
         // URL Validation Step
-        if ($request->event === 'endpoint.url_validation') {
-
-            $plainToken = $request->input('payload.plainToken');
-
-            $encryptedToken = hash_hmac(
-                'sha256',
-                $plainToken,
-                config('services.zoom.secret_token_webhook')
-            );
-
-            Log::info('Returning Zoom Validation Response', [
-                'plainToken' => $plainToken,
-                'encryptedToken' => $encryptedToken
-            ]);
-
-            return response()->json([
-                "plainToken" => $plainToken,
-                "encryptedToken" => $encryptedToken
-            ], 200);
-        }
+//        if ($request->event === 'endpoint.url_validation') {
+//
+//            $plainToken = $request->input('payload.plainToken');
+//
+//            $encryptedToken = hash_hmac(
+//                'sha256',
+//                $plainToken,
+//                config('services.zoom.secret_token_webhook')
+//            );
+//
+//            Log::info('Returning Zoom Validation Response', [
+//                'plainToken' => $plainToken,
+//                'encryptedToken' => $encryptedToken
+//            ]);
+//
+//            return response()->json([
+//                "plainToken" => $plainToken,
+//                "encryptedToken" => $encryptedToken
+//            ], 200);
+//        }
 
         // After validation: handle real events
 //       $this->zoomWebhookService->handleEvent($request->all());
 
-        Log::info('ZoomWebhook Event:', $request->all());
+//        Log::info('ZoomWebhook Event:', $request->all());
 
         return response("OK", 200);
     }
