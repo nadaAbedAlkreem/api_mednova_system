@@ -22,10 +22,15 @@ class RatingSeeder extends Seeder
 
         // جميع أنواع المختصين
         $therapists = Therapist::with('customer')->get();
-        $centers = RehabilitationCenter::with('customer')->get();
-        $programs = Program::all();
+//        $centers = RehabilitationCenter::with('customer')->get();
+//        $programs = Program::all();
 
-        if ($patients->isEmpty() || ($therapists->isEmpty() && $centers->isEmpty() && $programs->isEmpty())) {
+//        if ($patients->isEmpty() || ($therapists->isEmpty() && $centers->isEmpty() && $programs->isEmpty())) {
+//            $this->command->warn("⚠️ لا يوجد بيانات كافية لإنشاء التقييمات.");
+//            return;
+//        }
+
+        if ($patients->isEmpty() || ($therapists->isEmpty())) {
             $this->command->warn("⚠️ لا يوجد بيانات كافية لإنشاء التقييمات.");
             return;
         }
@@ -40,19 +45,19 @@ class RatingSeeder extends Seeder
             ]);
         }
 
-        foreach ($centers as $c) {
-            $allReviewees->push([
-                'id' => $c->customer->id,
-                'type' => Customer::class,
-            ]);
-        }
-
-        foreach ($programs as $p) {
-            $allReviewees->push([
-                'id' => $p->id,
-                'type' => Program::class,
-            ]);
-        }
+//        foreach ($centers as $c) {
+//            $allReviewees->push([
+//                'id' => $c->customer->id,
+//                'type' => Customer::class,
+//            ]);
+//        }
+//
+//        foreach ($programs as $p) {
+//            $allReviewees->push([
+//                'id' => $p->id,
+//                'type' => Program::class,
+//            ]);
+//        }
 
         // إنشاء التقييمات لكل مريض
         foreach ($patients as $patient) {
