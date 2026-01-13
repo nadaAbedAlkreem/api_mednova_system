@@ -40,9 +40,9 @@ class UpdateTherapistRequest extends FormRequest
             'license_authority' => 'string|max:255',
             'license_file' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
             'bio' => ' string',
-            'video_consultation_price' => ['required', 'numeric', 'min:0'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0'],
-            'currency' => ['required', 'string', 'size:3'],
+            'video_consultation_price' => ['numeric', 'min:0'],
+            'chat_consultation_price' => [ 'numeric', 'min:0'],
+            'currency' => [ 'string', 'size:3'],
         ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
