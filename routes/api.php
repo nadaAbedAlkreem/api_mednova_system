@@ -212,9 +212,6 @@ Route::prefix('zoom-webhook')->group(function ()
 
 
 });
-Route::get('/run-storage-link', function () {
-    Artisan::call('storage:link');
-});
 
 Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
 
