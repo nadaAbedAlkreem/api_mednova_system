@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -210,6 +211,9 @@ Route::prefix('zoom-webhook')->group(function ()
     Route::post('handle',[ZoomWebhookController::class, 'handle']);
 
 
+});
+Route::get('/run-storage-link', function () {
+    Artisan::call('storage:link');
 });
 
 Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
