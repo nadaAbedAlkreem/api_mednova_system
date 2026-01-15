@@ -217,14 +217,11 @@ Route::prefix('zoom-webhook')->group(function ()
 Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
 
 Route::get('/storage/{filename}', function ($filename) {
-    $path = storage_path('app/public/' . $filename);
+    $path = '/home/u593542202/mednovacare.com/storage/app/public/' . $filename;
 
     if (!file_exists($path)) {
-        abort(404); // الملف غير موجود
+        abort(404);
     }
 
-    $file = file_get_contents($path);
-    $type = mime_content_type($path);
-
-    return Response::make($file, 200)->header("Content-Type", $type);
+    return response()->file($path);
 });
