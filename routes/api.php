@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 
 Route::prefix('auth')->group(function ()
