@@ -15,8 +15,8 @@ class CheckConsultationStatus extends Command
     public function handle()
     {
         ConsultationVideoRequest::where('status', 'end')
-//            ->where('updated_at', '<', Carbon::now()->subHours(72)) in prod
-            ->where('updated_at', '<', Carbon::now()->subSecond(20))
+            ->where('updated_at', '<', Carbon::now()->subHours(72))
+//            ->where('updated_at', '<', Carbon::now()->subSecond(20))
             ->chunkById(100, function ($consultations) {
                 foreach ($consultations as $c) {
                     $consultant = $c->consultant_approved;

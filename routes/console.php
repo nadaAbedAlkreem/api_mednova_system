@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
-Schedule::command('consultations:update-status')->everyFiveSeconds();
+Schedule::command('consultations:update-status')->everySixHours();
 Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 //Schedule::command('app:check-pairing-of-smart-glove')->everyFiveSeconds();
 //Schedule::command('app:check-pending-glove-commands')->everyFiveSeconds();
 //Schedule::command('consultations:check-status')->hourly(); in production
-Schedule::command('consultations:check-status')->everyMinute();
+Schedule::command('consultations:check-status')->everyTenMinutes();

@@ -45,7 +45,8 @@ class UpdateChatConsultationStatus extends Command
             ->where('status', $status)
             ->whereNotNull($timeField)
             ->whereNull('ended_at')
-            ->where('created_at', '<',  now()->subHours(6))
+//            ->where('created_at', '<',  now()->subHours(6))
+            ->where($timeField, '<',  now()->subHours(6))
             ->chunkById(100, function ($consultations) use ($now, $shouldRemind, $status, $timeField) {
                 foreach ($consultations as $consultation) {
                      $timeValue = $consultation->$timeField;
@@ -54,17 +55,19 @@ class UpdateChatConsultationStatus extends Command
 //                    }
 //                    $secondsSince = $timeValue->diffInSeconds($now);
                     if ($timeValue) {
-                        $secondsSince = $now->getTimestamp() - $timeValue->getTimestamp();
+//                        $secondsSince = $now->getTimestamp() - $timeValue->getTimestamp();
+                        $hoursSince = $timeValue->diffInHours($now);
+
                     } else {
                         continue;
                     }
-                    $noMessages = $shouldRemind($consultation, $secondsSince);
+                    $noMessages = $shouldRemind($consultation, $hoursSince);
 
                     if ($noMessages) {
-                        $this->handleReminders($consultation, $secondsSince, $status);
+                        $this->handleReminders($consultation, $hoursSince, $status);
                     } else {
                         // إذا كانت الجلسة نشطة يتم إنهاؤها بعد مدة معينة
-                        if ($status === 'active' && $secondsSince >= 70) { // يتم انهائها بعد مرور 24 ساعة
+                        if ($status === 'active' && $hoursSince >= 24) { // يتم انهائها بعد مرور 24 ساعة
                             $this->completeConsultation($consultation);
                         }
                     }
@@ -78,17 +81,17 @@ class UpdateChatConsultationStatus extends Command
     /**
      * منطق إرسال التذكيرات أو الإلغاء
      */
-    private function handleReminders($consultation, int $secondsSince, string $status)
+    private function handleReminders($consultation, int $hoursSince, string $status)
     {
         $levels = [
-            1 => 60, // بعد 6 ساعة
-            2 => 120, // بعد 12 ساعة
-            3 => 260, // بعد 24 ساعة
+            1 => 6, // بعد 6 ساعة
+            2 => 12, // بعد 12 ساعة
+            3 => 24, // بعد 24 ساعة
         ];
 
         foreach ($levels as $level => $limit) {
 //            if ($secondsSince >= $limit && $consultation->last_reminder_level < $level) {
-            if ($secondsSince >= $limit && $consultation->last_reminder_level === $level - 1){
+            if ($hoursSince >= $limit && $consultation->last_reminder_level === $level - 1){
                 if ($level === 3) {
                     $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
                 } else {
