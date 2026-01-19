@@ -61,6 +61,7 @@ class RehabilitationCenterSeeder extends Seeder
 
             // 2) إنشاء مركز التأهيل RehabilitationCenter
             $center = RehabilitationCenter::create([
+                'name_center' => $centerName,
                 'customer_id' => $customer->id,
                 'year_establishment' => rand(2005, 2023),
                 'license_number' => 'LIC-' . rand(1000, 9999),

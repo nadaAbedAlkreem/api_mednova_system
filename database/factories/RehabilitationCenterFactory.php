@@ -18,6 +18,7 @@ class RehabilitationCenterFactory extends Factory
     public function definition(): array
     {
         return [
+            'name_center' => $this->faker->name(),
             'customer_id' => Customer::factory(),
             'year_establishment' => $this->faker->year(),
             'license_number' => strtoupper($this->faker->bothify('LCN-####')),
