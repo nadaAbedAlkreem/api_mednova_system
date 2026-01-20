@@ -64,15 +64,15 @@ class DatabaseSeeder extends Seeder
 //        });
 ////
 ////        // 🔹 أنشئ عملاء من نوع (Patient)
-//        Customer::factory(10)->create([
-//            'type_account' => 'patient',
-//        ])->each(function ($customer) {
-//            Patient::factory()->create([
-//                'customer_id' => $customer->id,
-//            ]);
-//
-//            Location::factory()->create(['customer_id' => $customer->id]);
-//        });
+        Customer::factory(10)->create([
+            'type_account' => 'patient',
+        ])->each(function ($customer) {
+            Patient::factory()->create([
+                'customer_id' => $customer->id,
+            ]);
+
+            Location::factory()->create(['customer_id' => $customer->id]);
+        });
 
 //        // 🔹 تقييمات تجريبية
 //        $this->call([RehabilitationCenterSeeder::class]);
