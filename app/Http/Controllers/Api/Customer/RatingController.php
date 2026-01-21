@@ -72,6 +72,7 @@ class RatingController extends Controller
             $modelClass = self::REVIEWABLE_MODELS[$request->reviewable_type];
             $model = $modelClass::findOrFail($request->reviewable_id);
             $ratings = $model->ratings()->latest()->paginate(10);
+            $ratings->load(['reviewer','reviewee']);
             return $this->successResponse(
                 'DATA_RETRIEVED_SUCCESSFULLY',
                 RatingResource::collection($ratings),
