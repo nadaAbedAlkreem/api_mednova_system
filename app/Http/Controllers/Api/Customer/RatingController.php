@@ -9,31 +9,42 @@ use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Http\Resources\Api\Customer\RatingResource;
 use App\Models\Rating;
 use App\Repositories\IConsultationChatRequestRepositories;
+use App\Repositories\ICustomerRepositories;
 use App\Repositories\IRatingRepositories;
 use App\Services\api\ConsultationStatusService;
 use App\Services\api\RatingService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RatingController extends Controller
 {
     use ResponseTrait;
 
     protected IRatingRepositories $ratingRepositories;
+    protected ICustomerRepositories $customerRepositories;
     protected RatingService $ratingService;
 
-    public function __construct(IRatingRepositories $ratingRepositories , RatingService $ratingService)
+
+    public function __construct(IRatingRepositories $ratingRepositories , RatingService $ratingService , ICustomerRepositories $customerRepositories)
     {
         $this->ratingRepositories = $ratingRepositories;
         $this->ratingService = $ratingService;
+        $this->customerRepositories = $customerRepositories;
     }
+    const REVIEWABLE_MODELS = [
+        'customer' => \App\Models\Customer::class,
+        'program' => \App\Models\Program::class,
+//        'platform' => \App\Models\Platform::class,
+    ];
+
 
     public function store(StoreRatingRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
             $rating = $this->ratingRepositories->create($request->handle());
             $rating->load(['reviewer','reviewee']);
-            return $this->successResponse(__('messages.CREATE_SUCCESS'), new RatingResource($rating), 201,);
+            return $this->successResponse(__('messages.CREATE_SUCCESS'), new RatingResource($rating), 201);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500, app()->getLocale());
         }
@@ -48,6 +59,34 @@ class RatingController extends Controller
             return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500);
         }
    }
+    public function getRatings(Request $request)
+    {
+        try {
+            $request->validate([
+                'reviewable_type' => [
+                    'required',
+                    Rule::in(array_keys(self::REVIEWABLE_MODELS))
+                ],
+                'reviewable_id' => ['required', 'integer'],
+            ]);
+            $modelClass = self::REVIEWABLE_MODELS[$request->reviewable_type];
+            $model = $modelClass::findOrFail($request->reviewable_id);
+            $ratings = $model->ratings()->latest()->paginate(10);
+            return $this->successResponse(
+                'DATA_RETRIEVED_SUCCESSFULLY',
+                RatingResource::collection($ratings),
+                200,
+                app()->getLocale()
+            );
+
+        } catch (\Exception $e) {
+            return $this->errorResponse(
+                'ERROR_OCCURRED',
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
 
 
 

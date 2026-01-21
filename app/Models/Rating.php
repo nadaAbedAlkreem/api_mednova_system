@@ -22,6 +22,7 @@ class Rating extends Model
 
     ];
 
+
     public function reviewer()
     {
         return $this->belongsTo(Customer::class , 'reviewer_id');

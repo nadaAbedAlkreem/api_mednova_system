@@ -49,7 +49,12 @@ Route::prefix('auth')->group(function ()
     Route::post('verifyToken', [ForgotPasswordController::class, 'verifyToken']);
     Route::get('verify-email', [RegisterController::class, 'verifyEmail']);
 });
-        Route::get('rating', [RatingController::class, 'getTopRatedServiceProvider']);
+
+        Route::prefix('ratings')->group(function ()
+        {
+            Route::get('', [RatingController::class, 'getRatings']);
+            Route::get('top-rated', [RatingController::class, 'getTopRatedServiceProvider']);
+        });
         Route::prefix('medical-specialties')->group(function ()
         {
             Route::get('', [MedicalSpecialtieController::class, 'getAll']);
