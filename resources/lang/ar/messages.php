@@ -31,6 +31,7 @@ return [
     'approved_consultation_success' =>  'تم اعتماد طلب الاستشارة من قبل احد المشاركين ' ,
     'successful_create_payment_link'=>'تم إنشاء رابط بوابة الدفع بنجاح.' ,
     'failed_to_initialize' => 'فشل في التهيئة رابط بوابة دفع من خلال بوابة اموال باي ' ,
+    'RESOURCE_NOT_FOUND' => 'لم يتم العثور على البيانات المطلوبة.',
 
 
     'consultation_pending'  => 'لديك طلب استشارة مع هذا المستشار قيد الانتظار.',

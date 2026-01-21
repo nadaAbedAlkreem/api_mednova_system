@@ -16,6 +16,7 @@ use App\Services\api\RatingService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RatingController extends Controller
 {
@@ -78,6 +79,13 @@ class RatingController extends Controller
                 RatingResource::collection($ratings),
                 200,
                 app()->getLocale()
+            );
+
+        }  catch (ModelNotFoundException $e) {
+            return $this->errorResponse(
+                __('messages.RESOURCE_NOT_FOUND'),
+                null,
+                404
             );
 
         } catch (\Exception $e) {
