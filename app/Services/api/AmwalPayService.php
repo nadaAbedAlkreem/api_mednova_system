@@ -87,20 +87,20 @@ class AmwalPayService
             if (!($response->successful() && ($response->json('success') === true))) {
                 throw new \Exception(__('messages.failed_to_initialize'));
             }
-            $this->gatewayPaymentRepository->create([
-                'transaction_id' => null,
-                'reference_type' => Customer::class,
-                'reference_id' => $data['customer']->id,
-                'gateway' => 'amwal',
-                'gateway_transaction_id' => null,
-                'gateway_reference' => $billerRef,
-                'payment_method' => $data['payment_method'],
-                'amount' => $data['amount'],
-                'currency' => 'OMR',
-                'status' => 'initiated',
-                'response_message' => $response['message'] ?? null,
-                'payload' => $response, // JSON column ممتاز
-            ]);
+//            $this->gatewayPaymentRepository->create([
+//                'transaction_id' => null,
+//                'reference_type' => Customer::class,
+//                'reference_id' => $data['customer']->id,
+//                'gateway' => 'amwal',
+//                'gateway_transaction_id' => null,
+//                'gateway_reference' => $billerRef,
+//                'payment_method' => $data['payment_method'],
+//                'amount' => $data['amount'],
+//                'currency' => 'OMR',
+//                'status' => 'initiated',
+//                'response_message' => $response['message'] ?? null,
+//                'payload' => $response, // JSON column ممتاز
+//            ]);
 
             return (object)[
                 'success' => $response->successful() && ($response->json('success') === true),

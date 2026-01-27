@@ -45,6 +45,7 @@ return [
     'delete_friend_request' => 'تم حذف  طلب الصداقة' ,
     'accept_friend_request' => 'تم قبول طلب الصداقة' ,
     'TRAFFICKER_SUCCESSFULLY' => 'تم إكمال عملية التتبع. ',
+    'successful_capture_data_via_webhook'  =>'تم استقبال بيانات  من اموال باي خاص في حركات المالية بنجاح ',
     'NOTIFICATION_SENT_SUCCESSFULLY'=> 'تم ارسال الاشعار بنجاح ' ,
     'GAME_END' =>'لقد تم الانتهاء من اللعبة.' ,
     'FINANCIA_GET_SUCCESSFULLY' => 'تمت عملية الحصول على بيانات المالية',

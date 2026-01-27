@@ -17,6 +17,11 @@ class BroadcastMessageJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $message;
+    public $timeout = 30; // ثواني
+    //  أعط فرصة لإعادة المحاولة عند فشل مؤقت
+    public $tries = 3;
+    //   انتظر قبل إعادة المحاولة
+    public $backoff = [10, 30, 60]; // ثواني
 
     /**
      * Create a new job instance.
@@ -52,10 +57,10 @@ class BroadcastMessageJob implements ShouldQueue
     /**
      * عدد مرات إعادة المحاولة قبل الفشل النهائي.
      */
-    public $tries = 3;
-
-    /**
-     * الفاصل الزمني بين كل محاولة.
-     */
-    public $backoff = 10; // بالثواني
+//    public $tries = 3;
+//
+//    /**
+//     * الفاصل الزمني بين كل محاولة.
+//     */
+//    public $backoff = 10; // بالثواني
 }

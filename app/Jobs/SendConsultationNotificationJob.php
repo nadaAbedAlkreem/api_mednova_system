@@ -16,10 +16,11 @@ class SendConsultationNotificationJob implements ShouldQueue
 
     public  $consultation , $message , $eventType ,$notification;
 
-    public $tries = 5;
-
-
-    public $backoff = [10, 30, 60, 120];
+    public $timeout = 10; // ثواني
+    //  أعط فرصة لإعادة المحاولة عند فشل مؤقت
+    public $tries = 3;
+    //   انتظر قبل إعادة المحاولة
+    public $backoff = [10, 30, 60]; // ثواني
     public function __construct($consultation , $message  , $eventType ,$notification)
     {
         $this->consultation = $consultation;
@@ -34,11 +35,11 @@ class SendConsultationNotificationJob implements ShouldQueue
 
             broadcast(new ConsultationRequestedBroadcast($this->consultation , $this->message , $this->eventType , $this->notification))->toOthers();
             $this->notification->update(['status' => 'sent']);
-            $this->notification->save();
+//            $this->notification->save()
+
         } catch (\Throwable $e) {
             $this->notification->update(['status' => 'failed']);
-            $this->notification->save();
-
+//            $this->notification->save();
             throw $e;
         }
     }
@@ -49,7 +50,7 @@ class SendConsultationNotificationJob implements ShouldQueue
             'error_message' => $exception->getMessage(),
         ]);
         $this->notification->update(['status' => 'failed']);
-        $this->notification->save();
+//        $this->notification->save();
 
 
     }

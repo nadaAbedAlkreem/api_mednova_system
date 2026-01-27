@@ -220,7 +220,8 @@ Route::prefix('zoom-webhook')->group(function ()
 
 });
 
-Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
+//Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
+Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
 
 Route::get('/storage/{path}', function ($path) {
     $fullPath = storage_path('app/public/' . $path);

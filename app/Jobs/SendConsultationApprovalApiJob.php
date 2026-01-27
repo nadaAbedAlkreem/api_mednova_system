@@ -18,8 +18,9 @@ class SendConsultationApprovalApiJob implements ShouldQueue
     protected string $dateTime;
     protected int $duration;
     protected ConsultationVideoRequest $consultation;
-
-
+    public $timeout = 45;     // Zoom API قد يأخذ وقت
+    public $tries = 3;        // إعادة 3 مرات
+    public $backoff = 30;     // انتظر 30 ثانية بين المحاولات
 
     /**
      * Create a new job instance.

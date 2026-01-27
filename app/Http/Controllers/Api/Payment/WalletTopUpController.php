@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Api\Payment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\payment\WalletTopUpRequest;
 use App\Models\Customer;
+use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\IWalletRepositories;
 use App\Services\api\AmwalPayService;
+use App\Services\api\FinancialOperationFactory;
+use App\Services\api\WalletTopUpService;
+use App\Services\api\PaymentIntentService;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -14,60 +18,96 @@ use Illuminate\Http\Request;
 class WalletTopUpController extends Controller
 {
     use ResponseTrait;
+
     protected IWalletRepositories $walletRepository;
     protected AmwalPayService $amwalPayService;
+    protected PaymentIntentService $paymentIntentService;
+    protected IGatewayPaymentRepositories $gatewayPaymentRepositories;
+    protected WalletTopUpService $financialTransactionService;
 
-    public function __construct(IWalletRepositories $walletRepository , AmwalPayService $amwalPayService)
+
+    public function __construct(WalletTopUpService $financialTransactionService, IGatewayPaymentRepositories $gatewayPaymentRepositories, IWalletRepositories $walletRepository, AmwalPayService $amwalPayService, PaymentIntentService $paymentIntentService)
     {
         $this->walletRepository = $walletRepository;
         $this->amwalPayService = $amwalPayService;
+        $this->paymentIntentService = $paymentIntentService;
+        $this->gatewayPaymentRepositories = $gatewayPaymentRepositories;
+        $this->financialTransactionService = $financialTransactionService;
     }
 
     /**
      * Wallet Top-up (Patient)
      */
+//    public function store(WalletTopUpRequest $request)
+//    {
+//         try {
+//            $customer = $request->user();
+//            if (!$customer instanceof Customer) {
+//                throw new \Exception('Get Current Customer  Failed');
+//            }
+//             /** @var \App\Models\Wallet $wallet */
+//            $wallet = $this->walletRepository->getByOwner($customer->id);
+//            /**
+//             * 1️⃣ Create checkout session with Amwal Pay
+//             * (NO DB RECORDS YET)
+//             */
+//             Log::info('AmwalPay Webhook test  in store:');
+//
+//             $paymentLink = $this->amwalPayService->createPaymentLinkByAmwalPay(['amount' => $request->amount, 'currency' => 'OMR', 'payment_method' => $request->payment_method, 'customer' => $customer]);
+//
+//             return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
+//        } catch (\Exception $exception) {
+//             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
     public function store(WalletTopUpRequest $request)
     {
-         try {
-            $customer = $request->user();
-            if (!$customer instanceof Customer) {
-                throw new \Exception('Get Current Customer  Failed');
-            }
-             /** @var \App\Models\Wallet $wallet */
-            $wallet = $this->walletRepository->getByOwner($customer->id);
-            /**
-             * 1️⃣ Create checkout session with Amwal Pay
-             * (NO DB RECORDS YET)
-             */
-             Log::info('AmwalPay Webhook test  in store:');
+        $customer = $request->user();
 
-             $paymentLink = $this->amwalPayService->createPaymentLinkByAmwalPay(['amount' => $request->amount, 'currency' => 'OMR', 'payment_method' => $request->payment_method, 'customer' => $customer]);
-
-             return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
-        } catch (\Exception $exception) {
-             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-        }
+        return $this->paymentIntentService->create(
+            owner: $customer,
+            amount: $request->amount,
+            paymentMethod: $request->payment_method,
+            purpose: 'wallet_top_up'
+        );
     }
 
-
-
-    public function captureDataViaWebhook(Request $request): \Illuminate\Http\JsonResponse
+    public function handle(Request $request)
     {
         try {
-            Log::info('AmwalPay Webhook test :');
-            $paymentLink = $this->amwalPayService->handleWebhook($request);
-            return $this->successResponse(__('messages.successful_create_payment_link'),$paymentLink, 202);
+            $payload = $request->all();
+            $gatewayPayment = $this->gatewayPaymentRepositories->findByReference($payload['MerchantReference']);
+            if ($gatewayPayment->status !== 'initiated') {
+                return; // Idempotency
+            }
+            if ($payload['ResponseCode'] !== '00') {$gatewayPayment->update(['status' => 'failed']);return;}
+            // نجاح الدفع
+//        $this->financialTransactionService->execute($gatewayPayment, $payload);
+            $operation = FinancialOperationFactory::make('wallet_top_up');
+            $operation->execute(['gateway_payment' => $gatewayPayment, 'payload' => $payload]);
+            return $this->successResponse(__('messages.successful_capture_data_via_webhook'),[], 202);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
 
 
+//    public function captureDataViaWebhook(Request $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            Log::info('AmwalPay Webhook test :');
+//            $paymentLink = $this->amwalPayService->handleWebhook($request);
+//            return $this->successResponse(__('messages.successful_create_payment_link'), $paymentLink, 202);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
+
 
     /**
-         * 2️⃣ Payment succeeded immediately (as per your rule)
-         * Now we open DB transaction
-         */
+     * 2️⃣ Payment succeeded immediately (as per your rule)
+     * Now we open DB transaction
+     */
 //        DB::transaction(function () use ($request, $wallet, $checkout) {
 //
 //            /**
