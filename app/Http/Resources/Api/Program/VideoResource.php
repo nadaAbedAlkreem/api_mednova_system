@@ -22,8 +22,8 @@ class VideoResource extends JsonResource
                 'video_path'=>$this->video_path,
                 'duration_minute' => $this->duration_minute ,
                 'order' => $this->order ,
-                'status'=>$this->status ,
-                'is_preview'=>$this->is_preview ,
+//                'status'=>$this->status ,
+//                'is_preview'=>$this->is_preview ,
                 'is_free'=>$this->is_free ,
 
 
