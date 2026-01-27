@@ -223,15 +223,15 @@ Route::prefix('zoom-webhook')->group(function ()
 //Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
 Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
 
-Route::get('/storage/{path}', function ($path) {
-    $fullPath = storage_path('app/public/' . $path);
-
-    if (!File::exists($fullPath)) {
-        abort(404);
-    }
-
-    $file = File::get($fullPath);
-    $type = File::mimeType($fullPath);
-
-    return Response::make($file, 200)->header("Content-Type", $type);
-})->where('path', '.*');
+//Route::get('/storage/{path}', function ($path) {
+//    $fullPath = storage_path('app/public/' . $path);
+//
+//    if (!File::exists($fullPath)) {
+//        abort(404);
+//    }
+//
+//    $file = File::get($fullPath);
+//    $type = File::mimeType($fullPath);
+//
+//    return Response::make($file, 200)->header("Content-Type", $type);
+//})->where('path', '.*');

@@ -23,6 +23,10 @@ class VideoResource extends JsonResource
                 'duration_minute' => $this->duration_minute ,
                 'order' => $this->order ,
                 'status'=>$this->status ,
-             ] ;
+                'is_preview'=>$this->is_preview ,
+                'is_free'=>$this->is_free ,
+
+
+            ] ;
     }
 }
