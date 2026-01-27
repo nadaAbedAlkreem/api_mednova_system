@@ -33,10 +33,11 @@ class ProgramResource extends JsonResource
                 'enrollments_count' => $this->enrollments_count,
                 "ratings_avg_rating" => $this->ratings_avg_rating,
                 "ratings_count" =>  $this->ratings_count ,
-                'ratings_4_to_5' => $this->ratings_4_to_5 ?? 0,
-                'ratings_3_to_4' => $this->ratings_3_to_4 ?? 0,
-                'ratings_2_to_3' => $this->ratings_2_to_3 ?? 0,
-                'ratings_0_to_1' => $this->ratings_0_to_1 ?? 0,
+                '5_stars' => $this->ratings_4_to_5 ?? 0,
+                '4_stars' => $this->ratings_3_to_4 ?? 0,
+                '3_stars' => $this->ratings_2_to_3 ?? 0,
+                '2_stars' => $this->ratings_1_to_2 ?? 0,
+                '1_stars' => $this->ratings_0_to_1 ?? 0,
                 "total_duration_minutes" => $this->total_duration_minutes
              ] ;
     }

@@ -21,16 +21,19 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
             ->withCount('ratings')
             ->withCount([
                 'ratings as ratings_4_to_5' => function ($query) {
-                    $query->whereBetween('rating', [4, 5]);
+                    $query->where('rating', '>=', 4)->where('rating', '<=', 5);
                 },
                 'ratings as ratings_3_to_4' => function ($query) {
-                    $query->whereBetween('rating', [3, 4]);
+                    $query->where('rating', '>=', 3)->where('rating', '<', 4);
                 },
                 'ratings as ratings_2_to_3' => function ($query) {
-                    $query->whereBetween('rating', [2, 3]);
+                    $query->where('rating', '>=', 2)->where('rating', '<', 3);
+                },
+                'ratings as ratings_1_to_2' => function ($query) {
+                    $query->where('rating', '>=', 1)->where('rating', '<', 2);
                 },
                 'ratings as ratings_0_to_1' => function ($query) {
-                    $query->whereBetween('rating', [0, 1]);
+                    $query->where('rating', '>=', 0)->where('rating', '<', 1);
                 },
             ])
             ->withCount('enrollments');
