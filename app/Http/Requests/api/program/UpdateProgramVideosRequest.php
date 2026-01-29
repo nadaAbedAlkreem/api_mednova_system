@@ -64,6 +64,14 @@ class UpdateProgramVideosRequest extends FormRequest
             'video.title_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.video_title_ar')]),
             'video.title_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.video_title_ar'), 'max' => 255]),
 
+            'videos.*.description_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.description_ar')]),
+            'videos.*.description_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.description_ar')]),
+            'videos.*.description_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.description_ar'), 'max' => 255]),
+
+            'videos.*.what_you_will_learn_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.what_you_will_learn_ar')]),
+            'videos.*.what_you_will_learn_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.what_you_will_learn_ar')]),
+            'videos.*.what_you_will_learn_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.what_you_will_learn_ar'), 'max' => 255]),
+
             'video.duration_minute.integer' => __('validation.integer', ['attribute' => __('validation.attributes.video_duration_minute')]),
             'video.duration_minute.min' => __('validation.min.numeric', ['attribute' => __('validation.attributes.video_duration_minute'), 'min' => 0]),
 
@@ -74,7 +82,7 @@ class UpdateProgramVideosRequest extends FormRequest
             'video.video_path.file' => __('validation.file', ['attribute' => __('validation.attributes.video_file')]),
             'video.video_path.mimes' => __('validation.mimes', ['attribute' => __('validation.attributes.video_file'), 'values' => 'mp4,mov,avi']),
             'video.video_path.max' => __('validation.max.file', ['attribute' => __('validation.attributes.video_file'), 'max' => 512000]),
-
+            'videos.*.is_program_intro.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_program_intro')]),
             'video.is_free.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.video_is_free')]),
         ];
     }

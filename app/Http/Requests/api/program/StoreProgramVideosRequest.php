@@ -87,7 +87,7 @@ class StoreProgramVideosRequest extends FormRequest
             'videos.*.order.integer' => __('validation.integer', ['attribute' => __('validation.attributes.order')]),
             'videos.*.order.min' => __('validation.min.numeric', ['attribute' => __('validation.attributes.order'), 'min' => 0]),
 
-            'videos.*.is_preview.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_preview')]),
+            'videos.*.is_program_intro.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_program_intro')]),
             'videos.*.is_free.boolean' => __('validation.boolean', ['attribute' => __('validation.attributes.is_free')]),
         ];
     }

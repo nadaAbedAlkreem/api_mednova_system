@@ -19,11 +19,11 @@ class VideoResource extends JsonResource
                 'id' => $this->id ,
                 'title' => $this->title_ar ,
                 'description' =>$this->description_ar ,
+                'what_you_will_learn_ar' =>$this->what_you_will_learn_ar ,
                 'video_path'=>$this->video_path,
                 'duration_minute' => $this->duration_minute ,
                 'order' => $this->order ,
-//                'status'=>$this->status ,
-//                'is_preview'=>$this->is_preview ,
+                'is_program_intro'=>$this->is_program_intro ,
                 'is_free'=>$this->is_free ,
 
 
