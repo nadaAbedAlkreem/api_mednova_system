@@ -114,11 +114,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/store', [ConsultationController::class, 'store']);
         Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
         Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
-        Route::prefix('video')->group(function ()
-        {
-            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
-            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
-        });
+//        Route::prefix('video')->group(function ()
+//        {
+//            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
+//            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
+//        });
 //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 
     });

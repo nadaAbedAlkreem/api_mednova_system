@@ -41,11 +41,15 @@ class UpdateProgramVideosRequest extends FormRequest
         return [
             'video_id' => 'required|exists:program_videos,id,deleted_at,NULL',
             'video.title_ar' => 'nullable|string|max:255',
+            'videos.*.what_you_will_learn_ar' => 'string|max:255',
+//            'videos.*.what_you_will_learn_en' => 'required|string|max:255',
+            'videos.*.description_ar' => 'string|max:255',
+//            'videos.*.description_en' => 'required|string|max:255',
             'video.duration_minute' => 'nullable|integer|min:0',
             'video.order' => 'nullable|integer|min:0',
-//            'video.is_preview' => 'nullable|boolean',
-//            'video.title_en' => 'nullable|string|max:255',
+ //            'video.title_en' => 'nullable|string|max:255',
             'video.video_path' => 'nullable|file|mimes:mp4,mov,avi|max:512000',
+            'videos.*.is_program_intro' => 'nullable|boolean',
             'video.is_free' => 'nullable|boolean',
         ];
     }

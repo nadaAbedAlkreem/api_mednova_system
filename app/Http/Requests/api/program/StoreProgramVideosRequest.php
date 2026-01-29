@@ -43,11 +43,13 @@ class StoreProgramVideosRequest extends FormRequest
             'videos.*.title_ar' => 'required|string|max:255',
 //            'videos.*.title_en' => 'nullable|string|max:255',
             'videos.*.description_ar' => 'required|string|max:255',
+            'videos.*.what_you_will_learn_ar' => 'required|string|max:255',
+//            'videos.*.what_you_will_learn_en' => 'required|string|max:255',
 //            'videos.*.description_en' => 'nullable|string|max:255',
             'videos.*.video_path' => 'required|file|mimes:mp4,mov,avi|max:512000', // أقصى 500MB
             'videos.*.duration_minute' => 'nullable|integer|min:0',
             'videos.*.order' => 'nullable|integer|min:0',
-            'videos.*.is_preview' => 'nullable|boolean',
+            'videos.*.is_program_intro' => 'nullable|boolean',
             'videos.*.is_free' => 'nullable|boolean',
         ];
     }
@@ -64,6 +66,15 @@ class StoreProgramVideosRequest extends FormRequest
             'videos.*.title_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.video_title_ar')]),
             'videos.*.title_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.video_title_ar')]),
             'videos.*.title_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.video_title_ar'), 'max' => 255]),
+
+            'videos.*.description_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.description_ar')]),
+            'videos.*.description_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.description_ar')]),
+            'videos.*.description_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.description_ar'), 'max' => 255]),
+
+            'videos.*.what_you_will_learn_ar.required' => __('validation.required', ['attribute' => __('validation.attributes.what_you_will_learn_ar')]),
+            'videos.*.what_you_will_learn_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.what_you_will_learn_ar')]),
+            'videos.*.what_you_will_learn_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.what_you_will_learn_ar'), 'max' => 255]),
+
 
             'videos.*.video_file.required' => __('validation.required', ['attribute' => __('validation.attributes.video_file')]),
             'videos.*.video_file.file' => __('validation.file', ['attribute' => __('validation.attributes.video_file')]),
