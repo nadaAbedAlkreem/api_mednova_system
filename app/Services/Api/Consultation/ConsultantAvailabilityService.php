@@ -46,8 +46,7 @@ class ConsultantAvailabilityService
     public function checkAvailableSlots(?int $patientId, int $consultantId, string $consultantType, string $day, string $date , string $typeAppointment ,     ?string $timezone = null
     ): array
     {
-//        $this->patientId = $patientId;
-        $userTimezone = $this->resolveTimezone($patientId, $timezone);
+        $this->patientId = $patientId;
         $schedule = Schedule::where('consultant_id', $consultantId)
             ->where('is_active', true)
             ->where('consultant_type', $consultantType)
@@ -55,6 +54,20 @@ class ConsultantAvailabilityService
         $availableSlots = $this->mergeAllSlots($schedule, $date);
         $bookedTimes = $this->getBookedTimes($consultantId, $day, $date , $typeAppointment);
         $freeSlotsUtc = $availableSlots->diff($bookedTimes)->values();
+//        dd($freeSlotsUtc);
+//        $patient = $this->customerRepositories->findOrFail($patientId);
+//        $patientTimezone = $patient->timezone ?? config('app.timezone');
+//        $now = Carbon::now($patientTimezone);
+//
+//        $slotsForPatient = $freeSlotsUtc->map(function ($slotUtc) use ($patientTimezone, $now) {
+//            $slotLocal = $this->timezone->toUserTimezone(Carbon::parse($slotUtc), $patientTimezone, 'Y-m-d H:i');
+////             dd($slotLocal);
+//             return $slotLocal;
+//            // استبعاد الأوقات الماضية
+////            return Carbon::parse($slotLocal)->gt($now) ? $slotLocal : null;
+//        })->filter()->values();
+//        dd($slotsForPatient->toArray());
+
         return $freeSlotsUtc->toArray();
     }
 
@@ -103,9 +116,8 @@ class ConsultantAvailabilityService
      */
     protected function getBookedTimes(int $consultantId, string $day, string $date , string $typeAppointment)
     {
-//        $patient = $this->customerRepositories->findOrFail($this->patientId);
-//        $patientTimezone = $patient->timezone ?? config('app.timezone'); // لو ما فيش timezone خذ الافتراضي
-        $patientTimezone = $this->resolveTimezone($this->patientId, null);
+        $patient = $this->customerRepositories->findOrFail($this->patientId);
+        $patientTimezone = $patient->timezone ?? config('app.timezone'); // لو ما فيش timezone خذ الافتراضي
 
         return AppointmentRequest::where('consultant_id', $consultantId)
             ->where('requested_day', $day)
@@ -130,9 +142,8 @@ class ConsultantAvailabilityService
         $slots = [];
         $startTime = Carbon::parse($date.' '.$start);
         $endTime = Carbon::parse($date.' '.$end);
-//        $patient = $this->customerRepositories->findOrFail($this->patientId);
-//        $patientTimezone = $patient->timezone ?? null;
-        $patientTimezone = $this->resolveTimezone($this->patientId, null);
+        $patient = $this->customerRepositories->findOrFail($this->patientId);
+        $patientTimezone = $patient->timezone ?? null;
         $now = Carbon::now($patientTimezone);
         while ($startTime->lt($endTime)) {
 //            $slotForPatient = $startTime->copy()->setTimezone($patientTimezone);
