@@ -32,14 +32,15 @@ class ChackAvailableSlotsRequest extends FormRequest
                 $date = Carbon::parse($this->input('date'));
             } catch (\Throwable $e) {
                 $validator->errors()->add('date', 'التاريخ غير صالح.');
-             }
+                return;
+            }
 
             // 2) تحقق تطابق day مع التاريخ (Carbon->format('l') يرجع اسم اليوم بالإنجليزية)
             $sentDay = $this->input('day'); // متوقع مثلاً "Monday"
             if ($date->format('l') !== $sentDay) {
                 $validator->errors()->add('day', 'اليوم لا يتوافق مع التاريخ المرسل.');
-                // لا نرجع فوراً — قد تريد جمع أكثر من خطأ، لكن يمكنك return إذا رغبت
-             }
+                return;
+            }
 
             // 3) تحقق أن هذا المختص لديه جدول فعال وأن هذا اليوم مسموح
             $consultantId = $this->input('consultant_id');
@@ -51,6 +52,7 @@ class ChackAvailableSlotsRequest extends FormRequest
                 ->first();
              if (!$schedule) {
                 $validator->errors()->add('consultant_id', 'لا يوجد جدول مواعيد لهذا المختص.');
+                 return;
              }
 
             $daysOfWeek = $schedule->day_of_week; // نوعه JSON أو TEXT
@@ -60,7 +62,8 @@ class ChackAvailableSlotsRequest extends FormRequest
 
             if (!is_array($daysOfWeek) || !in_array($this['day'], $daysOfWeek)) {
                 $validator->errors()->add('day', 'اليوم المختار غير متاح في جدول هذا المختص.');
-             }
+                return;
+            }
 
         });
     }
