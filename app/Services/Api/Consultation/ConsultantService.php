@@ -196,8 +196,8 @@ class ConsultantService
     ): array
     {
 
-        $patientName = $consultation->patient->name;
-        $consultantName = $consultation->consultant->name;
+        $patientName = $consultation->patient->full_name;
+        $consultantName = $consultation->consultant->full_name;
 
         // أول رسالة من المريض → إشعار للدكتور
         if ($this->isFirstMessageFromPatient($data)) {
