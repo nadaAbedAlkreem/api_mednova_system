@@ -85,7 +85,7 @@ class ConsultationChatRequestController extends Controller
     {
         try{
             $data = $request->getData();
-            $consultation = $this->consultationChatRequestRepositories->findOrFail($data);
+            $consultation = $this->consultationChatRequestRepositories->findOne($data);
             $notificationData = $this->consultantService->handleChatActivation($consultation, $data);
             $consultation->update($data);
 
