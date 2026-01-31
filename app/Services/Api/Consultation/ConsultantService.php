@@ -185,8 +185,8 @@ class ConsultantService
     {
         return $consultation->status === 'accepted'
             && (
-                !is_null($data['first_patient_message_at']) ||
-                !is_null($data['first_consultant_message_at'])
+                $this->isFirstMessageFromPatient($data)
+                || $this->isFirstMessageFromConsultant($data)
             );
     }
 
@@ -200,7 +200,7 @@ class ConsultantService
         $consultantName = $consultation->consultant->name;
 
         // أول رسالة من المريض → إشعار للدكتور
-        if (!is_null($data['first_patient_message_at'])) {
+        if ($this->isFirstMessageFromPatient($data)) {
             return [
                 'message' => sprintf(
                     'الدكتور %s، أصبحت جلسة الاستشارة مع المريض %s نشطة الآن، يمكنك البدء بالتفاعل للاستفادة من الاستشارة.',
@@ -220,6 +220,15 @@ class ConsultantService
             ),
             'event_type' => 'active_by_consultant',
         ];
+    }
+    private function isFirstMessageFromPatient(array $data): bool
+    {
+        return filled($data['first_patient_message_at'] ?? null);
+    }
+
+    private function isFirstMessageFromConsultant(array $data): bool
+    {
+        return filled($data['first_consultant_message_at'] ?? null);
     }
 
 
