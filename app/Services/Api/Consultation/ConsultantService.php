@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Api\Consultation;
 
 use App\Events\ConsultationRequested;
@@ -19,7 +20,8 @@ class ConsultantService
     protected IConsultationVideoRequestRepositories $videoRepo;
     protected IAppointmentRequestRepositories $appointmentRepo;
 
-    public function __construct(IAppointmentRequestRepositories $appointmentRepo, IConsultationChatRequestRepositories $chatRepo, IConsultationVideoRequestRepositories $videoRepo) {
+    public function __construct(IAppointmentRequestRepositories $appointmentRepo, IConsultationChatRequestRepositories $chatRepo, IConsultationVideoRequestRepositories $videoRepo)
+    {
         $this->chatRepo = $chatRepo;
         $this->videoRepo = $videoRepo;
         $this->appointmentRepo = $appointmentRepo;
@@ -65,8 +67,7 @@ class ConsultantService
                     $patientTimezone,
                     'Y-m-d H:i'
                 );
-            }
-            else {
+            } else {
                 throw new Exception('Invalid consultation type');
             }
 
@@ -77,10 +78,6 @@ class ConsultantService
             return $consultation;
         });
     }
-
-
-
-
 
 
     public function getAllConsultations(int $userId, string $userType, ?string $status = null, int $limit = 10): LengthAwarePaginator
@@ -115,7 +112,7 @@ class ConsultantService
             return $item;
         });
 
-        $videos = $videoQuery->get()->map(function ($item)  use ($userId) {
+        $videos = $videoQuery->get()->map(function ($item) use ($userId) {
             $item->consultation_type = 'video';
             $userTimezone = null;
             if ($item->consultant->id == $userId) {
@@ -181,7 +178,7 @@ class ConsultantService
         $data['status'] = 'active';
         $data['started_at'] = now();
 
-        return $this->prepareNotificationData($data);
+        return $this->prepareNotificationData($consultation, $data);
     }
 
     private function canActivateChat(ConsultationChatRequest $consultation, array $data): bool
@@ -193,30 +190,37 @@ class ConsultantService
             );
     }
 
-    private function prepareNotificationData(array $data): array
+    private function prepareNotificationData(
+        ConsultationChatRequest $consultation,
+        array                   $data
+    ): array
     {
+
+        $patientName = $consultation->patient->name;
+        $consultantName = $consultation->consultant->name;
+
+        // أول رسالة من المريض → إشعار للدكتور
         if (!is_null($data['first_patient_message_at'])) {
             return [
-                'message' => 'أصبحت جلسة استشارة بينك وبين الدكتور أحمد، اذهب الآن للاستفادة من الجلسة.',
+                'message' => sprintf(
+                    'الدكتور %s، أصبحت جلسة الاستشارة مع المريض %s نشطة الآن، يمكنك البدء بالتفاعل للاستفادة من الاستشارة.',
+                    $consultantName,
+                    $patientName
+                ),
                 'event_type' => 'active_by_patient',
             ];
         }
 
+        // أول رسالة من الدكتور → إشعار للمريض
         return [
-            'message' => 'أرسل الدكتور أحمد أول رسالة في جلسة الاستشارة، اذهب الآن للرد عليه.',
+            'message' => sprintf(
+                'عزيزي %s، أصبحت جلسة الاستشارة مع الدكتور %s نشطة الآن، يمكنك التفاعل والاستفادة من الاستشارة.',
+                $patientName,
+                $consultantName
+            ),
             'event_type' => 'active_by_consultant',
         ];
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }
