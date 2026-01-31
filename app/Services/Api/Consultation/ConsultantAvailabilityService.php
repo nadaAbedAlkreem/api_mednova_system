@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Api\Consultation;
 
 use App\Models\AppointmentRequest;
@@ -10,154 +11,181 @@ use Illuminate\Support\Carbon;
 class ConsultantAvailabilityService
 {
     protected int $duration;
-    protected int $durationMinutes; // وقت الفراغ بين كل جلسة
-    protected int $patientId ;
+    protected int $durationMinutes;
     protected ICustomerRepositories $customerRepositories;
-    protected TimezoneService $timezone;
+    protected TimezoneService $timezoneService;
 
-    public function __construct(TimezoneService $timezone , ICustomerRepositories $customerRepositories ,int $duration = 60 , int $durationMinutes = 10 , int $patientId = 0 )
-    {
-        $this->duration = $duration; // مدة كل جلسة بالدقائق
-        $this->durationMinutes = $durationMinutes; // مدة كل جلسة بالدقائق
-        $this->patientId = $patientId;
+    public function __construct(
+        TimezoneService $timezoneService,
+        ICustomerRepositories $customerRepositories,
+        int $duration = 60,
+        int $durationMinutes = 10
+    ) {
+        $this->duration = $duration;
+        $this->durationMinutes = $durationMinutes;
         $this->customerRepositories = $customerRepositories;
-        $this->timezone = $timezone;
-     }
-
-    /**
-     * الحصول على الفترات المتاحة لمستشار معين في يوم محدد
-     */
-    public function checkAvailableSlots(int $patientId, int $consultantId, string $consultantType, string $day, string $date , string $typeAppointment): array
-    {
-        $this->patientId = $patientId;
-        $schedule = Schedule::where('consultant_id', $consultantId)
-            ->where('is_active', true)
-            ->where('consultant_type', $consultantType)
-            ->firstOrFail();
-         $availableSlots = $this->mergeAllSlots($schedule, $date);
-         $bookedTimes = $this->getBookedTimes($consultantId, $day, $date , $typeAppointment);
-         $freeSlotsUtc = $availableSlots->diff($bookedTimes)->values();
-//        dd($freeSlotsUtc);
-//        $patient = $this->customerRepositories->findOrFail($patientId);
-//        $patientTimezone = $patient->timezone ?? config('app.timezone');
-//        $now = Carbon::now($patientTimezone);
-//
-//        $slotsForPatient = $freeSlotsUtc->map(function ($slotUtc) use ($patientTimezone, $now) {
-//            $slotLocal = $this->timezone->toUserTimezone(Carbon::parse($slotUtc), $patientTimezone, 'Y-m-d H:i');
-////             dd($slotLocal);
-//             return $slotLocal;
-//            // استبعاد الأوقات الماضية
-////            return Carbon::parse($slotLocal)->gt($now) ? $slotLocal : null;
-//        })->filter()->values();
-//        dd($slotsForPatient->toArray());
-
-        return $freeSlotsUtc->toArray();
+        $this->timezoneService = $timezoneService;
     }
 
     /**
-     * دمج كل الفترات الزمنية (صباح + مساء)
+     * تحديد التايم زون (مريض → request → افتراضي)
      */
-    protected function mergeAllSlots(Schedule $schedule, string $date)
+    private function resolveTimezone(?int $patientId, ?string $timezone): string
     {
+        if ($patientId) {
+            $patient = $this->customerRepositories->findOne($patientId);
+            if ($patient && $patient->timezone) {
+                return $patient->timezone;
+            }
+        }
+
+        if ($timezone) {
+            return $timezone;
+        }
+
+        return config('app.timezone');
+    }
+
+    /**
+     * الحصول على المواعيد المتاحة
+     */
+    public function checkAvailableSlots(
+        ?int $patientId,
+        int $consultantId,
+        string $consultantType,
+        string $day,
+        string $date,
+        string $typeAppointment,
+        ?string $timezone = null
+    ): array {
+        $userTimezone = $this->resolveTimezone($patientId, $timezone);
+
+        $schedule = Schedule::where('consultant_id', $consultantId)
+            ->where('consultant_type', $consultantType)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $availableSlots = $this->mergeAllSlots($schedule, $date, $userTimezone);
+
+        $bookedTimes = $this->getBookedTimes(
+            $consultantId,
+            $day,
+            $date,
+            $typeAppointment,
+            $userTimezone
+        );
+
+        return $availableSlots
+            ->diff($bookedTimes)
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * دمج الفترات الصباحية + المسائية
+     */
+    protected function mergeAllSlots(
+        Schedule $schedule,
+        string $date,
+        string $timezone
+    ) {
         $slots = collect();
-         // المواعيد الصباحية
-         $slots = $slots->merge($this->getSlotsForPeriod(
-             Carbon::parse($schedule->start_time_morning)->format('H:i:s'),
-             Carbon::parse($schedule->end_time_morning)->format('H:i:s'),
-            $date
-        ));
 
+        $slots = $slots->merge(
+            $this->getSlotsForPeriod(
+                $schedule->start_time_morning,
+                $schedule->end_time_morning,
+                $date,
+                $timezone
+            )
+        );
 
-        // المواعيد المسائية
         if ($schedule->is_have_evening_time) {
-            $slots = $slots->merge($this->getSlotsForPeriod(
-                Carbon::parse($schedule->start_time_evening)->format('H:i:s'),
-                Carbon::parse($schedule->end_time_evening)->format('H:i:s'),
-                $date
-            ));
+            $slots = $slots->merge(
+                $this->getSlotsForPeriod(
+                    $schedule->start_time_evening,
+                    $schedule->end_time_evening,
+                    $date,
+                    $timezone
+                )
+            );
         }
 
         return $slots;
     }
 
     /**
-     * جلب الفترات الزمنية لفترة معينة
+     * فترات زمنية لفترة واحدة
      */
-    protected function getSlotsForPeriod(?string $start, ?string $end, string $date)
-    {
+    protected function getSlotsForPeriod(
+        ?string $start,
+        ?string $end,
+        string $date,
+        string $timezone
+    ) {
         if (!$start || !$end) {
             return collect();
         }
 
-
-         return collect($this->generateTimeSlots($start, $end, $this->duration, $date))
-            ->map(fn($time) => $time);
+        return collect(
+            $this->generateTimeSlots($start, $end, $date, $timezone)
+        );
     }
 
     /**
-     * جلب المواعيد المحجوزة لنفس اليوم
+     * المواعيد المحجوزة
      */
-    protected function getBookedTimes(int $consultantId, string $day, string $date , string $typeAppointment)
-    {
-        $patient = $this->customerRepositories->findOrFail($this->patientId);
-        $patientTimezone = $patient->timezone ?? config('app.timezone'); // لو ما فيش timezone خذ الافتراضي
-
+    protected function getBookedTimes(
+        int $consultantId,
+        string $day,
+        string $date,
+        string $typeAppointment,
+        string $timezone
+    ) {
         return AppointmentRequest::where('consultant_id', $consultantId)
             ->where('requested_day', $day)
             ->whereDate('requested_time', $date)
             ->where('type_appointment', $typeAppointment)
-            ->where(function ($q) {
-                $q->where('status', 'pending')
-                    ->orWhere('status', 'approved');
-            })
+            ->whereIn('status', ['pending', 'approved'])
             ->pluck('requested_time')
-            ->map(fn($t) => Carbon::parse($t)
-                ->timezone($patientTimezone)  // تحويل UTC -> توقيت المريض
+            ->map(fn ($time) => Carbon::parse($time)
+                ->timezone($timezone)
                 ->format('Y-m-d H:i')
             );
     }
 
     /**
-     * دالة توليد الفترات الزمنية بين وقت البداية والنهاية
+     * توليد الفترات الزمنية
      */
-    protected function generateTimeSlots(string $start, string $end, int $duration, string $date): array
-    {
+    protected function generateTimeSlots(
+        string $start,
+        string $end,
+        string $date,
+        string $timezone
+    ): array {
         $slots = [];
-        $startTime = Carbon::parse($date.' '.$start);
-        $endTime = Carbon::parse($date.' '.$end);
-        $patient = $this->customerRepositories->findOrFail($this->patientId);
-        $patientTimezone = $patient->timezone ?? null;
-        $now = Carbon::now($patientTimezone);
+
+        $startTime = Carbon::parse($date . ' ' . $start);
+        $endTime   = Carbon::parse($date . ' ' . $end);
+        $now       = Carbon::now($timezone);
+
         while ($startTime->lt($endTime)) {
-//            $slotForPatient = $startTime->copy()->setTimezone($patientTimezone);
-            $slotEnd = $startTime->copy()->addMinutes($duration); // نهاية الموعد
+            $slotEnd = $startTime->copy()->addMinutes($this->duration);
+
             if ($slotEnd->gt($endTime)) {
-                break; // أوقف التوليد
+                break;
             }
-          $slotForPatient = $this->timezone->toUserTimezone($startTime ,$patientTimezone );
-             if (!($slotForPatient->toDateString() === $now->toDateString() && $slotForPatient->lt($now))) {
-                $slots[] = $slotForPatient->format('Y-m-d H:i');
+
+            $slotForUser = $this->timezoneService
+                ->toUserTimezone($startTime, $timezone);
+
+            if (!($slotForUser->isToday() && $slotForUser->lt($now))) {
+                $slots[] = $slotForUser->format('Y-m-d H:i');
             }
-            $startTime->addMinutes($duration)->addMinutes($this->durationMinutes);
-         }
+
+            $startTime->addMinutes($this->duration + $this->durationMinutes);
+        }
+
         return $slots;
     }
-//    protected function generateTimeSlots(string $start, string $end, int $duration, string $date): array
-//    {
-//        $slots = [];
-//        $startTime = Carbon::parse($date.' '.$start);
-//        $endTime = Carbon::parse($date.' '.$end);
-//        while ($startTime->lt($endTime))
-//        {
-//            $slots[] = $startTime->format('Y-m-d H:i');
-//            $startTime->addMinutes($duration)->addMinutes($this->durationMinutes);
-//        }
-//        return $slots;
-//    }
-
-
-
-
-
-
 }

@@ -39,8 +39,10 @@ class AppointmentRequestController extends Controller
                 $request->consultant_type,
                 $request->day ,
                 $request->date ,
-                $request->type_appointment
-            );
+                $request->type_appointment,
+                $request->timezone
+
+              );
              return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ['day' =>$request->day ,'available_slots' => $freeSlots], 202,);
 
         }catch (ModelNotFoundException $e) {
