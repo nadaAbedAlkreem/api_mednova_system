@@ -115,7 +115,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::prefix('chat')->group(function ()
         {
-            Route::get('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+            Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
         });
 //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 
