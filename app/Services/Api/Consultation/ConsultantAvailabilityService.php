@@ -6,6 +6,7 @@ use App\Models\Schedule;
 use App\Repositories\ICustomerRepositories;
 use App\Services\Api\Customer\TimezoneService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ConsultantAvailabilityService
 {
@@ -49,6 +50,7 @@ class ConsultantAvailabilityService
     {
 //        $this->patientId = $patientId;
         $this->resolveTimezone($patientId, $timezone);
+        Log::info('timezone' . $this->timezoneDefault);
         $schedule = Schedule::where('consultant_id', $consultantId)
             ->where('is_active', true)
             ->where('consultant_type', $consultantType)
