@@ -34,20 +34,20 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
         try {
             $this->notification->update(['status' => 'sent']);
             $this->notification->save();
-            if ($this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
+            if ($this->eventType === 'active_by_patient' || $this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
                 Log::info(' for nada', [
                     'requested' => $this->consultation->consultant_id,
                 ]);
                 return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
             }
-            if ($this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
+            if ($this->eventType === 'active_by_consultant' ||$this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
                 Log::info(' for cancelled', [
                     'consultant' => $this->consultation->consultant_id,
                 ]);
                 return new PrivateChannel('patient.' . $this->consultation->patient_id);
             }
 
-            if ($this->eventType === 'cancelled_by_system' || $this->eventType === 'completed' || $this->eventType === 'reminder_for_all') {
+            if ($this->eventType === 'cancelled_by_system'  || $this->eventType === 'active' || $this->eventType === 'completed' || $this->eventType === 'reminder_for_all') {
                 return [
                     new PrivateChannel('consultant.' . $this->consultation->consultant_id),
                     new PrivateChannel('patient.' . $this->consultation->patient_id),

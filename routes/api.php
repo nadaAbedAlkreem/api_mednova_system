@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Consultation\AppointmentRequestController;
 use App\Http\Controllers\Api\Consultation\ConsultationChatRequestController;
 use App\Http\Controllers\Api\Consultation\ConsultationController;
-use App\Http\Controllers\Api\Consultation\ConsultationVideoRequestController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
 use App\Http\Controllers\Api\Consultation\ZoomWebhookController;
@@ -16,7 +15,6 @@ use App\Http\Controllers\Api\Device\DeviceController;
 use App\Http\Controllers\Api\Device\DeviceRequestController;
 use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
-use App\Http\Controllers\Api\Device\GloveDeviceController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
@@ -30,13 +28,8 @@ use App\Http\Controllers\Api\Customer\PatientController;
 use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\File;
 
 
 Route::prefix('auth')->group(function ()
@@ -119,6 +112,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
 //            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
 //        });
+
+        Route::prefix('chat')->group(function ()
+        {
+            Route::get('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+        });
 //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 
     });
