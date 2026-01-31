@@ -28,6 +28,10 @@ class TherapistResource extends JsonResource
                 'license_authority'=>$this->license_authority,
                 'license_file'=>$this->license_file ,
                 'bio'=>$this->bio ,
+                'video_consultation_price' =>$this->video_consultation_price ,
+                'chat_consultation_price' =>$this->chat_consultation_price,
+                'currency' => $this->currency ,
+
 
 
              ] ;

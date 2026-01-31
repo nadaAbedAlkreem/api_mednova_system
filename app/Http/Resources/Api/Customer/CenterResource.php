@@ -28,6 +28,10 @@ class CenterResource extends JsonResource
                 'commercial_registration_number'=>$this->commercial_registration_number,
                 'commercial_registration_file'=>$this->commercial_registration_file ,
                 'commercial_registration_authority'=>$this->commercial_registration_authority ,
-             ] ;
+                'video_consultation_price' =>$this->video_consultation_price ,
+                'chat_consultation_price' =>$this->chat_consultation_price,
+                'currency' => $this->currency ,
+
+            ] ;
     }
 }
