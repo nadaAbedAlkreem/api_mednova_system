@@ -12,37 +12,35 @@ class ConsultantAvailabilityService
     protected int $duration;
     protected int $durationMinutes; // وقت الفراغ بين كل جلسة
     protected int $patientId ;
+    protected string $timezoneDefault ;
     protected ICustomerRepositories $customerRepositories;
-    protected  $timezone;
+    protected TimezoneService $timezone;
 
-    public function __construct( $timezone , ICustomerRepositories $customerRepositories ,int $duration = 60 , int $durationMinutes = 10 , int $patientId = 0 )
+
+    public function __construct(TimezoneService $timezone , ICustomerRepositories $customerRepositories ,int $duration = 60 , int $durationMinutes = 10 , int $patientId =  null,  string $timezoneDefault = null)
     {
         $this->duration = $duration; // مدة كل جلسة بالدقائق
         $this->durationMinutes = $durationMinutes; // مدة كل جلسة بالدقائق
         $this->patientId = $patientId;
         $this->customerRepositories = $customerRepositories;
         $this->timezone = $timezone;
+        $this->timezoneDefault = $timezoneDefault;
     }
-    private function resolveTimezone(?int $patientId, ?string $timezone): string
+    private function resolveTimezone(?int $patientId, ?string $timezone)
     {
         if ($patientId) {
             $patient = $this->customerRepositories->findOne($patientId);
             if ($patient && $patient->timezone) {
-                $this->patientId = $patient->timezone;
-                return $patient->timezone;
+                return  $this->timezoneDefault = $patient->timezone;
+
             }
-        }else if ($timezone) {
-            $this->timezone = $timezone;
-            return $timezone;
+        }elseif ($timezone) {
+            return $this->timezoneDefault = $timezone;
         }
 
-        return config('app.timezone');
+        return $this->timezoneDefault =  config('app.timezone');
     }
 
-
-    /**
-     * الحصول على الفترات المتاحة لمستشار معين في يوم محدد
-     */
     /**
      * الحصول على الفترات المتاحة لمستشار معين في يوم محدد
      */
@@ -58,6 +56,20 @@ class ConsultantAvailabilityService
         $availableSlots = $this->mergeAllSlots($schedule, $date);
         $bookedTimes = $this->getBookedTimes($consultantId, $day, $date , $typeAppointment);
         $freeSlotsUtc = $availableSlots->diff($bookedTimes)->values();
+//        dd($freeSlotsUtc);
+//        $patient = $this->customerRepositories->findOrFail($patientId);
+//        $patientTimezone = $patient->timezone ?? config('app.timezone');
+//        $now = Carbon::now($patientTimezone);
+//
+//        $slotsForPatient = $freeSlotsUtc->map(function ($slotUtc) use ($patientTimezone, $now) {
+//            $slotLocal = $this->timezone->toUserTimezone(Carbon::parse($slotUtc), $patientTimezone, 'Y-m-d H:i');
+////             dd($slotLocal);
+//             return $slotLocal;
+//            // استبعاد الأوقات الماضية
+////            return Carbon::parse($slotLocal)->gt($now) ? $slotLocal : null;
+//        })->filter()->values();
+//        dd($slotsForPatient->toArray());
+
         return $freeSlotsUtc->toArray();
     }
 
@@ -108,7 +120,7 @@ class ConsultantAvailabilityService
     {
 //        $patient = $this->customerRepositories->findOrFail($this->patientId);
 //        $patientTimezone = $patient->timezone ?? config('app.timezone'); // لو ما فيش timezone خذ الافتراضي
-        $patientTimezone = $this->resolveTimezone($this->patientId, $this->timezone);
+          $patientTimezone = $this->timezoneDefault ;
 
         return AppointmentRequest::where('consultant_id', $consultantId)
             ->where('requested_day', $day)
@@ -135,7 +147,7 @@ class ConsultantAvailabilityService
         $endTime = Carbon::parse($date.' '.$end);
 //        $patient = $this->customerRepositories->findOrFail($this->patientId);
 //        $patientTimezone = $patient->timezone ?? null;
-        $patientTimezone = $this->resolveTimezone($this->patientId, $this->timezone);
+          $patientTimezone = $this->timezoneDefault ;
         $now = Carbon::now($patientTimezone);
         while ($startTime->lt($endTime)) {
 //            $slotForPatient = $startTime->copy()->setTimezone($patientTimezone);
