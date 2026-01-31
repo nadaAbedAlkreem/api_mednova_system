@@ -49,9 +49,11 @@ class ChackAvailableSlotsRequest extends FormRequest
                 ->where('is_active', true)
                 ->where('consultant_type', $consultantType)
                 ->first();
-             if (! $schedule) {
+             if (!$schedule) {
+                 dd($schedule);
                 $validator->errors()->add('consultant_id', 'لا يوجد جدول مواعيد لهذا المختص.');
              }
+             dd($schedule);
 
             $daysOfWeek = $schedule->day_of_week; // نوعه JSON أو TEXT
             if (is_string($daysOfWeek)) {
