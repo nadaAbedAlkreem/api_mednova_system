@@ -3,7 +3,7 @@
 namespace App\Http\Requests\api\program;
 
 use App\Models\Admin;
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProgramRequest extends FormRequest

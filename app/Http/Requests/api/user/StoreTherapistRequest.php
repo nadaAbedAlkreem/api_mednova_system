@@ -3,12 +3,10 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
-use App\Services\api\TimezoneService;
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\TimezoneService;
+use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
-use function Symfony\Component\Translation\t;
 
 class StoreTherapistRequest extends FormRequest
 {

@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\api\user;
 
-use App\Models\Customer;
-use App\Services\api\TimezoneService;
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\TimezoneService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateScheduleRequest extends FormRequest

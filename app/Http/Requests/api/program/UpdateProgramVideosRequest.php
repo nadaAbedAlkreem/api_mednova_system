@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\api\program;
 
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProgramVideosRequest extends FormRequest

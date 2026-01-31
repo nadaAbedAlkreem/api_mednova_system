@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\api\VideoConsultationStatusService;
+use App\Services\Api\Consultation\VideoConsultationStatusService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;

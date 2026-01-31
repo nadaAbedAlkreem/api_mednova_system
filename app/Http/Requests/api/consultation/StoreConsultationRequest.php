@@ -5,7 +5,7 @@ namespace App\Http\Requests\api\consultation;
 use App\Models\AppointmentRequest;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
-use App\Services\api\TimezoneService;
+use App\Services\Api\Customer\TimezoneService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -3,10 +3,8 @@
 namespace App\Http\Resources\Api\Consultation;
 
 use App\Http\Resources\Api\Customer\CustomerResource;
-use App\Services\api\TimezoneService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Carbon;
 
 class AppointmentResource extends JsonResource
 {
