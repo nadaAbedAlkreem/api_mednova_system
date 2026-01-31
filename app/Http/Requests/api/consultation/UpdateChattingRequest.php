@@ -31,7 +31,7 @@ class UpdateChattingRequest extends FormRequest
             'first_consultant_message_at' => 'nullable|date',
             'patient_message_count' => 'integer|min:1|required_without:consultant_message_count',
             'consultant_message_count' => 'integer|min:1|required_without:patient_message_count',
-            'status'=> '',
+//            'status'=> '',
         ];
     }
 
@@ -78,12 +78,13 @@ class UpdateChattingRequest extends FormRequest
     public function getData()
     {
         $data = $this->validated();
+        dd($this->consultation);
+
         if (
             (!is_null($data['first_patient_message_at']) || !is_null($data['first_consultant_message_at']))
             && $this->consultation->status === 'accepted' // فقط إذا كانت مقبولة
         ) {
 
-            dd($this->consultation);
             $data['status'] = 'active';
             $data['started_at'] = now();
             $eventType  = '';
