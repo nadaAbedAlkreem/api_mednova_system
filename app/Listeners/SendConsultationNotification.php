@@ -35,8 +35,8 @@ class SendConsultationNotification
 
         try {
             $targets = match ($eventType) {
-                'requested', 'cancelled_by_patient' => [$consultation->consultant_id], // عند إرسال طلب استشارة → إشعار للمستشار
-                'accepted', 'cancelled_by_consultant' => [$consultation->patient_id],     // عند قبول الطلب → إشعار للمريض
+                'requested', 'cancelled_by_patient' ,'active_by_patient' => [$consultation->consultant_id], // عند إرسال طلب استشارة → إشعار للمستشار
+                'accepted', 'cancelled_by_consultant' , 'active_by_consultant' => [$consultation->patient_id],     // عند قبول الطلب → إشعار للمريض
                 'reminder_for_all' , 'cancelled_by_system', 'completed' => [$consultation->patient_id, $consultation->consultant_id], // النظام ألغى → إشعار للطرفين
                 default => [],
             };

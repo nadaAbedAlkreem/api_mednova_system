@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ConsultationVideoRequest;
-use App\Services\api\ZoomMeetingService;
+use App\Services\Api\Consultation\ZoomMeetingService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
