@@ -17,7 +17,7 @@ class ConsultantAvailabilityService
     protected TimezoneService $timezone;
 
 
-    public function __construct(TimezoneService $timezone , ICustomerRepositories $customerRepositories ,int $duration = 60 , int $durationMinutes = 10 , int $patientId =  null,  string $timezoneDefault = null)
+    public function __construct(TimezoneService $timezone , ICustomerRepositories $customerRepositories ,int $duration = 60 , int $durationMinutes = 10 , int $patientId =  0,  string $timezoneDefault = null)
     {
         $this->duration = $duration; // مدة كل جلسة بالدقائق
         $this->durationMinutes = $durationMinutes; // مدة كل جلسة بالدقائق
