@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Http\Resources\Api\Device\DeviceResource;

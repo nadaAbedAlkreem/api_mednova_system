@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\api\auth\RegisterUserRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Repositories\Eloquent\CustomerRepository;
-use App\Services\api\CustomerService;
+use App\Services\Api\Customer\CustomerService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -3,12 +3,9 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConsultationVideoRequest;
-use App\Services\api\ZoomMeetingService;
+use App\Services\Api\Consultation\ZoomMeetingService;
 use App\Traits\ResponseTrait;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ZoomWebhookController extends Controller

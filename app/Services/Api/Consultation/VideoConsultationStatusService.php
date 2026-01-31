@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Services\api;
+namespace App\Services\Api\Consultation;
 
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Services\api\ZoomMeetingService;
 
 class VideoConsultationStatusService
 {

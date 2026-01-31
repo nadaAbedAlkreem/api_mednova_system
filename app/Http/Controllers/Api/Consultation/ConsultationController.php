@@ -6,19 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\CheckDependenciesDataRequest;
 use App\Http\Requests\api\consultation\StoreConsultationRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
-use App\Http\Resources\Api\Consultation\ConsultationChatRequestResource;
 use App\Http\Resources\Api\Consultation\ConsultationResource;
-use App\Models\ConsultationVideoActivity;
 use App\Models\Customer;
 use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
-use App\Services\api\ConsultantService;
-use App\Services\api\ConsultationStatusService;
-use App\Services\api\TimezoneService;
+use App\Services\Api\Consultation\ConsultantService;
+use App\Services\Api\Consultation\ConsultationStatusService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use function Laravel\Prompts\error;
+
 
 class ConsultationController extends Controller
 {

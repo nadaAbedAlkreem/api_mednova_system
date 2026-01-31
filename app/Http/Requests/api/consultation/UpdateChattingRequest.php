@@ -31,7 +31,7 @@ class UpdateChattingRequest extends FormRequest
             'first_consultant_message_at' => 'nullable|date',
             'patient_message_count' => 'integer|min:1|required_without:consultant_message_count',
             'consultant_message_count' => 'integer|min:1|required_without:patient_message_count',
-//            'status'=> '',
+            'status'=> '',
         ];
     }
 
@@ -78,33 +78,6 @@ class UpdateChattingRequest extends FormRequest
     public function getData()
     {
         $data = $this->validated();
-        dd($this->consultation);
-
-        if (
-            (!is_null($data['first_patient_message_at']) || !is_null($data['first_consultant_message_at']))
-            && $this->consultation->status === 'accepted' // فقط إذا كانت مقبولة
-        ) {
-
-            $data['status'] = 'active';
-            $data['started_at'] = now();
-            $eventType  = '';
-
-            // تحديد نص الرسالة حسب من بدأ التفاعل
-            if (!is_null($data['first_patient_message_at'])) {
-                $notificationMessage = "أصبحت جلسة استشارة بينك وبين الدكتور أحمد، اذهب الآن للاستفادة من الجلسة.";
-                $eventType = 'active_by_patient';
-            } elseif (!is_null($data['first_consultant_message_at'])) {
-                $notificationMessage = "أرسل الدكتور أحمد أول رسالة في جلسة الاستشارة، اذهب الآن للرد عليه.";
-                $eventType = 'active_by_consultant';
-
-            }
-            // إطلاق الحدث مع الرسالة المناسبة
-            event(new \App\Events\ConsultationRequested(
-                $this->consultation,
-                $notificationMessage,
-                $eventType,
-            ));
-        }
         return $data;
     }
 

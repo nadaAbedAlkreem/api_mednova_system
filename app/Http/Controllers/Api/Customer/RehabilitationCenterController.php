@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\user\StoreRehabilitationCenterRequest;
 use App\Http\Requests\api\user\UpdateRehabilitationCenterRequest;
-use App\Http\Requests\api\user\UpdateScheduleRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Models\RehabilitationCenter;
@@ -13,7 +12,7 @@ use App\Repositories\ICustomerRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
-use App\Services\api\RehabilitationCenterService;
+use App\Services\Api\Customer\RehabilitationCenterService;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
 

@@ -1,16 +1,10 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Consultation;
 
-use App\Events\ConsultationRequested;
 use App\Models\AppointmentRequest;
-use App\Models\ConsultationChatRequest;
-use App\Models\Customer;
 use App\Models\Schedule;
-use App\Models\User;
-use App\Repositories\Eloquent\PatientRepository;
 use App\Repositories\ICustomerRepositories;
-use App\Repositories\IPatientRepositories;
-use Exception;
+use App\Services\Api\Customer\TimezoneService;
 use Illuminate\Support\Carbon;
 
 class ConsultantAvailabilityService

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\api;
+namespace App\Services\Api\Payment;
 
 use App\Models\GatewayPayment;
 use App\Repositories\IGatewayPaymentRepositories;

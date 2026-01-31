@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Services\api;
-
+namespace App\Services\Api\Payment;
 class FinancialOperationFactory
 {
     public static function make(string $type): FinancialOperationInterface {

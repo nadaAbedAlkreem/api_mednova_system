@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\device\StoreGloveCommandRequest;
-use App\Http\Requests\UpdateGloveCommandRequest;
-use App\Models\Customer;
 use App\Models\GloveCommand;
 use App\Models\GloveError;
 use App\Repositories\IGloveErrorRepositories;
-use App\Services\api\GloveCommandService;
+use App\Services\api\Glove\GloveCommandService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Services\api;
+namespace App\Services\Api\Consultation;
 
 
 use App\Events\ConsultationRequested;
-use App\Models\ConsultationVideoReport;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;

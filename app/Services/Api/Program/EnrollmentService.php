@@ -1,15 +1,9 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Program;
 
-use App\Events\ConsultationRequested;
-use App\Models\ConsultationChatRequest;
-use App\Models\Customer;
+
 use App\Models\ProgramEnrollment;
-use App\Models\Rating;
-use App\Models\User;
-use App\Repositories\ICustomerRepositories;
-use Exception;
-use Illuminate\Support\Facades\DB;
+
 
 class EnrollmentService
 {

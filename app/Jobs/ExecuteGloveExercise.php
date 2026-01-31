@@ -3,16 +3,17 @@
 namespace App\Jobs;
 
 use App\Models\GloveCommand;
+use App\Models\GloveData;
 use App\Models\GloveDevice;
 use App\Models\GloveSession;
-use App\Models\GloveData;
-use App\Services\Api\GloveCommandService;
+use App\Services\api\Glove\GloveCommandService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+
 class ExecuteGloveExercise implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;

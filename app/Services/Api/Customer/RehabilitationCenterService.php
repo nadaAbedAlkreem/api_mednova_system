@@ -1,13 +1,11 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Customer;
 
-use App\Models\User;
 use App\Repositories\ICustomerRepositories;
 use App\Repositories\ILocationRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
-use Exception;
 use Illuminate\Support\Facades\DB;
 
 class RehabilitationCenterService

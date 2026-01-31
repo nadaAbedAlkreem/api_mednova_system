@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Services\api;
+namespace App\Services\Api\Glove;
 
 use App\Jobs\ExecuteGloveExercise;
 use App\Models\Device;
-use App\Models\GloveCommand;
-use App\Models\GloveData;
 use App\Models\GloveDevice;
 use App\Models\GloveError;
-use App\Models\GloveSession;
 use App\Repositories\IGloveCommandRepositories;
 use App\Repositories\IGloveDeviceRepositories;
 use App\Repositories\IGloveErrorRepositories;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class GloveCommandService
 {

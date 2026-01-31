@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Consultation\NotificationsResource;
 use App\Models\Notification;
 use App\Repositories\INotificationRepositories;
-use App\Services\api\TimezoneService;
 use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Http\Request;

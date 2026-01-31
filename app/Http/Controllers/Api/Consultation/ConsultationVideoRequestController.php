@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Requests\StoreConsultationVideoRequestRequest;
-use App\Http\Requests\UpdateConsultationVideoRequestRequest;
 use App\Models\ConsultationVideoRequest;
 use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
-use App\Services\api\ConsultantService;
-use App\Services\api\ConsultationStatusService;
+use App\Services\Api\Consultation\ConsultantService;
+use App\Services\Api\Consultation\ConsultationStatusService;
 use App\Traits\ResponseTrait;
 
 class ConsultationVideoRequestController extends Controller

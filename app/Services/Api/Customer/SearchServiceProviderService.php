@@ -1,10 +1,8 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Customer;
 
 use App\Models\Customer;
-use App\Models\User;
-use App\Repositories\ICustomerRepositories;
-use Exception;
+
 
 class SearchServiceProviderService
 {

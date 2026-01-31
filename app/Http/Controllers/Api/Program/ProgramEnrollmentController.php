@@ -7,7 +7,7 @@ use App\Http\Requests\StoreProgramEnrollmentRequest;
 use App\Http\Requests\UpdateProgramEnrollmentRequest;
 use App\Http\Resources\Api\Program\ProgramResource;
 use App\Models\ProgramEnrollment;
-use App\Services\api\EnrollmentService;
+use App\Services\Api\Program\EnrollmentService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 

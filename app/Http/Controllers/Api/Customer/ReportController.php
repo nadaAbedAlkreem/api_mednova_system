@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\user\StoreReportRequest;
-use App\Models\Report;
 use App\Repositories\IReportRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;

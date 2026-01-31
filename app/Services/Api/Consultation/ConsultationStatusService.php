@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Consultation;
 
 use App\Events\ConsultationRequested;
 use App\Events\ConsultationVideoApproval;

@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Models\GatewayPayment;
-use App\Services\api\AmwalWebhookService;
+use App\Services\Api\Payment\AmwalWebhookService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AmwalWebhookController extends Controller
 {

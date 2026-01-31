@@ -1,21 +1,6 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Customer;
 
-use App\Events\ConsultationRequested;
-use App\Models\AppointmentRequest;
-use App\Models\ConsultationChatRequest;
-use App\Models\ConsultationVideoRequest;
-use App\Models\Customer;
-use App\Models\Schedule;
-use App\Models\User;
-use App\Repositories\IAppointmentRequestRepositories;
-use App\Repositories\IConsultationChatRequestRepositories;
-use App\Repositories\IConsultationVideoRequestRepositories;
-use App\Repositories\ICustomerRepositories;
-use Exception;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class TimezoneService
 {

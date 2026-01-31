@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Services\api;
+namespace App\Services\Api\Payment;
 
-use App\Models\Customer;
 use App\Repositories\Eloquent\TransactionRepository;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\ITransactionRepositories;
@@ -12,7 +11,6 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AmwalPayService

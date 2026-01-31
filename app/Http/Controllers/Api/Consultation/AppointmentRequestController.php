@@ -6,14 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\ChackAvailableSlotsRequest;
 use App\Http\Requests\StoreAppointmentRequestRequest;
 use App\Http\Requests\UpdateAppointmentRequestRequest;
-use App\Http\Resources\Api\Consultation\AppointmentResource;
 use App\Models\AppointmentRequest;
-use App\Models\Schedule;
-use App\Services\api\ConsultantAvailabilityService;
+use App\Services\Api\Consultation\ConsultantAvailabilityService;
 use App\Traits\ResponseTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class AppointmentRequestController extends Controller
 {
@@ -34,7 +30,7 @@ class AppointmentRequestController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function checkAvailableSlots(ChackAvailableSlotsRequest $request)
+    public function checkAvailableSlots(ChackAvailableSlotsRequest $request): \Illuminate\Http\JsonResponse
     {
         try{
               $freeSlots = $this->consultantAvailabilityService->checkAvailableSlots(

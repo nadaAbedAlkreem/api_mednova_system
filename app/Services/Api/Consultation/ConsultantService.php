@@ -1,22 +1,17 @@
 <?php
-namespace App\Services\api;
+namespace App\Services\Api\Consultation;
 
 use App\Events\ConsultationRequested;
-use App\Models\AppointmentRequest;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
-use App\Models\Customer;
-use App\Models\Schedule;
-use App\Models\User;
 use App\Repositories\IAppointmentRequestRepositories;
 use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
-use App\Repositories\ICustomerRepositories;
+use App\Services\Api\Customer\TimezoneService;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ConsultantService
 {
@@ -82,6 +77,11 @@ class ConsultantService
             return $consultation;
         });
     }
+
+
+
+
+
 
     public function getAllConsultations(int $userId, string $userType, ?string $status = null, int $limit = 10): LengthAwarePaginator
     {
@@ -171,4 +171,55 @@ class ConsultantService
 
         return $paginated;
     }
+
+    public function handleChatActivation(ConsultationChatRequest $consultation, array &$data): ?array
+    {
+        if (!$this->canActivateChat($consultation, $data)) {
+            return null;
+        }
+
+        $data['status'] = 'active';
+        $data['started_at'] = now();
+
+        return $this->prepareNotificationData($data);
     }
+
+    private function canActivateChat(ConsultationChatRequest $consultation, array $data): bool
+    {
+        return $consultation->status === 'accepted'
+            && (
+                !is_null($data['first_patient_message_at']) ||
+                !is_null($data['first_consultant_message_at'])
+            );
+    }
+
+    private function prepareNotificationData(array $data): array
+    {
+        if (!is_null($data['first_patient_message_at'])) {
+            return [
+                'message' => 'أصبحت جلسة استشارة بينك وبين الدكتور أحمد، اذهب الآن للاستفادة من الجلسة.',
+                'event_type' => 'active_by_patient',
+            ];
+        }
+
+        return [
+            'message' => 'أرسل الدكتور أحمد أول رسالة في جلسة الاستشارة، اذهب الآن للرد عليه.',
+            'event_type' => 'active_by_consultant',
+        ];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+

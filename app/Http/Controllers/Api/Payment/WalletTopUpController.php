@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\payment\WalletTopUpRequest;
-use App\Models\Customer;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\IWalletRepositories;
-use App\Services\api\AmwalPayService;
-use App\Services\api\FinancialOperationFactory;
-use App\Services\api\WalletTopUpService;
-use App\Services\api\PaymentIntentService;
+use App\Services\Api\Payment\AmwalPayService;
+use App\Services\Api\Payment\FinancialOperationFactory;
+use App\Services\Api\Payment\PaymentIntentService;
+use App\Services\Api\Payment\WalletTopUpService;
 use App\Traits\ResponseTrait;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class WalletTopUpController extends Controller

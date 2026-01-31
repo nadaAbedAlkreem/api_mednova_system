@@ -11,7 +11,7 @@ use App\Repositories\ILocationRepositories;
 use App\Repositories\IPatientRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\ITherapistRepositories;
-use App\Services\api\SearchServiceProviderService;
+use App\Services\Api\Customer\SearchServiceProviderService;
 use App\Traits\ResponseTrait;
 use DateTimeZone;
 use Illuminate\Http\Request;
