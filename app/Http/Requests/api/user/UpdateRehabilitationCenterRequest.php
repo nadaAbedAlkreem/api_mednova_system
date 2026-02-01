@@ -189,8 +189,8 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             $data['license_file'] =  asset('storage/' . $path);;
         }
         $data = collect($data);
-        $dataCustomer = $data->only(['customer_id' , 'email' , 'phone','gender', 'birth_date','image']);
-        $dataRehabilitation_centers = $data->only(['customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' ,'timezone', 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
+        $dataCustomer = $data->only(['customer_id' , 'email' , 'phone','gender', 'birth_date','image' , 'timezone']);
+        $dataRehabilitation_centers = $data->only(['customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
 
         return ['customer'=>$dataCustomer  , 'center' => $dataRehabilitation_centers ];
     }
