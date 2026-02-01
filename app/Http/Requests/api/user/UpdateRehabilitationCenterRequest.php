@@ -28,6 +28,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'gender' => '',
             'birth_date' => '',
+            'name_center' => 'string',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'full_name' => 'string|max:255',
 //            'email' => 'string|email|max:255',
@@ -190,7 +191,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
         }
         $data = collect($data);
         $dataCustomer = $data->only(['customer_id' , 'email' , 'phone','gender', 'birth_date','image' , 'timezone']);
-        $dataRehabilitation_centers = $data->only(['customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
+        $dataRehabilitation_centers = $data->only(['name_center','customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
 
         return ['customer'=>$dataCustomer  , 'center' => $dataRehabilitation_centers ];
     }
