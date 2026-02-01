@@ -43,7 +43,7 @@ class UpdatePatientRequest extends FormRequest
 //            'email' => 'string|email|max:255',
 
             'phone' => ['string',  'unique:customers,phone,' . $this->customer_id, 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
-            'emergency_phone' => [ 'unique:patients,emergency_phone,' . $this->id,'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
+            'emergency_phone' => [ 'unique:patients,emergency_phone,' . $this->customer_id . ',customer_id','regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
             'relationship' => [
                 'string',
                 'min:2',
