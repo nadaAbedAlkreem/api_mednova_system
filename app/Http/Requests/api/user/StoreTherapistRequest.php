@@ -239,7 +239,7 @@ class StoreTherapistRequest extends FormRequest
 
         }
 
-         $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ]);
+         $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ,'video_consultation_price' , 'chat_consultation_price' , 'currency']);
          return ['data'=>$data ,'schedule'=> $dataSchedule] ;
     }
 }

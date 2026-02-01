@@ -3,8 +3,8 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
-use App\Services\api\TimezoneService;
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\TimezoneService;
+use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -228,7 +228,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
         $data = collect($data);
         $dataCustomer = $data->only(['customer_id', 'gender', 'birth_date', 'image']);
         $dataLocation = $data->only(['customer_id', 'formatted_address', 'city', 'country']);
-        $dataRehabilitation_centers = $data->only(['name_center','customer_id', 'year_establishment', 'license_number', 'license_authority', 'license_file', 'bio', 'has_commercial_registration', 'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority']);
+        $dataRehabilitation_centers = $data->only(['name_center','customer_id', 'year_establishment', 'license_number', 'license_authority', 'license_file', 'bio', 'has_commercial_registration','chat_consultation_price' , 'chat_consultation_price' , 'currency', 'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority']);
         $data['consultant_id'] = $data['customer_id'];
         $data['consultant_type'] = 'rehabilitation_center';
         $data['day_of_week'] = json_encode($data['day_of_week']);

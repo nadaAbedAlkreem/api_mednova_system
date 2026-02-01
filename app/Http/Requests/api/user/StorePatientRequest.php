@@ -2,9 +2,8 @@
 
 namespace App\Http\Requests\api\user;
 
-use App\Services\api\UploadService;
+use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 class StorePatientRequest extends FormRequest
 {
