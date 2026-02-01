@@ -127,11 +127,20 @@ class UpdateScheduleRequest extends FormRequest
         $customer = auth()->user();
         if ($customer) {
            $localTimezone = $customer->timezone ?? config('app.timezone');
-            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
-            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
-            if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 1) {
-                $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
-                $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+            if(isset($data['start_time_morning'])) {
+                $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+            }
+            if(isset($data['end_time_morning'])) {
+                $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+            }
+            if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 1)
+            {
+                if(isset($data['start_time_evening'])) {
+                    $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+                }
+                if(isset($data['end_time_evening'])) {
+                    $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+                }
             }
         }
         return $data;
