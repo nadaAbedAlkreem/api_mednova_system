@@ -4,6 +4,7 @@ namespace App\Http\Requests\api\user;
 
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTherapistRequest extends FormRequest
 {
@@ -42,7 +43,9 @@ class UpdateTherapistRequest extends FormRequest
             'bio' => ' string',
             'video_consultation_price' => ['numeric', 'min:0'],
             'chat_consultation_price' => [ 'numeric', 'min:0'],
-            'currency' => [ 'string', 'size:3'],
+            'currency' => ['string', 'size:3'],
+            'timezone' => [Rule::in(\DateTimeZone::listIdentifiers())],
+
         ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
