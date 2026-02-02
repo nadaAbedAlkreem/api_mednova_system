@@ -83,7 +83,7 @@ class RehabilitationCenterController extends Controller
                             $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
                                 ->whereIn('status', ['active', 'accepted', 'pending']);
                         })
-                            ->orWhereHas('consultationVideoRequests', function ($q) {
+                            ->orWhereHas('consultationVideoRequestsForConsultant', function ($q) {
                                 $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
                                     ->whereIn('status', ['active', 'accepted', 'pending']);
                             });

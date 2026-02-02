@@ -127,6 +127,10 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(ConsultationVideoRequest::class);
     }
+    public function consultationVideoRequestsForConsultant(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ConsultationVideoRequest::class ,'consultant_id');
+    }
 
     // علاقة باقات المستخدم
     public function userPackages(): \Illuminate\Database\Eloquent\Relations\HasMany
