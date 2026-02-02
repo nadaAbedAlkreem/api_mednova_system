@@ -11,6 +11,7 @@ class TimezoneService
     public static function toUserTimezone($datetime, ?string $timezone, string $format = 'Y-m-d H:i')
     {
         $timezone = $timezone ?? config('app.timezone');
+        dd($timezone);
           return $datetime
             ?$datetime->copy()->setTimezone($timezone)
              : null;
