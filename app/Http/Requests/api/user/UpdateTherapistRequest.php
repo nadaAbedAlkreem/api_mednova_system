@@ -152,6 +152,7 @@ class UpdateTherapistRequest extends FormRequest
     {
         $uploadService = new UploadService();
         $data= $this::validated();
+
         if ($this->hasFile('image')) {
             $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
             $data['image'] =  asset('storage/' . $path);

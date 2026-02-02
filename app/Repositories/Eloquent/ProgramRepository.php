@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Program;
 use App\Repositories\IProgramRepositories;
+use Illuminate\Support\Facades\Auth;
 
 
 class ProgramRepository  extends BaseRepository implements IProgramRepositories
@@ -14,14 +15,14 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
     }
     public function baseQuery()
     {
-        return Program::query()
+        $query = Program::query()
             ->public()
             ->with(['creator'])
             ->withAvg('ratings', 'rating')
             ->withCount('ratings')
             ->withCount([
                 'ratings as ratings_4_to_5' => function ($query) {
-                    $query->where('rating', '>=', 4)->where('rating', '<=', 5);
+                    $query->whereBetween('rating', [4, 5]);
                 },
                 'ratings as ratings_3_to_4' => function ($query) {
                     $query->where('rating', '>=', 3)->where('rating', '<', 4);
@@ -37,6 +38,17 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
                 },
             ])
             ->withCount('enrollments');
+
+        // ✅ لو المستخدم مسجل دخول
+        if (Auth::guard('api')->check()) {
+            $query->withExists([
+                'enrollments as is_enrolled' => function ($q) {
+                    $q->where('customer_id', Auth::id());
+                }
+            ]);
+        }
+
+        return $query;
     }
 
     public function findWithDetails(int $id)
