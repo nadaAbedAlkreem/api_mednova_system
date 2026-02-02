@@ -253,6 +253,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             }
             if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 1)
             {
+                dd($localTimezone);
                 if(isset($data['start_time_evening'])) {
                     $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
                 }
