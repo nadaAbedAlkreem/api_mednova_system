@@ -11,8 +11,7 @@ class TimezoneService
     public static function toUserTimezone($datetime, ?string $timezone, string $format = 'Y-m-d H:i')
     {
         $timezone = $timezone ?? config('app.timezone');
-        dd($timezone);
-          return $datetime
+         return $datetime
             ?$datetime->copy()->setTimezone($timezone)
              : null;
     }
@@ -38,6 +37,16 @@ class TimezoneService
             : null;
 
     }
+
+    public static function toLocalHour($utcTime, ?string $timezone)
+    {
+        return $utcTime
+            ? \Carbon\Carbon::createFromFormat('H:i', $utcTime, 'UTC') // الوقت مخزن بـ UTC
+            ->setTimezone($timezone) // حوّله إلى timezone المطلوب
+            ->format('H:i') // صيغة الساعة والدقيقة
+            : null;
+    }
+
 
 
 }
