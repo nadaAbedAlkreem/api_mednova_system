@@ -64,12 +64,11 @@ class RehabilitationCenterController extends Controller
         try {
             DB::beginTransaction();
             $authUser = auth('api')->user();
-            dd($authUser->timezone);
 
             if (empty($authUser->timezone)) {
                 throw new \RuntimeException("User timezone is required for this operation.");
             }
-
+            dd('aa');
             $authUserTimezone = $authUser->timezone;
             $data = $this->rehabilitationCenterService->prepare($request->validated(), $authUserTimezone);
             $this->customerRepositories->update($data['customer']->toArray(),$request['customer_id'] );
