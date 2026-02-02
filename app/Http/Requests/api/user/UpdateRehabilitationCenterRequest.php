@@ -3,6 +3,7 @@
 namespace App\Http\Requests\api\user;
 
 use App\Models\Customer;
+use App\Services\Api\Customer\TimezoneService;
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -54,6 +55,53 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'currency' => ['string', 'size:3'],
             'timezone' => [Rule::in(\DateTimeZone::listIdentifiers())],
 
+             //// scheduler
+            'day_of_week' => 'array',
+            'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
+
+            'start_time_morning' => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour >= 12) {
+                        $fail('الوقت الصباحي يجب أن يكون قبل الساعة 12:00.');
+                    }
+                }
+            ],
+            'end_time_morning' => [
+                'required',
+                'date_format:H:i',
+                'after:start_time_morning',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour >= 12) {
+                        $fail('نهاية الفترة الصباحية يجب أن تكون قبل الساعة 12:00.');
+                    }
+                }
+            ],
+            'is_have_evening_time' => 'boolean',
+            'start_time_evening' => [
+                'required_if:is_have_evening_time,true',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour < 12) {
+                        $fail('الوقت المسائي يجب أن يكون بعد الساعة 12:00.');
+                    }
+                }
+            ],
+            'end_time_evening' => [
+                'required_if:is_have_evening_time,true',
+                'date_format:H:i',
+                'after:start_time_evening',
+                function ($attribute, $value, $fail) {
+                    $hour = intval(explode(':', $value)[0]);
+                    if ($hour < 12) {
+                        $fail('نهاية الفترة المسائية يجب أن تكون بعد الساعة 12:00.');
+                    }
+                }
+            ],
 
         ];
     }
@@ -169,6 +217,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'currency.required' => __('validation.required', ['attribute' => __('validation.attributes.currency')]),
             'currency.string' =>__('validation.string', ['attribute' => __('validation.attributes.currency')]),
             'currency.size' =>__('validation.size.string', ['attribute' => __('validation.attributes.currency')]),
+
         ];
     }
     public function getData(): array
@@ -189,11 +238,37 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
             $data['license_file'] =  asset('storage/' . $path);;
         }
+        if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
+        {
+            $data['start_time_evening'] = null ;
+            $data['end_time_evening'] = null ;
+
+        }
+        $customer = auth()->user();
+        if ($customer) {
+            $localTimezone = $customer->timezone ?? config('app.timezone');
+            if(isset($data['start_time_morning'])) {
+                $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+            }
+            if(isset($data['end_time_morning'])) {
+                $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+            }
+            if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 1)
+            {
+                if(isset($data['start_time_evening'])) {
+                    $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+                }
+                if(isset($data['end_time_evening'])) {
+                    $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+                }
+            }
+        }
         $data = collect($data);
         $dataCustomer = $data->only(['customer_id' , 'email' , 'phone','gender', 'birth_date','image' , 'timezone']);
         $dataRehabilitation_centers = $data->only(['name_center','customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
+        $dataScheduler = $data->only(['day_of_week','start_time_morning','end_time_morning' ,'start_time_evening' , 'end_time_evening','is_have_evening_time'  ]);
 
-        return ['customer'=>$dataCustomer  , 'center' => $dataRehabilitation_centers ];
+        return ['customer'=>$dataCustomer  , 'center' => $dataRehabilitation_centers  , 'schedule' => $dataScheduler];
     }
 
 }

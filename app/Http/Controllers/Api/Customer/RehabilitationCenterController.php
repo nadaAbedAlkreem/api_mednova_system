@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Customer;
 
+use App\Enums\ConsultantType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\user\StoreRehabilitationCenterRequest;
 use App\Http\Requests\api\user\UpdateRehabilitationCenterRequest;
@@ -12,6 +13,7 @@ use App\Repositories\ICustomerRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
 use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
+use App\Services\Api\Consultation\SchedulerService;
 use App\Services\Api\Customer\RehabilitationCenterService;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
@@ -20,17 +22,20 @@ class RehabilitationCenterController extends Controller
 {
     use ResponseTrait ;
     protected ICustomerRepositories $customerRepositories;
+    protected SchedulerService $schedulerService;
     protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
     protected ITherapistRepositories $therapistRepositories;
     protected IScheduleRepositories $scheduleRepositories;
+    protected RehabilitationCenterService $rehabilitationCenterService;
 
-
-    public function __construct(IScheduleRepositories $scheduleRepositories ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    public function __construct(RehabilitationCenterService $rehabilitationCenterService,SchedulerService $schedulerService ,IScheduleRepositories $scheduleRepositories ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
         $this->therapistRepositories = $therapistRepositories;
         $this->scheduleRepositories = $scheduleRepositories;
+        $this->schedulerService = $schedulerService;
+        $this->rehabilitationCenterService = $rehabilitationCenterService;
     }
 
     /**
@@ -52,11 +57,11 @@ class RehabilitationCenterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRehabilitationCenterRequest $request, RehabilitationCenterService $service): \Illuminate\Http\JsonResponse
+    public function store(StoreRehabilitationCenterRequest $request): \Illuminate\Http\JsonResponse
     {
     try {
         $data = $request->getData();
-        $customer = $service->store($data, $request['customer_id'], $request['specialty_id']);
+        $customer = $this->rehabilitationCenterService->store($data, $request['customer_id'], $request['specialty_id']);
         if(!$customer instanceof Customer ){
             throw new \Exception('Create Customer Failed');
 
@@ -98,6 +103,13 @@ class RehabilitationCenterController extends Controller
                 $center = $this->customerRepositories->findOrFail($request['customer_id'] );
                 $center->medicalSpecialties()->sync($request['specialty_id']);
             }
+            if (!empty($data['schedule'])) {
+                $this->schedulerService->update(
+                    $request->customer_id,
+                    ConsultantType::REHABILITATION_CENTER,
+                    $data['schedule']
+                );
+            }
             DB::commit();
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 200,);
         }catch (\Exception $e) {
@@ -105,14 +117,4 @@ class RehabilitationCenterController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(RehabilitationCenter $rehabilitationCenter)
-    {
-        //
-    }
-}
+ }
