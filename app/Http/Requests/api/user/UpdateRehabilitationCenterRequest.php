@@ -60,7 +60,6 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
 
             'start_time_morning' => [
-                'required',
                 'date_format:H:i',
                 function ($attribute, $value, $fail) {
                     $hour = intval(explode(':', $value)[0]);
@@ -70,7 +69,6 @@ class UpdateRehabilitationCenterRequest extends FormRequest
                 }
             ],
             'end_time_morning' => [
-                'required',
                 'date_format:H:i',
                 'after:start_time_morning',
                 function ($attribute, $value, $fail) {
