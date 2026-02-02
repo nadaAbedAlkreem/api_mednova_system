@@ -243,7 +243,6 @@ class UpdateRehabilitationCenterRequest extends FormRequest
 
         }
         $customer = auth()->user();
-        dd($customer);
         if ($customer) {
             $localTimezone = $customer->timezone ?? config('app.timezone');
             if(isset($data['start_time_morning'])) {
