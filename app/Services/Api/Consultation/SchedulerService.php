@@ -6,22 +6,22 @@ namespace App\Services\Api\Consultation;
 
 
 use App\Enums\ConsultantType;
-use App\Repositories\IRehabilitationCenterRepositories;
+use App\Repositories\IScheduleRepositories;
 
 class SchedulerService
 {
 
-    protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
+    protected IScheduleRepositories $scheduleRepositories;
 
-    public function __construct(IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    public function __construct(IScheduleRepositories $scheduleRepositories )
     {
-      $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
+     $this->scheduleRepositories = $scheduleRepositories;
     }
     public function update(int $serviceProviderId, ConsultantType $typeAccount, array $data): void
     {
         match ($typeAccount) {
             ConsultantType::REHABILITATION_CENTER =>
-            $this->rehabilitationCenterRepositories->updateWhere(
+            $this->scheduleRepositories->updateWhere(
                 $data,
                 ['consultant_id' => $serviceProviderId, 'type_account' => $typeAccount]
             ),
