@@ -262,7 +262,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             }
         }
         $data = collect($data);
-        $dataCustomer = $data->only(['customer_id' , 'email' , 'phone','gender', 'birth_date','image' , 'timezone']);
+        $dataCustomer = $data->only(['customer_id' ,'full_name' ,'email' , 'phone','gender', 'birth_date','image' , 'timezone']);
         $dataRehabilitation_centers = $data->only(['name_center','customer_id','video_consultation_price' ,'chat_consultation_price' , 'currency','year_establishment' ,'license_number' , 'license_authority' , 'license_file' , 'bio' , 'has_commercial_registration' ,'commercial_registration_number' , 'commercial_registration_file' ,'commercial_registration_authority'  ]);
         $dataScheduler = $data->only(['day_of_week','start_time_morning','end_time_morning' ,'start_time_evening' , 'end_time_evening','is_have_evening_time'  ]);
 
