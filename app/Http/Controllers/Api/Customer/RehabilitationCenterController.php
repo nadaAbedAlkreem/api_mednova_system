@@ -77,16 +77,19 @@ class RehabilitationCenterController extends Controller
                 $center->medicalSpecialties()->sync($request['specialty_id']);
             }
             if (!empty($data['schedule'])) {
-                $hasActiveConsultations = Customer::
-                    whereHas('consultationRequests', function($q) {
-                        $q->whereIn('status', ['active', 'accepted', 'pending']);
+                $hasActiveConsultation = Customer::where('id', $request['customer_id'])
+                    ->where(function ($query) {
+                        $query->whereHas('consultationRequests', function ($q) {
+                            $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
+                                ->whereIn('status', ['active', 'accepted', 'pending']);
+                        })
+                            ->orWhereHas('consultationVideoRequests', function ($q) {
+                                $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
+                                    ->whereIn('status', ['active', 'accepted', 'pending']);
+                            });
                     })
-                    ->orWhereHas('consultationVideoRequests', function($q) {
-                        $q->whereIn('status', ['active', 'accepted', 'pending']);
-                    })
-                    ->where('id', $request['customer_id'])
                     ->exists();
-                if ($hasActiveConsultations) {
+                if ($hasActiveConsultation) {
                     throw new \Exception('لا يمكن تحديث المواعيد بسبب وجود استشارات نشطة أو مقبولة أو معلقة.');
                 }
                  $this->schedulerService->update(
