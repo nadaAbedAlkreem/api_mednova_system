@@ -10,20 +10,93 @@ use Illuminate\Support\Facades\DB;
 
 class RehabilitationCenterService
 {
+    protected UploadService $uploadService;
+
     protected ICustomerRepositories $customerRepositories;
     protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
     protected ITherapistRepositories $therapistRepositories;
 
-    protected  IScheduleRepositories $scheduleRepositories;
+    protected IScheduleRepositories $scheduleRepositories;
     protected ILocationRepositories $locationRepositories;
-    public function __construct(IScheduleRepositories $scheduleRepositories ,ILocationRepositories $locationRepositories  ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    public function __construct(UploadService $uploadService ,IScheduleRepositories $scheduleRepositories ,ILocationRepositories $locationRepositories  ,ICustomerRepositories $customerRepositories, ITherapistRepositories $therapistRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
     {
+        $this->uploadService = $uploadService;
         $this->customerRepositories = $customerRepositories;
         $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
         $this->therapistRepositories = $therapistRepositories;
         $this->locationRepositories = $locationRepositories;
         $this->scheduleRepositories = $scheduleRepositories;
     }
+
+
+    public function prepare(array $data, $authUserTimezone = null): array
+    {
+        // رفع الملفات
+        if (!empty($data['image'])) {
+            $path = $this->uploadService->upload($data['image'], 'therapist_profile_images', 'public', 'therapist_profile');
+            $data['image'] = asset('storage/' . $path);
+        }
+
+        if (!empty($data['license_file'])) {
+            $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images', 'public', 'therapistLicense');
+            $data['license_file'] = asset('storage/' . $path);
+        }
+
+        if (!empty($data['certificate_file'])) {
+            $path = $this->uploadService->upload($data['certificate_file'], 'therapist_certificate_images', 'public', 'therapistCertificate');
+            $data['certificate_file'] = asset('storage/' . $path);
+        }
+        if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
+        {
+            $data['start_time_evening'] = null ;
+            $data['end_time_evening'] = null ;
+        }
+        if(!empty($data['timezone']))
+        {
+            foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
+                if (!empty($data[$timeField])) {
+                    $data[$timeField] = TimezoneService::toUTCHour($data[$timeField], $data['timezone']);
+                }
+            }
+        }
+
+//
+//        // تحويل التوقيت للـ UTC
+//        if ($authUserTimezone) {
+//            foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
+//                if (!empty($data[$timeField])) {
+//                    $data[$timeField] = TimezoneService::toUTCHour($data[$timeField], $authUserTimezone);
+//                }
+//            }
+//        }
+        $data = collect($data);
+        $dataCustomer = $data->only([
+            'customer_id', 'full_name', 'email', 'phone', 'gender', 'birth_date', 'image', 'timezone'
+        ])->toArray();
+
+        $dataRehabilitationCenters = $data->only([
+            'name_center', 'customer_id', 'video_consultation_price', 'chat_consultation_price',
+            'currency', 'year_establishment', 'license_number', 'license_authority',
+            'license_file', 'bio', 'has_commercial_registration',
+            'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority'
+        ])->toArray();
+
+        $dataScheduler = $data->only([
+            'day_of_week', 'start_time_morning', 'end_time_morning',
+            'start_time_evening', 'end_time_evening', 'is_have_evening_time'
+        ])->toArray();
+
+        return [
+            'customer' => $dataCustomer,
+            'center' => $dataRehabilitationCenters,
+            'schedule' => $dataScheduler,
+        ];
+     }
+
+
+
+
+
 
     public function store(array $data, int $customerId, array $specialtyIds)
     {
@@ -56,4 +129,9 @@ class RehabilitationCenterService
             ]);
         });
     }
+
+
+
+
+
 }

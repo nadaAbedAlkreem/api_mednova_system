@@ -37,23 +37,6 @@ class RehabilitationCenterController extends Controller
         $this->schedulerService = $schedulerService;
         $this->rehabilitationCenterService = $rehabilitationCenterService;
     }
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -74,29 +57,18 @@ class RehabilitationCenterController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(RehabilitationCenter $rehabilitationCenter)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(RehabilitationCenter $rehabilitationCenter)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateRehabilitationCenterRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
-            $data = $request->getData();
+            if (empty($authUser->timezone)) {
+                throw new \RuntimeException("User timezone is required for this operation.");
+            }
+
+            $authUserTimezone = $authUser->timezone;
+            $data = $this->rehabilitationCenterService->prepare($request->validated(), $authUserTimezone);
             $this->customerRepositories->update($data['customer']->toArray(),$request['customer_id'] );
             $this->rehabilitationCenterRepositories->updateWhere($data['center']->toArray(),['customer_id'=>$request['customer_id']] );
             if (!empty($request['specialty_id'])) {
