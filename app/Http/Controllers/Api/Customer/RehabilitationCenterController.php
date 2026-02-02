@@ -64,7 +64,7 @@ class RehabilitationCenterController extends Controller
         try {
             DB::beginTransaction();
             $authUser = auth('api')->user();
-            dd($authUser);
+            dd($authUser->timezone);
 
             if (empty($authUser->timezone)) {
                 throw new \RuntimeException("User timezone is required for this operation.");
