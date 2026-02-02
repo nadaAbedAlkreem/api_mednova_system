@@ -107,7 +107,7 @@ class RehabilitationCenterController extends Controller
                 $this->schedulerService->update(
                     $request->customer_id,
                     ConsultantType::REHABILITATION_CENTER,
-                    $data['schedule']
+                    $data['schedule']->toArray()
                 );
             }
             DB::commit();
