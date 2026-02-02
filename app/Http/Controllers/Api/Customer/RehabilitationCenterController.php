@@ -70,8 +70,8 @@ class RehabilitationCenterController extends Controller
             }
             $authUserTimezone = $authUser->timezone;
             $data = $this->rehabilitationCenterService->prepare($request->validated(), $authUserTimezone);
-            $this->customerRepositories->update($data['customer']->toArray(),$request['customer_id'] );
-            $this->rehabilitationCenterRepositories->updateWhere($data['center']->toArray(),['customer_id'=>$request['customer_id']] );
+            $this->customerRepositories->update($data['customer'],$request['customer_id'] );
+            $this->rehabilitationCenterRepositories->updateWhere($data['center'],['customer_id'=>$request['customer_id']] );
             if (!empty($request['specialty_id'])) {
                 $center = $this->customerRepositories->findOrFail($request['customer_id'] );
                 $center->medicalSpecialties()->sync($request['specialty_id']);
