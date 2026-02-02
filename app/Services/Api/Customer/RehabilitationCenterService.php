@@ -33,18 +33,18 @@ class RehabilitationCenterService
     {
         // رفع الملفات
         if (!empty($data['image'])) {
-            $path = $this->uploadService->upload($data['image'], 'therapist_profile_images', 'public', 'therapist_profile');
+            $path = $this->uploadService->upload($data['image'], 'centerProfileImages', 'public', 'centerProfile');
             $data['image'] = asset('storage/' . $path);
         }
 
         if (!empty($data['license_file'])) {
-            $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images', 'public', 'therapistLicense');
+            $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images', 'public', 'centerLicense');
             $data['license_file'] = asset('storage/' . $path);
         }
 
-        if (!empty($data['certificate_file'])) {
-            $path = $this->uploadService->upload($data['certificate_file'], 'therapist_certificate_images', 'public', 'therapistCertificate');
-            $data['certificate_file'] = asset('storage/' . $path);
+        if (!empty($data['commercial_registration_file'])) {
+            $path = $this->uploadService->upload($data['commercial_registration_file'], 'center_commercial_registration_file', 'public', 'centerCertificate');
+            $data['commercial_registration_file'] = asset('storage/' . $path);
         }
         if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
