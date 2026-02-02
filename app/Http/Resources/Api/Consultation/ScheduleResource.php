@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\Consultation;
 
+use App\Services\Api\Customer\TimezoneService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,16 +16,35 @@ class ScheduleResource extends JsonResource
 
     public function toArray(Request $request): array
     {
+        $timezone = $request->user('api')?->timezone ?? 'Europe/Vaduz';
            return
             [
                 'id' => $this->id ,
                 'day_of_week' =>json_decode($this->day_of_week),
-                'start_time_morning' => $this->start_time_morning ? date('H:i', strtotime($this->start_time_morning)) : null,
-                'end_time_morning'   => $this->end_time_morning ? date('H:i', strtotime($this->end_time_morning)) : null,
-                'is_have_evening_time'=> $this->is_have_evening_time,
-                'start_time_evening' => $this->start_time_evening ? date('H:i', strtotime($this->start_time_evening)) : null,
-                'end_time_evening'   => $this->end_time_evening ? date('H:i', strtotime($this->end_time_evening)) : null,
-                'type_time' => $this->type
+//                'start_time_morning' => $this->start_time_morning ? date('H:i', strtotime($this->start_time_morning)) : null,
+//                'end_time_morning'   => $this->end_time_morning ? date('H:i', strtotime($this->end_time_morning)) : null,
+//                'is_have_evening_time'=> $this->is_have_evening_time,
+//                'start_time_evening' => $this->start_time_evening ? date('H:i', strtotime($this->start_time_evening)) : null,
+//                'end_time_evening'   => $this->end_time_evening ? date('H:i', strtotime($this->end_time_evening)) : null,
+                   'start_time_morning' => $this->start_time_morning
+                       ? TimezoneService::toUserTimezone($this->start_time_morning, $timezone , 'H:i')
+                       : null,
+
+                   'end_time_morning' => $this->end_time_morning
+                       ? TimezoneService::toUserTimezone($this->end_time_morning, $timezone , 'H:i')
+                       : null,
+
+                   'is_have_evening_time' => $this->is_have_evening_time,
+
+                   'start_time_evening' => $this->start_time_evening
+                       ? TimezoneService::toUserTimezone($this->start_time_evening, $timezone , 'H:i')
+                       : null,
+
+                   'end_time_evening' => $this->end_time_evening
+                       ? TimezoneService::toUserTimezone($this->end_time_evening, $timezone , 'H:i')
+                       : null,
+                'type_time' => $this->type,
+
 
 
              ] ;

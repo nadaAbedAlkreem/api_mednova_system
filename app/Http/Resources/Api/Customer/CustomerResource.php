@@ -36,7 +36,7 @@ class CustomerResource extends JsonResource
                 'is_completed' => $this->isProfileCompleted(),
                 'status' => $this->status ,
                 'is_banned' => $this->is_banned ,
-                'timezone'=> $this->timezone ,
+                'timezone'=> $this->timezone ?? app('config')->get('app.timezone') ,
                 'email_verified_at'=> $this->email_verified_at,
 
 
