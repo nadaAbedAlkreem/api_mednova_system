@@ -23,7 +23,7 @@ class SchedulerService
             ConsultantType::REHABILITATION_CENTER =>
             $this->scheduleRepositories->updateWhere(
                 $data,
-                ['consultant_id' => $serviceProviderId, 'type_account' => $typeAccount]
+                ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount]
             ),
         };
 
