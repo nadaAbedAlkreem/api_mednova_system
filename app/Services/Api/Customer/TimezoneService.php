@@ -38,12 +38,12 @@ class TimezoneService
 
     }
 
-    public static function toLocalHour($utcTime, ?string $timezone)
+    public static function toLocalHour($utcTime, ?string $timezone , $format = 'H:i')
     {
         return $utcTime
-            ? \Carbon\Carbon::createFromFormat('H:i', $utcTime, 'UTC') // الوقت مخزن بـ UTC
-            ->setTimezone($timezone) // حوّله إلى timezone المطلوب
-            ->format('H:i') // صيغة الساعة والدقيقة
+            ? \Carbon\Carbon::parse($utcTime, 'UTC')  // parse يتعامل مع التاريخ والوقت معًا
+            ->setTimezone($timezone)
+                ->format($format)
             : null;
     }
 
