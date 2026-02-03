@@ -16,8 +16,7 @@ class ScheduleResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $authUser = auth('api')->user();
-        dd($authUser);
+        $timezone = $request->user('api')?->timezone;
            return
             [
                 'id' => $this->id ,
