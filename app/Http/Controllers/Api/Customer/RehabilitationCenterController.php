@@ -66,6 +66,7 @@ class RehabilitationCenterController extends Controller
      */
     public function update(UpdateRehabilitationCenterRequest $request): \Illuminate\Http\JsonResponse
     {
+        dd($request);
         try {
             DB::beginTransaction();
             $authUser = auth('api')->user();
@@ -81,6 +82,7 @@ class RehabilitationCenterController extends Controller
             if (!empty($request['specialty_id'])) {
                 $center = $this->customerRepositories->findOrFail($request['customer_id'] );
                 $center->medicalSpecialties()->sync($request['specialty_id']);
+
             }
             if (!empty($data['schedule'])) {
                 $hasActiveConsultation = Customer::where('id', $request['customer_id'])
