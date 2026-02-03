@@ -56,6 +56,8 @@ class RehabilitationCenterService
                 }
             }
         }
+         $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
+
 
         $data = collect($data);
         $dataCustomer = $data->only([
