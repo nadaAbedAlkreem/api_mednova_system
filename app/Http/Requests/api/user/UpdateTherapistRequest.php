@@ -148,25 +148,25 @@ class UpdateTherapistRequest extends FormRequest
     }
 
 
-    public function getData()
-    {
-        $uploadService = new UploadService();
-        $data= $this::validated();
-
-        if ($this->hasFile('image')) {
-            $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
-            $data['image'] =  asset('storage/' . $path);
-        }
-
-        if ($this->hasFile('certificate_file')) {
-            $path = $uploadService->upload($this->file('certificate_file'), 'therapist_certificate_images' ,'public' ,'therapistCertificate');
-            $data['certificate_file'] =  asset('storage/' . $path);
-        }
-
-        if ($this->hasFile('license_file')) {
-            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
-            $data['license_file'] =  asset('storage/' . $path);;
-        }
-        return $data;
-    }
+//    public function getData()
+//    {
+//        $uploadService = new UploadService();
+//        $data= $this::validated();
+//
+//        if ($this->hasFile('image')) {
+//            $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
+//            $data['image'] =  asset('storage/' . $path);
+//        }
+//
+//        if ($this->hasFile('certificate_file')) {
+//            $path = $uploadService->upload($this->file('certificate_file'), 'therapist_certificate_images' ,'public' ,'therapistCertificate');
+//            $data['certificate_file'] =  asset('storage/' . $path);
+//        }
+//
+//        if ($this->hasFile('license_file')) {
+//            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
+//            $data['license_file'] =  asset('storage/' . $path);;
+//        }
+//        return $data;
+//    }
 }

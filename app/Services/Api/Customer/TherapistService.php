@@ -8,20 +8,15 @@ use App\Repositories\IScheduleRepositories;
 use App\Repositories\ITherapistRepositories;
 use Illuminate\Support\Facades\DB;
 
-class RehabilitationCenterService
+class TherapistService
 {
     protected UploadService $uploadService;
-
-    protected ICustomerRepositories $customerRepositories;
-    protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
+    protected ITherapistRepositories $therapistRepositories;
     protected IScheduleRepositories $scheduleRepositories;
-    protected ILocationRepositories $locationRepositories;
-    public function __construct(UploadService $uploadService ,IScheduleRepositories $scheduleRepositories ,ILocationRepositories $locationRepositories  ,ICustomerRepositories $customerRepositories , IRehabilitationCenterRepositories $rehabilitationCenterRepositories)
+    public function __construct(UploadService $uploadService ,IScheduleRepositories $scheduleRepositories  , ITherapistRepositories $therapistRepositories )
     {
         $this->uploadService = $uploadService;
-        $this->customerRepositories = $customerRepositories;
-        $this->rehabilitationCenterRepositories = $rehabilitationCenterRepositories;
-        $this->locationRepositories = $locationRepositories;
+        $this->therapistRepositories = $therapistRepositories;
         $this->scheduleRepositories = $scheduleRepositories;
     }
 
@@ -30,19 +25,23 @@ class RehabilitationCenterService
     {
         // رفع الملفات
         if (!empty($data['image'])) {
-            $path = $this->uploadService->upload($data['image'], 'centerProfileImages', 'public', 'centerProfile');
-            $data['image'] = asset('storage/' . $path);
+            $path = $this->uploadService->upload($data['image'], 'therapist_profile_images' ,'public' ,'therapist_profile');
+            $data['image'] =  asset('storage/' . $path);
+        }
+
+        if (!empty($data['certificate_file'])) {
+            $path = $this->uploadService->upload($data['certificate_file'], 'therapist_certificate_images' ,'public' ,'therapistCertificate');
+            $data['certificate_file'] =  asset('storage/' . $path);
         }
 
         if (!empty($data['license_file'])) {
-            $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images', 'public', 'centerLicense');
-            $data['license_file'] = asset('storage/' . $path);
+            $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images','public', 'therapistLicense');
+            $data['license_file'] =  asset('storage/' . $path);
         }
-
-        if (!empty($data['commercial_registration_file'])) {
-            $path = $this->uploadService->upload($data['commercial_registration_file'], 'center_commercial_registration_file', 'public', 'centerCertificate');
-            $data['commercial_registration_file'] = asset('storage/' . $path);
-        }
+        $data['consultant_id'] =  $data['customer_id'] ;
+        $data['consultant_type'] = 'therapist' ;
+        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
+        $data['type'] = 'online' ;
         if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
             $data['start_time_evening'] = null ;
@@ -57,30 +56,48 @@ class RehabilitationCenterService
             }
         }
 
+//
+//        // تحويل التوقيت للـ UTC
+//        if ($authUserTimezone) {
+//            foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
+//                if (!empty($data[$timeField])) {
+//                    $data[$timeField] = TimezoneService::toUTCHour($data[$timeField], $authUserTimezone);
+//                }
+//            }
+//        }
         $data = collect($data);
         $dataCustomer = $data->only([
             'customer_id', 'full_name', 'email', 'phone', 'gender', 'birth_date', 'image', 'timezone'
         ])->toArray();
 
-        $dataRehabilitationCenters = $data->only([
-            'name_center', 'customer_id', 'video_consultation_price', 'chat_consultation_price',
-            'currency', 'year_establishment', 'license_number', 'license_authority',
-            'license_file', 'bio', 'has_commercial_registration',
-            'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority'
+        $dataTherapist = $data->only([
+            'customer_id',
+            'medical_specialties_id',
+            'experience_years' ,
+            'university_name' ,
+            'countries_certified' ,
+            'graduation_year' ,
+            'certificate_file' ,
+            'license_number' ,
+            'license_authority' ,
+            'video_consultation_price' ,
+            'chat_consultation_price' ,
+            'currency' ,
+            'bio' ,
+            'license_file'
         ])->toArray();
 
         $dataScheduler = $data->only([
             'day_of_week', 'start_time_morning', 'end_time_morning',
             'start_time_evening', 'end_time_evening', 'is_have_evening_time'
         ])->toArray();
-
         $dataLocation = $data->only([
             'formatted_address', 'country', 'city'
         ])->toArray();
 
         return [
             'customer' => $dataCustomer,
-            'center' => $dataRehabilitationCenters,
+            'therapist' => $dataTherapist,
             'schedule' => $dataScheduler,
             'location' => $dataLocation
         ];

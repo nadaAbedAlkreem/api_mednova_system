@@ -201,45 +201,45 @@ class StoreTherapistRequest extends FormRequest
     }
 
 
-    public function getData()
-    {
-        $uploadService = new UploadService();
-        $data= $this::validated();
-        if ($this->hasFile('image')) {
-            $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
-            $data['image'] =  asset('storage/' . $path);
-        }
-        if ($this->hasFile('certificate_file')) {
-            $path = $uploadService->upload($this->file('certificate_file'), 'therapist_certificate_images' ,'public' ,'therapistCertificate');
-            $data['certificate_file'] =  asset('storage/' . $path);
-        }
-        if ($this->hasFile('license_file')) {
-            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
-            $data['license_file'] =  asset('storage/' . $path);
-        }
-        $data = collect($data);
-        $data['consultant_id'] =  $data['customer_id'] ;
-        $data['consultant_type'] = 'therapist' ;
-        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
-        $data['type'] = 'online' ;
-        ////
-
-        $customer = Customer::find($data['customer_id']) ;
-        if($customer)
-        {
-            $localTimezone = $customer->timezone ?? config('app.timezone');
-            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
-            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
-
-         if($data['is_have_evening_time'])
-         {
-             $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
-             $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
-         }
-
-        }
-
-         $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ,'video_consultation_price' , 'chat_consultation_price' , 'currency']);
-         return ['data'=>$data ,'schedule'=> $dataSchedule] ;
-    }
+//    public function getData()
+//    {
+//        $uploadService = new UploadService();
+//        $data= $this::validated();
+//        if ($this->hasFile('image')) {
+//            $path = $uploadService->upload($this->file('image'), 'therapist_profile_images' ,'public' ,'therapist_profile');
+//            $data['image'] =  asset('storage/' . $path);
+//        }
+//        if ($this->hasFile('certificate_file')) {
+//            $path = $uploadService->upload($this->file('certificate_file'), 'therapist_certificate_images' ,'public' ,'therapistCertificate');
+//            $data['certificate_file'] =  asset('storage/' . $path);
+//        }
+//        if ($this->hasFile('license_file')) {
+//            $path = $uploadService->upload($this->file('license_file'), 'license_certificate_images','public', 'therapistLicense');
+//            $data['license_file'] =  asset('storage/' . $path);
+//        }
+//        $data = collect($data);
+//        $data['consultant_id'] =  $data['customer_id'] ;
+//        $data['consultant_type'] = 'therapist' ;
+//        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
+//        $data['type'] = 'online' ;
+//        ////
+//
+//        $customer = Customer::find($data['customer_id']) ;
+//        if($customer)
+//        {
+//            $localTimezone = $customer->timezone ?? config('app.timezone');
+//            $data['start_time_morning'] = TimezoneService::toUTCHour($data['start_time_morning'], $localTimezone);
+//            $data['end_time_morning'] = TimezoneService::toUTCHour($data['end_time_morning'], $localTimezone);
+//
+//         if($data['is_have_evening_time'])
+//         {
+//             $data['start_time_evening'] = TimezoneService::toUTCHour($data['start_time_evening'], $localTimezone);
+//             $data['end_time_evening'] = TimezoneService::toUTCHour($data['end_time_evening'], $localTimezone);
+//         }
+//
+//        }
+//
+//         $dataSchedule = $data->only(['consultant_id' , 'consultant_type' , 'day_of_week','type' , 'start_time_morning' , 'end_time_morning' , 'start_time_evening' , 'end_time_evening', 'is_have_evening_time' ,'video_consultation_price' , 'chat_consultation_price' , 'currency']);
+//         return ['data'=>$data ,'schedule'=> $dataSchedule] ;
+//    }
 }

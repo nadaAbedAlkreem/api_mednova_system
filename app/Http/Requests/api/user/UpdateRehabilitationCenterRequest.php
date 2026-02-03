@@ -100,6 +100,9 @@ class UpdateRehabilitationCenterRequest extends FormRequest
                     }
                 }
             ],
+            'formatted_address' => '',
+            'country' => '',
+            'city' => '',
 
         ];
     }
