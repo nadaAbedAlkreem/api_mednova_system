@@ -38,7 +38,9 @@ class ProgramResource extends JsonResource
                 '3_stars' => $this->ratings_2_to_3 ?? 0,
                 '2_stars' => $this->ratings_1_to_2 ?? 0,
                 '1_stars' => $this->ratings_0_to_1 ?? 0,
-                "total_duration_minutes" => $this->total_duration_minutes
+                'total_duration_minutes'=> $this->total_duration_minutes,
+                'is_enrolled' => $this->is_enrolled,
+
              ] ;
     }
 }
