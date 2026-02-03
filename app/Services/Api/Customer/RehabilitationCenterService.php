@@ -73,7 +73,7 @@ class RehabilitationCenterService
             'commercial_registration_number', 'commercial_registration_file', 'commercial_registration_authority'
         ])->toArray();
 
-        $dataScheduler = $data->only(['customer_id',
+        $dataScheduler = $data->only(['type', 'consultant_id', 'consultant_type', 'day_of_week',
             'day_of_week', 'start_time_morning', 'end_time_morning',
             'start_time_evening', 'end_time_evening', 'is_have_evening_time'
         ])->toArray();
