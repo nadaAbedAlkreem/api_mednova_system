@@ -41,11 +41,11 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
 
         // ✅ لو المستخدم مسجل دخول
         if (Auth::guard('api')->check()) {
-            dd($query->withExists([
+            $query->withExists([
                 'enrollments as is_enrolled' => function ($q) {
                     $q->where('customer_id', Auth::id());
                 }
-            ]));
+            ]);
 
         }
 
