@@ -75,7 +75,6 @@ class RehabilitationCenterController extends Controller
             }
             $authUserTimezone = $authUser->timezone;
             $data = $this->rehabilitationCenterService->prepare($request->validated(), $authUserTimezone);
-            dd($data);
             $this->customerRepositories->update($data['customer'],$request['customer_id'] );
             $this->rehabilitationCenterRepositories->updateWhere($data['center'],['customer_id'=>$request['customer_id']] );
             $this->locationRepositories->updateWhere($data['location'],['customer_id'=>$request['customer_id']] );
