@@ -66,7 +66,6 @@ class RehabilitationCenterController extends Controller
      */
     public function update(UpdateRehabilitationCenterRequest $request): \Illuminate\Http\JsonResponse
     {
-        dd($request);
         try {
             DB::beginTransaction();
             $authUser = auth('api')->user();
