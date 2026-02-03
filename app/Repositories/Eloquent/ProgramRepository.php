@@ -41,8 +41,6 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
 
         if (Auth::guard('api')->check()) {
             $customerId = Auth::guard('api')->id();
-            dd($customerId);
-
             $query->withExists([
                 'enrollments as is_enrolled' => function ($q) use ($customerId) {
                     $q->where('customer_id', $customerId);
