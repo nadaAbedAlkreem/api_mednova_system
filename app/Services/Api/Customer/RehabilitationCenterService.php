@@ -112,7 +112,6 @@ class RehabilitationCenterService
               // إنشاء بيانات
 
             $this->locationRepositories->create($data['location']);
-            dd($data['schedule']);
             // إنشاء بيانات  مواعيد العمل
             $this->scheduleRepositories->create($data['schedule']);
 
