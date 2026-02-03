@@ -50,6 +50,7 @@ class RehabilitationCenterService
         }
         if(!empty($data['timezone']))
         {
+            dd($data['timezone']);
             foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
                 if (!empty($data[$timeField])) {
                     $data[$timeField] = TimezoneService::toUTCHour($data[$timeField], $data['timezone']);
