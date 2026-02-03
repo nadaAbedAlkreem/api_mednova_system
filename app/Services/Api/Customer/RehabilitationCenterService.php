@@ -58,7 +58,7 @@ class RehabilitationCenterService
         }
         $data['consultant_id'] = $data['customer_id'];
         $data['consultant_type'] = 'rehabilitation_center';
-        dd($data);
+        dd(isset($data['day_of_week']));
          if(!isset($data['day_of_week']))
         {
             $data['day_of_week'] = json_encode($data['day_of_week']);
