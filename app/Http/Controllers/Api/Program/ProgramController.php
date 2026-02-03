@@ -30,7 +30,6 @@ class ProgramController extends Controller
         try {
             $limit = $request->get('limit', config('app.pagination_limit'))  ??  5 ;
             $programs = $this->programRepositories->paginateWithDetails($limit);
-            dd($programs);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ProgramResource::collection($programs), 200);
         } catch (\Exception $e) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'),['error' => $e->getMessage()],500);

@@ -39,13 +39,14 @@ class ProgramRepository  extends BaseRepository implements IProgramRepositories
             ])
             ->withCount('enrollments');
 
-        // ✅ لو المستخدم مسجل دخول
         if (Auth::guard('api')->check()) {
             $query->withExists([
                 'enrollments as is_enrolled' => function ($q) {
                     $q->where('customer_id', Auth::id());
                 }
             ]);
+            dd
+            ($query);
 
         }
 
