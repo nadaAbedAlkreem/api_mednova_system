@@ -28,7 +28,7 @@ class StoreTherapistRequest extends FormRequest
     {
         return [
             'gender' => 'required|in:Male,Female',
-            'birth_date' => ['required', 'date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
+            'birth_date' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:therapists,customer_id',
             'medical_specialties_id' => 'required|exists:medical_specialties,id',
