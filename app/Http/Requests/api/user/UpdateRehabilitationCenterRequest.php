@@ -69,6 +69,12 @@ class UpdateRehabilitationCenterRequest extends FormRequest
                     }
                 }
             ],
+            'year_establishment' => [
+                'integer',
+                'digits:4',
+                'min:1900',
+                'max:' . date('Y'),
+            ],
             'end_time_morning' => [
                 'date_format:H:i',
                 'after:start_time_morning',

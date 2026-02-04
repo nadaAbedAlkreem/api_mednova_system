@@ -46,7 +46,13 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'commercial_registration_number' => 'required_if:has_commercial_registration,yes|string|max:100',
             'commercial_registration_file' => 'required_if:has_commercial_registration,yes|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'commercial_registration_authority' => 'required_if:has_commercial_registration,yes|string|max:255',
-
+            'year_establishment' => [
+                'required',
+                'integer',
+                'digits:4',
+                'min:1900',
+                'max:' . date('Y'),
+            ],
 //
 //            ///schedule
             'day_of_week' => 'required|array',

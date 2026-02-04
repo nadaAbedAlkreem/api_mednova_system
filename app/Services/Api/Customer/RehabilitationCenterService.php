@@ -44,7 +44,7 @@ class RehabilitationCenterService
             $path = $this->uploadService->upload($data['commercial_registration_file'], 'center_commercial_registration_file', 'public', 'centerCertificate');
             $data['commercial_registration_file'] = asset('storage/' . $path);
         }
-        if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
+        if(isset($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
             $data['start_time_evening'] = null ;
             $data['end_time_evening'] = null ;
