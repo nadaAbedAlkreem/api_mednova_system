@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Services\Api\Customer\TimezoneService;
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class UpdateRehabilitationCenterRequest extends FormRequest
@@ -27,8 +28,9 @@ class UpdateRehabilitationCenterRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
-            'gender' => '',
-            'birth_date' => '',
+            'gender' => 'in:Male,Female',
+            'birth_date' => ['date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
+
             'name_center' => 'string',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'full_name' => 'string|max:255',

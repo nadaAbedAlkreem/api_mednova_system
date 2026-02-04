@@ -29,7 +29,7 @@ class StoreRehabilitationCenterRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:rehabilitation_centers,customer_id',
-            'gender' => 'required',
+            'gender' => 'required|in:Male,Female',
             'birth_date' => ['required', 'date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'specialty_id' => 'required|array',
@@ -205,6 +205,10 @@ class StoreRehabilitationCenterRequest extends FormRequest
             'birth_date.date' => __('validation.date', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.before_or_equal' => __('validation.before_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.after_or_equal' => __('validation.after_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+
+            'gender.required' => __('validation.required', ['attribute' => __('validation.attributes.gender')]),
+            'gender.in' => __('validation.in', ['attribute' => __('validation.attributes.gender')]),
+
 
         ];
     }

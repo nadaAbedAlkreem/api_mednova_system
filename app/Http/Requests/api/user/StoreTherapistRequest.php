@@ -116,7 +116,6 @@ class StoreTherapistRequest extends FormRequest
     public function messages(): array
     {
         return [
-
             'birth_date.required' => __('validation.required', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.date' => __('validation.date', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.before_or_equal' => __('validation.before_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
