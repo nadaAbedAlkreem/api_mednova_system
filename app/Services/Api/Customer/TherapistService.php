@@ -45,9 +45,12 @@ class TherapistService
         }
         if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
+            dd('tets');
             $data['start_time_evening'] = null ;
             $data['end_time_evening'] = null ;
         }
+        dd('tetlls');
+
         if(!empty($data['timezone']))
         {
             foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
