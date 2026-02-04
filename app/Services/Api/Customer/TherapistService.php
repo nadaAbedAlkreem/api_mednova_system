@@ -28,6 +28,7 @@ class TherapistService
 
     public function prepare(array $data, $authUserTimezone = null): array
     {
+        dd($data);
         // رفع الملفات
         if (!empty($data['image'])) {
             $path = $this->uploadService->upload($data['image'], 'therapist_profile_images' ,'public' ,'therapist_profile');
@@ -96,6 +97,10 @@ class TherapistService
             'customer_id',
             'formatted_address', 'country', 'city'
         ])->toArray();
+         dd(      $dataCustomer,
+            $dataTherapist,
+         $dataScheduler,
+             $dataLocation);
 
         return [
             'customer' => $dataCustomer,

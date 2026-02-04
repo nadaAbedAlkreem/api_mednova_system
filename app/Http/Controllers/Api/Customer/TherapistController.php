@@ -86,7 +86,6 @@ class TherapistController extends Controller
         try {
 //            $data = $request->getData();
             $data = $this->therapistService->prepare($request->validated(),null);
-            dd($data);
 //            $customerData = array_intersect_key($data, array_flip(['full_name', 'email', 'birth_date', 'phone', 'image', 'gender' , 'timezone']));
             $this->customerRepositories->update($data['customer'],$request['customer_id'] );
 //            $therapistData = array_intersect_key($data, array_flip(['medical_specialties_id', 'experience_years', 'university_name', 'countries_certified', 'graduation_year','video_consultation_price' , 'certificate_file', 'license_number', 'license_authority', 'license_file', 'bio', 'video_consultation_price' , 'chat_consultation_price']));
