@@ -43,9 +43,7 @@ class TherapistService
             $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images','public', 'therapistLicense');
             $data['license_file'] =  asset('storage/' . $path);
         }
-        $data['consultant_id'] =  $data['customer_id'] ;
-        $data['consultant_type'] = 'therapist' ;
-        $data['type'] = 'online' ;
+        dd($data);
         if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
             $data['start_time_evening'] = null ;
