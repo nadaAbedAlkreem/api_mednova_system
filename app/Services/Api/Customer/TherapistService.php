@@ -16,7 +16,6 @@ class TherapistService
     protected IScheduleRepositories $scheduleRepositories;
     protected ICustomerRepositories $customerRepositories;
     protected ILocationRepositories $locationRepositories;
-    protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
     public function __construct(ILocationRepositories $locationRepositories, ICustomerRepositories $customerRepositories , UploadService $uploadService ,IScheduleRepositories $scheduleRepositories  , ITherapistRepositories $therapistRepositories )
     {
         $this->uploadService = $uploadService;
@@ -122,13 +121,12 @@ class TherapistService
 //            if (!empty($specialtyIds)) {
 //                $customer->medicalSpecialties()->sync($specialtyIds);
 //            }
+            $this->locationRepositories->create($data['location']);
 
             // إنشاء بيانات مركز التأهيل
-           $this->rehabilitationCenterRepositories->create($data['center']);
-
+            $this->therapistRepositories->create($data['therapist']);
               // إنشاء بيانات
 
-            $this->locationRepositories->create($data['location']);
 
             // إنشاء بيانات  مواعيد العمل
             $this->scheduleRepositories->create($data['schedule']);
