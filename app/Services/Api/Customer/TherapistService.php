@@ -124,7 +124,7 @@ class TherapistService
             $this->locationRepositories->create($data['location']);
 
             // إنشاء بيانات مركز التأهيل
-            $this->therapistRepositories->create($data['therapist']);
+            $therapist = $this->therapistRepositories->create($data['therapist']);
               // إنشاء بيانات
 
 
@@ -132,12 +132,10 @@ class TherapistService
             $this->scheduleRepositories->create($data['schedule']);
 
 
-            return $customer->load([
-                'rehabilitationCenter',
-                'location',
-                'medicalSpecialties',
-                'schedules',
-            ]);
+            $therapist->load('customer');
+            $therapist->customer->load(['location' ,'schedules','therapist' ,'therapist.specialty']);
+            return $therapist;
+
         });
     }
 
