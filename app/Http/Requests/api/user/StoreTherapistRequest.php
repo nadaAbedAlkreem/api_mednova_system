@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Services\Api\Customer\TimezoneService;
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class StoreTherapistRequest extends FormRequest
@@ -26,8 +27,8 @@ class StoreTherapistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gender' => 'required',
-            'birth_date' => 'required',
+            'gender' => 'required|in:Male,Female',
+            'birth_date' => ['required', 'date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:therapists,customer_id',
             'medical_specialties_id' => 'required|exists:medical_specialties,id',
@@ -115,6 +116,15 @@ class StoreTherapistRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'birth_date.required' => __('validation.required', ['attribute' => __('validation.attributes.birth_date')]),
+            'birth_date.date' => __('validation.date', ['attribute' => __('validation.attributes.birth_date')]),
+            'birth_date.before_or_equal' => __('validation.before_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+            'birth_date.after_or_equal' => __('validation.after_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+
+            'gender.required' => __('validation.required', ['attribute' => __('validation.attributes.gender')]),
+            'gender.in' => __('validation.in', ['attribute' => __('validation.attributes.gender')]),
+
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.unique' => __('validation.unique', ['attribute' => __('validation.attributes.customer_id')]),

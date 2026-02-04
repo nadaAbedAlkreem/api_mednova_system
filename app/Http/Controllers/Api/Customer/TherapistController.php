@@ -45,10 +45,11 @@ class TherapistController extends Controller
         try {
 //            $data = $request->getData();
             $data = $this->therapistService->prepare($request->validated(),null);
-            $this->customerRepositories->update($data['customer'],$request['customer_id'] );
-            $this->locationRepositories->create($data['location']);
-            $therapist = $this->therapistRepositories->create($data['therapist']);
-            $this->scheduleRepositories->create($data['schedule']);
+            $therapist = $this->therapistService->store($data ,$request['customer_id'] );
+//            $this->customerRepositories->update($data['customer'],$request['customer_id'] );
+//            $this->locationRepositories->create($data['location']);
+//            $therapist = $this->therapistRepositories->create($data['therapist']);
+//            $this->scheduleRepositories->create($data['schedule']);
             $therapist->load('customer');
             $therapist->customer->load(['location' ,'schedules','therapist' ,'therapist.specialty']);
         DB::commit();

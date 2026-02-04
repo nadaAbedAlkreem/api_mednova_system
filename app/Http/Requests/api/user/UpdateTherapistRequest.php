@@ -4,6 +4,7 @@ namespace App\Http\Requests\api\user;
 
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class UpdateTherapistRequest extends FormRequest
@@ -24,8 +25,8 @@ class UpdateTherapistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gender' => '',
-            'birth_date' => '',
+            'gender' => 'in:Male,Female',
+            'birth_date' => [ 'date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'full_name' => 'string|max:255',
@@ -66,6 +67,11 @@ class UpdateTherapistRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'birth_date.required' => __('validation.required', ['attribute' => __('validation.attributes.birth_date')]),
+            'birth_date.before_or_equal' => __('validation.before_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+            'birth_date.after_or_equal' => __('validation.after_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.unique' => __('validation.unique', ['attribute' => __('validation.attributes.customer_id')]),

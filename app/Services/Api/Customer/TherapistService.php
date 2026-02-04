@@ -14,11 +14,16 @@ class TherapistService
     protected UploadService $uploadService;
     protected ITherapistRepositories $therapistRepositories;
     protected IScheduleRepositories $scheduleRepositories;
-    public function __construct(UploadService $uploadService ,IScheduleRepositories $scheduleRepositories  , ITherapistRepositories $therapistRepositories )
+    protected ICustomerRepositories $customerRepositories;
+    protected ILocationRepositories $locationRepositories;
+    protected IRehabilitationCenterRepositories $rehabilitationCenterRepositories;
+    public function __construct(ILocationRepositories $locationRepositories, ICustomerRepositories $customerRepositories , UploadService $uploadService ,IScheduleRepositories $scheduleRepositories  , ITherapistRepositories $therapistRepositories )
     {
         $this->uploadService = $uploadService;
         $this->therapistRepositories = $therapistRepositories;
         $this->scheduleRepositories = $scheduleRepositories;
+        $this->customerRepositories = $customerRepositories;
+        $this->locationRepositories = $locationRepositories;
     }
 
 
@@ -107,17 +112,17 @@ class TherapistService
 
 
 
-    public function store(array $data, int $customerId, array $specialtyIds)
+    public function store(array $data, int $customerId)
     {
-        return DB::transaction(function () use ($data, $customerId, $specialtyIds) {
+        return DB::transaction(function () use ($data, $customerId) {
 
             // تحديث بيانات العميل
             $customer = $this->customerRepositories->updateAndReturn($data['customer']->toArray(), $customerId);
 
-            // مزامنة التخصصات الطبية إذا وجدت
-            if (!empty($specialtyIds)) {
-                $customer->medicalSpecialties()->sync($specialtyIds);
-            }
+//            // مزامنة التخصصات الطبية إذا وجدت
+//            if (!empty($specialtyIds)) {
+//                $customer->medicalSpecialties()->sync($specialtyIds);
+//            }
 
             // إنشاء بيانات مركز التأهيل
            $this->rehabilitationCenterRepositories->create($data['center']->toArray());
