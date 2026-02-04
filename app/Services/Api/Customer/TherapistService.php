@@ -92,7 +92,7 @@ class TherapistService
         $dataScheduler = $data->only(['type', 'consultant_id', 'consultant_type', 'day_of_week', 'start_time_morning', 'end_time_morning',
             'start_time_evening', 'end_time_evening', 'is_have_evening_time'
         ])->toArray();
-        $dataLocation = $data->only([
+         $dataLocation = $data->only([
             'customer_id',
             'formatted_address', 'country', 'city'
         ])->toArray();
