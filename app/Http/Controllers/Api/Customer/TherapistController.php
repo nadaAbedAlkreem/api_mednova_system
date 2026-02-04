@@ -84,7 +84,7 @@ class TherapistController extends Controller
     public function update(UpdateTherapistRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $data = $request->getData();
+//            $data = $request->getData();
             $data = $this->therapistService->prepare($request->validated(),null);
 //            $customerData = array_intersect_key($data, array_flip(['full_name', 'email', 'birth_date', 'phone', 'image', 'gender' , 'timezone']));
             $this->customerRepositories->update($data['customer'],$request['customer_id'] );
