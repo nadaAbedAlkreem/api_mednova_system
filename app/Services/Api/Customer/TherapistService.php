@@ -43,7 +43,7 @@ class TherapistService
             $path = $this->uploadService->upload($data['license_file'], 'license_certificate_images','public', 'therapistLicense');
             $data['license_file'] =  asset('storage/' . $path);
         }
-        dd((!empty($data['is_have_evening_time'])) && $data['is_have_evening_time'] == 0);
+        dd((!empty($data['is_have_evening_time'])));
          if((!empty($data['is_have_evening_time'])) && $data['is_have_evening_time'] == 0)
         {
             $data['start_time_evening'] = null ;
