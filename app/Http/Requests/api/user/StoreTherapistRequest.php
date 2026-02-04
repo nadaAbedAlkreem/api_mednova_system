@@ -32,7 +32,7 @@ class StoreTherapistRequest extends FormRequest
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL|unique:therapists,customer_id',
             'medical_specialties_id' => 'required|exists:medical_specialties,id',
-            'experience_years' => 'required|integer|min:0|max:80',
+            'experience_years' => 'required|integer|min:0|max:50',
             'university_name' => 'required|string|max:255',
             'countries_certified' => 'required|string',
             'graduation_year' => 'required|digits:4|integer|min:1950|max:' . date('Y'),

@@ -26,14 +26,14 @@ class UpdateTherapistRequest extends FormRequest
     {
         return [
             'gender' => 'in:Male,Female',
-            'birth_date' => [ 'date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
+            'birth_date' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'full_name' => 'string|max:255',
             'email' => 'string|email|max:255',
             'phone' => ['string','unique:customers,phone,'.$this->customer_id, 'regex:/^(\+968\d{8}|\+966\d{9}|\+971\d{9}|\+965\d{8}|\+974\d{8}|\+973\d{8})$/'],
             'medical_specialties_id' => 'exists:medical_specialties,id,deleted_at,NULL',
-            'experience_years' => 'integer|min:0|max:80',
+            'experience_years' => 'integer|min:0|max:50',
             'university_name' => 'string|max:255',
             'countries_certified' => 'string',
             'graduation_year' => 'digits:4|integer|min:1950|max:' . date('Y'),

@@ -29,8 +29,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
         return [
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'gender' => 'in:Male,Female',
-            'birth_date' => ['date', 'before_or_equal:' . Carbon::now()->subYear(1)->format('Y-m-d'), 'after_or_equal:' . Carbon::now()->subYears(120)->format('Y-m-d'),],
-
+            'birth_date' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
             'name_center' => 'string',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'full_name' => 'string|max:255',
@@ -41,7 +40,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'specialty_id.*' => 'exists:medical_specialties,id,deleted_at,NULL',
 
 
-            'year_establishment' => 'digits:4|integer|min:1900|max:' . date('Y'),
+            'experience_years' => 'integer|min:0|max:50',
             'license_number' => 'string|max:100',
             'license_authority' => 'string|max:255',
             'license_file' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
