@@ -116,7 +116,7 @@ class TherapistService
         return DB::transaction(function () use ($data, $customerId) {
 
             // تحديث بيانات العميل
-            $customer = $this->customerRepositories->updateAndReturn($data['customer']->toArray(), $customerId);
+            $customer = $this->customerRepositories->updateAndReturn($data['customer'], $customerId);
 
 //            // مزامنة التخصصات الطبية إذا وجدت
 //            if (!empty($specialtyIds)) {
@@ -124,14 +124,14 @@ class TherapistService
 //            }
 
             // إنشاء بيانات مركز التأهيل
-           $this->rehabilitationCenterRepositories->create($data['center']->toArray());
+           $this->rehabilitationCenterRepositories->create($data['center']);
 
               // إنشاء بيانات
 
-            $this->locationRepositories->create($data['location']->toArray());
+            $this->locationRepositories->create($data['location']);
 
             // إنشاء بيانات  مواعيد العمل
-            $this->scheduleRepositories->create($data['schedule']->toArray());
+            $this->scheduleRepositories->create($data['schedule']);
 
 
             return $customer->load([
