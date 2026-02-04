@@ -46,7 +46,6 @@ class TherapistService
         }
         $data['consultant_id'] =  $data['customer_id'] ;
         $data['consultant_type'] = 'therapist' ;
-        $data['day_of_week'] = json_encode($data['day_of_week'] ) ;
         $data['type'] = 'online' ;
         if(!empty($data['is_have_evening_time']) && $data['is_have_evening_time'] == 0)
         {
