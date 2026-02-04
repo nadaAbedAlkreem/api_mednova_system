@@ -26,7 +26,7 @@ class UpdateTherapistRequest extends FormRequest
     {
         return [
             'gender' => 'in:Male,Female',
-            'birth_date' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
+            'birth_date' => 'date|after_or_equal:1950-01-01|before_or_equal:today',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'full_name' => 'string|max:255',

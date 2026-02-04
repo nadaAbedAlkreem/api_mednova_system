@@ -29,7 +29,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
         return [
             'customer_id' => 'required|exists:customers,id,deleted_at,NULL',
             'gender' => 'in:Male,Female',
-            'birth_date' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
+            'birth_date' => 'date|after_or_equal:1950-01-01|before_or_equal:today',
             'name_center' => 'string',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'full_name' => 'string|max:255',
