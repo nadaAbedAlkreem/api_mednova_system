@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Api\Customer;
 
+use App\Enums\ConsultantType;
 use App\Repositories\ICustomerRepositories;
 use App\Repositories\ILocationRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
@@ -56,15 +57,13 @@ class TherapistService
             }
         }
 
-//
-//        // تحويل التوقيت للـ UTC
-//        if ($authUserTimezone) {
-//            foreach (['start_time_morning', 'end_time_morning', 'start_time_evening', 'end_time_evening'] as $timeField) {
-//                if (!empty($data[$timeField])) {
-//                    $data[$timeField] = TimezoneService::toUTCHour($data[$timeField], $authUserTimezone);
-//                }
-//            }
-//        }
+        $data['consultant_id'] = $data['customer_id'];
+        $data['consultant_type'] = ConsultantType::THERAPIST;
+        if(isset($data['day_of_week']))
+        {
+            $data['day_of_week'] = json_encode($data['day_of_week']);
+        }
+        $data['type'] = 'online';
         $data = collect($data);
         $dataCustomer = $data->only([
             'customer_id', 'full_name', 'email', 'phone', 'gender', 'birth_date', 'image', 'timezone'
@@ -87,11 +86,11 @@ class TherapistService
             'license_file'
         ])->toArray();
 
-        $dataScheduler = $data->only([
-            'day_of_week', 'start_time_morning', 'end_time_morning',
+        $dataScheduler = $data->only(['type', 'consultant_id', 'consultant_type', 'day_of_week', 'start_time_morning', 'end_time_morning',
             'start_time_evening', 'end_time_evening', 'is_have_evening_time'
         ])->toArray();
         $dataLocation = $data->only([
+            'customer_id',
             'formatted_address', 'country', 'city'
         ])->toArray();
 

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Api\Customer;
 
+use App\Enums\ConsultantType;
 use App\Repositories\ICustomerRepositories;
 use App\Repositories\ILocationRepositories;
 use App\Repositories\IRehabilitationCenterRepositories;
@@ -57,7 +58,7 @@ class RehabilitationCenterService
             }
         }
         $data['consultant_id'] = $data['customer_id'];
-        $data['consultant_type'] = 'rehabilitation_center';
+        $data['consultant_type'] = ConsultantType::REHABILITATION_CENTER;
         if(isset($data['day_of_week']))
         {
             $data['day_of_week'] = json_encode($data['day_of_week']);
