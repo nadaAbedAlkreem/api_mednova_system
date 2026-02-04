@@ -19,14 +19,7 @@ class SchedulerService
     }
     public function update(int $serviceProviderId, ConsultantType $typeAccount, array $data): void
     {
-        match ($typeAccount) {
-            ConsultantType::REHABILITATION_CENTER =>
-            $this->scheduleRepositories->updateWhere(
-                $data,
-                ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount]
-            ),
-        };
-
+     $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount]);
 
     }
 
