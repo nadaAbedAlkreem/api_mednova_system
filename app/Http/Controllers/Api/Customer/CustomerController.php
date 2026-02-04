@@ -41,7 +41,6 @@ class CustomerController extends Controller
    {
        try {
           $customer = $this->customerRepositories->findWith($id , ['location','patient','therapist' ,'therapist.specialty','rehabilitationCenter' ,'medicalSpecialties','schedules']);
-         dd($customer);
           if(!$customer instanceof  Customer){
               throw new \Exception('Get Customer Failed');
           }
