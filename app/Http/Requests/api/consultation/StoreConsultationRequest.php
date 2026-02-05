@@ -169,6 +169,7 @@ class StoreConsultationRequest extends FormRequest
 
             'type_appointment.required' => __('validation.required', ['attribute' => __('validation.attributes.type_appointment')]),
             'type_appointment.in' => __('validation.in', ['attribute' => __('validation.attributes.type_appointment')]),
+            'timezone.required' => __('validation.required', ['attribute' => __('validation.attributes.timezone')]),
 
         ];
     }

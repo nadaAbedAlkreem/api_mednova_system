@@ -25,6 +25,7 @@ class AppointmentResource extends JsonResource
              'requested_day'=>$this->requested_day ,
              'requested_time' => ($this->requested_time != null) ? $this->requested_time->format('Y-m-d H:i'): null ,
              'confirmed_end_time' => ($this->confirmed_end_time != null)? $this->confirmed_end_time->format('Y-m-d H:i'): null ,
+             'timezone' => $this->timezone,
              'status'   => $this->status ,
              'is_finished' => $this->is_finished,
              'finished_at' => $this->finished_at,
