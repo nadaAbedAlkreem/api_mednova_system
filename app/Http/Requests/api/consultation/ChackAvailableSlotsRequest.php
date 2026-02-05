@@ -77,7 +77,7 @@ class ChackAvailableSlotsRequest extends FormRequest
              'day' => 'required|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', // مفروض هذه القيمة يتم تحدديها من قبل الفروتت حسب ابام كل مستشار
              'date' => 'required|date|after_or_equal:today', // التاريخ الفعلي للجلسة 2025-11-27
              'type_appointment' => 'required|string|in:offline,online',
-             'timezone' => [Rule::in(\DateTimeZone::listIdentifiers())]
+             'timezone' => ['required' , Rule::in(\DateTimeZone::listIdentifiers())]
          ];
     }
 
@@ -121,6 +121,7 @@ class ChackAvailableSlotsRequest extends FormRequest
             'type_appointment.required' => __('validation.required', ['attribute' => __('validation.attributes.type_appointment')]), //
             'type_appointment.in' => __('validation.in', ['attribute' => __('validation.attributes.type_appointment')]), //
             'type_appointment.string' => __('validation.string', ['attribute' => __('validation.attributes.type_appointment')]), //
+            'timezone.required' => __('validation.required', ['attribute' => __('validation.attributes.timezone')]),
 
 
         ];

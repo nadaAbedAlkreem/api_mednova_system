@@ -27,29 +27,29 @@ class ConsultantAvailabilityService
         $this->timezone = $timezone;
         $this->timezoneDefault = $timezoneDefault;
     }
-    private function resolveTimezone(?int $patientId, ?string $timezone)
-    {
-        if ($patientId) {
-            $patient = $this->customerRepositories->findOne($patientId);
-            if ($patient && $patient->timezone) {
-                return  $this->timezoneDefault = $patient->timezone;
-
-            }
-        }elseif ($timezone) {
-            return $this->timezoneDefault = $timezone;
-        }
-
-        return $this->timezoneDefault =  config('app.timezone');
-    }
+//    private function resolveTimezone(?int $patientId, ?string $timezone)
+//    {
+//        if ($patientId) {
+//            $patient = $this->customerRepositories->findOne($patientId);
+//            if ($patient && $patient->timezone) {
+//                return  $this->timezoneDefault = $patient->timezone;
+//
+//            }
+//        }elseif ($timezone) {
+//            return $this->timezoneDefault = $timezone;
+//        }
+//
+//        return $this->timezoneDefault =  config('app.timezone');
+//    }
 
     /**
      * الحصول على الفترات المتاحة لمستشار معين في يوم محدد
      */
-    public function checkAvailableSlots(?int $patientId, int $consultantId, string $consultantType, string $day, string $date , string $typeAppointment ,     ?string $timezone = null
-    ): array
+    public function checkAvailableSlots(?int $patientId, int $consultantId, string $consultantType, string $day, string $date , string $typeAppointment , string $timezone): array
     {
 //        $this->patientId = $patientId;
-        $this->resolveTimezone($patientId, $timezone);
+//        $this->resolveTimezone($patientId, $timezone);
+        $this->timezoneDefault = $timezone;
         Log::info('timezone' . $this->timezoneDefault);
         $schedule = Schedule::where('consultant_id', $consultantId)
             ->where('is_active', true)
