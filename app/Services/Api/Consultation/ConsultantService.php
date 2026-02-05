@@ -121,21 +121,18 @@ class ConsultantService
             }
             if ($item->patient->id == $userId) {
 //                $userTimezone = $item->patient->timezone ?? config('app.timezone');
-                $userTimezone = $currentTimeZone ?? $item->patient->timezone;
+                $userTimezone =  $item->timezone  ?? $currentTimeZone ;
             }
 
             if ($userTimezone) {
                 $item->appointmentRequest->requested_time = TimezoneService::toUserTimezone(
                     $item->appointmentRequest->requested_time,
                     $userTimezone,
-                    'Y-m-d H:i'
-                );
-
+                    'Y-m-d H:i');
                 $item->appointmentRequest->confirmed_end_time = TimezoneService::toUserTimezone(
                     $item->appointmentRequest->confirmed_end_time,
                     $userTimezone,
-                    'Y-m-d H:i'
-                );
+                    'Y-m-d H:i');
                 $item->created_at = TimezoneService::toUserTimezone(
                     $item->created_at,
                     $userTimezone,
