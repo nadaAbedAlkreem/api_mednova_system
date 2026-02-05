@@ -51,8 +51,9 @@ class ConsultationController extends Controller
                 throw new \Exception('Get Current User  Failed');
             }
             $status = $request->query('status');
+            $currentTimeZone = $request->query('current_time_zone');
             $limit = $request->query('limit', 10);
-            $consultations = $this->consultantService->getAllConsultations($user['id'], $user['type_account'], $status, $limit);
+            $consultations = $this->consultantService->getAllConsultations($user['id'], $user['type_account'], $currentTimeZone ,$status,$limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ConsultationResource::collection($consultations), 200);
         }catch (\Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

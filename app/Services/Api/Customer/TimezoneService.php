@@ -35,6 +35,13 @@ class TimezoneService
             ?   \Carbon\Carbon::createFromFormat('H:i',$datetime, $timezone)
                 ->setTimezone('UTC')->format('H:i')
             : null;
+//        return $datetime
+//            ? \Carbon\Carbon::createFromFormat(
+//                'Y-m-d H:i',
+//                "$date $datetime",
+//                $timezone
+//            )->setTimezone('UTC')->format('H:i')
+//            : null;
 
     }
 

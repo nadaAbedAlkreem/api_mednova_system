@@ -80,7 +80,7 @@ class ConsultantService
     }
 
 
-    public function getAllConsultations(int $userId, string $userType, ?string $status = null, int $limit = 10): LengthAwarePaginator
+    public function getAllConsultations(int $userId, string $userType,string $currentTimeZone  ,?string $status = null ,  int $limit = 10  ): LengthAwarePaginator
     {
         // استعلامات كل نوع
         $chatQuery = ConsultationChatRequest::query();
@@ -112,15 +112,16 @@ class ConsultantService
             return $item;
         });
 
-        $videos = $videoQuery->get()->map(function ($item) use ($userId) {
+        $videos = $videoQuery->get()->map(function ($item) use ($userId , $currentTimeZone) {
             $item->consultation_type = 'video';
             $userTimezone = null;
             if ($item->consultant->id == $userId) {
-                $userTimezone = $item->consultant->timezone ?? config('app.timezone');
+//                $userTimezone = $item->consultant->timezone ?? config('app.timezone');
+                $userTimezone = $currentTimeZone ??  $item->consultant->timezone ;
             }
             if ($item->patient->id == $userId) {
-
-                $userTimezone = $item->patient->timezone ?? config('app.timezone');
+//                $userTimezone = $item->patient->timezone ?? config('app.timezone');
+                $userTimezone = $currentTimeZone ?? $item->patient->timezone;
             }
 
             if ($userTimezone) {
