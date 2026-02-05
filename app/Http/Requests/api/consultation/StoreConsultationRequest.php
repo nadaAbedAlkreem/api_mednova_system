@@ -8,6 +8,7 @@ use App\Models\ConsultationVideoRequest;
 use App\Services\Api\Customer\TimezoneService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreConsultationRequest extends FormRequest
 {
@@ -35,8 +36,10 @@ class StoreConsultationRequest extends FormRequest
             'consultant_nature'=>'required|in:chat,video',
             'requested_day'=>'required_if:consultant_nature,video|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
             'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d H:i',
+            'timezone' => ['required',Rule::in(\DateTimeZone::listIdentifiers())],
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
+
 
 
         ];
@@ -174,10 +177,10 @@ class StoreConsultationRequest extends FormRequest
         $data= $this::validated();
         $data['status'] =   $data['status'] ?? 'pending';
          if (isset($data['requested_time'])) {
-             $patient = \App\Models\Customer::find($this->patient_id);
-             $patientTimezone = $patient->timezone ?? config('app.timezone');
+//             $patient = \App\Models\Customer::find($this->patient_id);
+//             $patientTimezone = $patient->timezone ;
              // تحويل وقت البدء إلى UTC
-             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
+             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $this['timezone']);
              $data['requested_time'] = $requestedTimeUtc;
              // حساب وقت الانتهاء (بناءً على مدة 60 دقيقة) وتحويله أيضاً إلى UTC
              $confirmedEndTimeUtc = Carbon::parse($requestedTimeUtc)->addMinutes(60)->format('Y-m-d H:i:s');

@@ -16,6 +16,7 @@ class AppointmentRequest extends Model
         'consultant_type',
         'requested_day',
         'requested_time',
+        'timezone',
         'status',
         'type_appointment',
         'confirmed_end_time',
