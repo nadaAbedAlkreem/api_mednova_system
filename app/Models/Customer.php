@@ -17,7 +17,8 @@ class Customer extends Authenticatable
     const TYPE_CENTER = 'rehabilitation_center';
 
     const STATUS_PENDING = 'pending';
-    const STATUS_ACTIVE = 'active';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
     protected $fillable = [
         'full_name',
         'email',
@@ -33,7 +34,7 @@ class Customer extends Authenticatable
         'last_active_at' ,
         'is_banned' ,
         'type_account',
-        'status',
+        'approval_status',
         'timezone',
         'email_verified_at',
     ];
@@ -156,8 +157,8 @@ class Customer extends Authenticatable
     {
         parent::boot();
         static::creating(function ($customer) {
-            if (empty($customer->status) && !empty($customer->type_account)) {
-                $customer->status = self::resolveDefaultStatus($customer->type_account);
+            if (empty($customer->approval_status) && !empty($customer->type_account)) {
+                $customer->approval_status = self::resolveDefaultStatus($customer->type_account);
             }
         });
         static::deleting(function ($customer) {
@@ -233,7 +234,7 @@ class Customer extends Authenticatable
     public static function resolveDefaultStatus(string $type): string
     {
         return $type === self::TYPE_PATIENT
-            ? self::STATUS_ACTIVE
+            ? self::STATUS_APPROVED
             : self::STATUS_PENDING;
     }
 
@@ -247,7 +248,7 @@ class Customer extends Authenticatable
     public function scopeActiveVerified($query)
     {
         return $query
-            ->where('status', self::STATUS_ACTIVE)
+            ->where('approval_status', self::STATUS_APPROVED)
             ->whereNotNull('email_verified_at')
             ->where('is_banned', false);
     }

@@ -11,13 +11,15 @@ use Illuminate\Support\Facades\Auth;
 class AdminRepository extends AuthRepository implements IAdminRepositories
 {
     use ResponseTrait ;
-    protected string $guard = 'web';
+    protected string $guard = 'admin';
     public function __construct()
     {
     $this->model = new Admin();
     }
-    protected function afterLogin($user): ?string { return $user; }
-
+    protected function afterLogin($user): ?string
+    {
+         return $user->createToken('api-token')->plainTextToken;
+    }
 
 
 }

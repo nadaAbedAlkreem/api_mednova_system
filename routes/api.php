@@ -32,16 +32,17 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 
-Route::prefix('auth')->group(function ()
-{
-    Route::post('/register', [RegisterController::class, 'register']);
-    Route::post('/login', [LoginController::class, 'login'])->name('login-post');
-    Route::post('social-callback', [SocialAuthController::class, 'handleSocialLogin']);
-    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
-    Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
-    Route::post('verifyToken', [ForgotPasswordController::class, 'verifyToken']);
-    Route::get('verify-email', [RegisterController::class, 'verifyEmail']);
-});
+        Route::prefix('auth')->group(function ()
+        {
+            Route::post('/register', [RegisterController::class, 'register']);
+            Route::post('/login', [LoginController::class, 'login'])->name('login-post');
+            Route::post('social-callback', [SocialAuthController::class, 'handleSocialLogin']);
+            Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+            Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
+            Route::post('verifyToken', [ForgotPasswordController::class, 'verifyToken']);
+            Route::get('verify-email', [RegisterController::class, 'verifyEmail']);
+        });
+
 
         Route::prefix('ratings')->group(function ()
         {
@@ -73,163 +74,156 @@ Route::prefix('auth')->group(function ()
             Route::get('/', [DeviceController::class, 'get']);
         });
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'logout']);
-    Broadcast::routes(['middleware' => ['auth:sanctum']]);
-    Route::prefix('patient')->group(function ()
-    {
-        Route::post('/store', [PatientController::class, 'store']);
-        Route::post('/update', [PatientController::class, 'update']);
+        Route::prefix('smart-glove-device')->group(function () {
+            Route::post('feedback-error', [GloveErrorController::class, 'receiveErrorReport']);
+            Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
+            Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
+        });
 
-    });
-
-
-    Route::prefix('therapist')->group(function ()
-    {
-        Route::get('/', [TherapistController::class, 'get']);
-        Route::post('/store', [TherapistController::class, 'store']);
-        Route::post('/update', [TherapistController::class, 'update']);
-    });
-
-    Route::prefix('schedule')->group(function ()
-    {
-        Route::post('store', [ScheduleController::class, 'store']);
-        Route::post('/update', [ScheduleController::class, 'update']);
-
-    });
-    Route::prefix('location')->group(function ()
-    {
-        Route::post('store', [LocationController::class, 'store']);
-        Route::post('update', [LocationController::class, 'update']);
-    });
-    Route::prefix('consultation-request')->group(function ()
-    {
-        Route::post('/store', [ConsultationController::class, 'store']);
-        Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
-        Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
-//        Route::prefix('video')->group(function ()
-//        {
-//            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
-//            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
-//        });
-
-        Route::prefix('chat')->group(function ()
+        Route::prefix('zoom-webhook')->group(function ()
         {
-            Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+            Route::post('handle',[ZoomWebhookController::class, 'handle']);
         });
-//        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 
-    });
-//    Route::post('/zoom/webhooks', [ZoomWebhookController::class, 'handle']);
-    Route::prefix('programs')->group(function () {
- //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
-        Route::post('/', [ProgramController::class, 'store']);
-        Route::post('program/update', [ProgramController::class, 'update']);
-        Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
-        Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
+        Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
+        Route::prefix('control-panel')->group(function () {
+             Route::prefix('auth')->group(function ()
+             {
+                 Route::post('/login', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'login'])->name('login-control');
+             });
 
-    });
+            Route::prefix('users')->group(function ()
+            {
+//                Route::get('/', [::class, 'get']);
+            });
 
 
-//        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
-//
-        Route::prefix('/videos')->group(function () {
-            Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-            Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
-            Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
-//            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
+             Route::middleware(['auth:admin'])->group(function () {
+                 Route::post('/logout', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'logout']);
+             });
         });
-//
-        Route::prefix('{program}/review-requests')->group(function () {
-//            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
-//            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
+
+
+
+
+        Route::middleware(['auth:api'])->group(function () {
+            Route::post('/logout', [LoginController::class, 'logout']);
+            Broadcast::routes(['middleware' => ['auth:sanctum']]);
+            Route::prefix('patient')->group(function ()
+            {
+                Route::post('/store', [PatientController::class, 'store']);
+                Route::post('/update', [PatientController::class, 'update']);
+
+            });
+
+
+            Route::prefix('therapist')->group(function ()
+            {
+                Route::get('/', [TherapistController::class, 'get']);
+                Route::post('/store', [TherapistController::class, 'store']);
+                Route::post('/update', [TherapistController::class, 'update']);
+            });
+
+            Route::prefix('schedule')->group(function ()
+            {
+                Route::post('store', [ScheduleController::class, 'store']);
+                Route::post('/update', [ScheduleController::class, 'update']);
+
+            });
+            Route::prefix('location')->group(function ()
+            {
+                Route::post('store', [LocationController::class, 'store']);
+                Route::post('update', [LocationController::class, 'update']);
+            });
+            Route::prefix('consultation-request')->group(function ()
+            {
+                Route::post('/store', [ConsultationController::class, 'store']);
+                Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
+                Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
+        //        Route::prefix('video')->group(function ()
+        //        {
+        //            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
+        //            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
+        //        });
+
+                Route::prefix('chat')->group(function ()
+                {
+                    Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+                });
+        //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
+
+            });
+        //    Route::post('/zoom/webhooks', [ZoomWebhookController::class, 'handle']);
+            Route::prefix('programs')->group(function () {
+         //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
+                Route::post('/', [ProgramController::class, 'store']);
+                Route::post('program/update', [ProgramController::class, 'update']);
+                Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
+                Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
+
+            });
+
+
+        //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+        //
+                Route::prefix('/videos')->group(function () {
+                    Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+                    Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+                    Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+        //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
+                });
+        //
+                Route::prefix('{program}/review-requests')->group(function () {
+        //            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
+        //            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
+                });
+        //    });
+        //
+
+
+            Route::prefix('notification')->group(function ()
+            {
+                Route::get('/', [NotificationsController::class, 'getNotificationsForCurrentUser']);
+                Route::get('mark-as-read', [NotificationsController::class, 'markAsRead']);
+
+            });
+            Route::prefix('messages')->group(function ()
+            {
+                Route::get('messengers/current-user', [MessageController::class, 'getMessengers']);
+                Route::get('{chatId}', [MessageController::class, 'fetchMessages']);
+                Route::post('sent', [MessageController::class, 'sendMessage']);
+                Route::get('mark-as-read/{senderId}', [MessageController::class, 'markAsRead']);
+            });
+
+            Route::prefix('center')->group(function ()
+            {
+                Route::post('/store', [RehabilitationCenterController::class, 'store']);
+                Route::post('/update', [RehabilitationCenterController::class, 'update']);
+            });
+
+            Route::prefix('device-request')->group(function () {
+                Route::post('/store', [DeviceRequestController::class, 'store']);
+                Route::post('/update', [DeviceRequestController::class, 'update']);
+            });
+
+
+            Route::prefix('rating')->group(function ()
+            {
+                Route::post('store', [RatingController::class, 'store']);
+            });
+            Route::prefix('smart-glove-device')->group(function () {
+                Route::post('send-command', [GloveCommandController::class, 'sendCommand']);
+            });
+            Route::prefix('reports')->group(function () {
+                Route::get('enums', [ReportController::class, 'reportEnums']);
+                Route::post('store', [ReportController::class, 'store']);
+
+            });
+
+            Route::prefix('payment-gateway')->group(function () {
+                Route::post('create-link-payment', [WalletTopUpController::class, 'store']);
+
+            });
+
         });
-//    });
-//
-//// إدارة طلبات المراجعة من منظور المشرف
-//    Route::prefix('review-requests')->group(function () {
-//        Route::get('/', [ProgramReviewRequestController::class, 'all']);           // قائمة كل طلبات المراجعة
-//        Route::patch('{request}', [ProgramReviewRequestController::class, 'update']); // الموافقة أو الرفض
-//    });
 
-
-    Route::prefix('notification')->group(function ()
-    {
-        Route::get('/', [NotificationsController::class, 'getNotificationsForCurrentUser']);
-        Route::get('mark-as-read', [NotificationsController::class, 'markAsRead']);
-
-    });
-    Route::prefix('messages')->group(function ()
-    {
-        Route::get('messengers/current-user', [MessageController::class, 'getMessengers']);
-        Route::get('{chatId}', [MessageController::class, 'fetchMessages']);
-        Route::post('sent', [MessageController::class, 'sendMessage']);
-        Route::get('mark-as-read/{senderId}', [MessageController::class, 'markAsRead']);
-    });
-
-    Route::prefix('center')->group(function ()
-    {
-        Route::post('/store', [RehabilitationCenterController::class, 'store']);
-        Route::post('/update', [RehabilitationCenterController::class, 'update']);
-    });
-
-
-
-
-    Route::prefix('device-request')->group(function () {
-        Route::post('/store', [DeviceRequestController::class, 'store']);
-        Route::post('/update', [DeviceRequestController::class, 'update']);
-    });
-
-
-    Route::prefix('rating')->group(function ()
-    {
-        Route::post('store', [RatingController::class, 'store']);
-    });
-    Route::prefix('smart-glove-device')->group(function () {
-        Route::post('send-command', [GloveCommandController::class, 'sendCommand']);
-    });
-    Route::prefix('reports')->group(function () {
-        Route::get('enums', [ReportController::class, 'reportEnums']);
-        Route::post('store', [ReportController::class, 'store']);
-
-    });
-
-    Route::prefix('payment-gateway')->group(function () {
-        Route::post('create-link-payment', [WalletTopUpController::class, 'store']);
-
-    });
-
-});
-//Route::middleware(VerifyDeviceToken::class)->prefix('smart-glove-device-simulation')->group(function () {
-//    Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
-//});
-
-Route::prefix('smart-glove-device')->group(function () {
-    Route::post('feedback-error', [GloveErrorController::class, 'receiveErrorReport']);
-    Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
-    Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
-});
-
-Route::prefix('zoom-webhook')->group(function ()
-{
-    Route::post('handle',[ZoomWebhookController::class, 'handle']);
-
-
-});
-
-//Route::post('/amwalpay/callback', [WalletTopUpController::class, 'captureDataViaWebhook']);
-Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
-
-//Route::get('/storage/{path}', function ($path) {
-//    $fullPath = storage_path('app/public/' . $path);
-//
-//    if (!File::exists($fullPath)) {
-//        abort(404);
-//    }
-//
-//    $file = File::get($fullPath);
-//    $type = File::mimeType($fullPath);
-//
-//    return Response::make($file, 200)->header("Content-Type", $type);
-//})->where('path', '.*');

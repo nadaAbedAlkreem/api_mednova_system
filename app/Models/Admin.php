@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\AdminFactory> */
 
-    use HasFactory , SoftDeletes;
+    use  HasApiTokens, HasFactory , SoftDeletes;
     protected $fillable = [
         'name',
         'email',
@@ -23,7 +24,7 @@ class Admin extends Authenticatable
     }
     public function notifications()
     {
-        return $this->morphMany(\App\Models\Notifications::class, 'notifiable');
+//        return $this->morphMany(\App\Models\Notifications::class, 'notifiable');
     }
 
 }

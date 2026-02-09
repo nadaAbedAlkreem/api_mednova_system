@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\ControlPanel\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\auth\LoginUserRequest;
-use App\Http\Resources\Api\Customer\CustomerResource;
-use App\Services\Auth\CustomerAuthService;
+use App\Http\Requests\api\controlPanel\Auth\LoginUserRequest;
+use App\Http\Resources\Api\Customer\AdminResource;
+use App\Repositories\IAdminRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     use ResponseTrait ;
-    protected CustomerAuthService $authService;
-    public function __construct(CustomerAuthService $authService)
+    protected  IAdminRepositories $adminRepo;
+    public function __construct(IAdminRepositories $adminRepo)
     {
-        $this->authService = $authService;
+        $this->adminRepo = $adminRepo;
     }
 
 
@@ -25,17 +25,12 @@ class LoginController extends Controller
     {
            try {
               $credentials = $request->only('email', 'password');
-              $token = $this->authService->login($credentials);
-              $customer = Auth::guard('api')->user();
-              if(!$customer['email_verified_at'])
-              {
-                  throw new \Exception(__('messages.EMAIL_NOT_VERIFIED'));
-              }
-              $customer->load(['location','patient','therapist' ,'therapist.specialty','rehabilitationCenter' ,'medicalSpecialties','schedules']);
+              $token = $this->adminRepo->login($credentials);
+              $admin = Auth::guard('admin')->user();
               return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
                    [
                    'access_token' =>'Bearer ' . $token,
-                   'user' => new CustomerResource($customer),
+                   'admin' => new  AdminResource($admin),
                ], 202,app()->getLocale());
           } catch (\Exception $e) {
               return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
@@ -45,7 +40,8 @@ class LoginController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $admin = Auth::guard('admin')->user();
+        $admin->currentAccessToken()->delete();
         return $this->successResponse(__('messages.LOGGED_OUT_SUCCESSFULLY') ,[] ,200, app()->getLocale());
     }
 }

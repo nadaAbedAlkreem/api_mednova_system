@@ -45,7 +45,8 @@ class LoginController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $apiUser = Auth::guard('api')->user();
+        $apiUser->currentAccessToken()->delete();
         return $this->successResponse(__('messages.LOGGED_OUT_SUCCESSFULLY') ,[] ,200, app()->getLocale());
     }
 }

@@ -34,7 +34,7 @@ class CustomerResource extends JsonResource
                 'average_rating' => $this->average_rating ,
                 'total_reviews'=> $this->total_reviews   ,
                 'is_completed' => $this->isProfileCompleted(),
-                'status' => $this->status ,
+                'approval_status' => $this->approval_status ,
                 'is_banned' => $this->is_banned ,
                 'timezone'=> $this->timezone ?? app('config')->get('app.timezone') ,
                 'email_verified_at'=> $this->email_verified_at,

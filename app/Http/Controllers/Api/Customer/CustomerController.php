@@ -44,14 +44,14 @@ class CustomerController extends Controller
           if(!$customer instanceof  Customer){
               throw new \Exception('Get Customer Failed');
           }
-           return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new CustomerResource($customer), 201);
+           return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new CustomerResource($customer), 202);
        }catch (\Exception $e){
            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
        }
 
    }
 
-    public function searchOfServiceProvider(Request $request): \Illuminate\Http\JsonResponse
+    public function searchOfServiceProvider(Request $request): \Illuminate\Http\JsonResponse // test
     {
         try {
             $results = $this->searchServiceProviderService->searchServiceProviders($request->all());

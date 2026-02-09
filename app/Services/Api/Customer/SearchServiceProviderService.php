@@ -12,7 +12,7 @@ class SearchServiceProviderService
     public function searchServiceProviders($filters): \Illuminate\Pagination\LengthAwarePaginator
     {
 //        $query = Customer::query();
-        $query = Customer::specialistsAndCenters();
+        $query = Customer::specialistsAndCenters()->ActiveVerified();
         $limit = $filters['limit'] ?? 5;
 
         // البحث حسب نوع الحساب
