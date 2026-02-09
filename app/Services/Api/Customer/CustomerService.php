@@ -22,14 +22,13 @@ class CustomerService
         try {
             $customer = $this->customerRepository->create($data);
             $customerToken =  $customer->createToken('API Token')->plainTextToken;
-            return   [
+            return [
                 'access_token' =>  'Bearer '.$customerToken ,
                 'customer' => $customer
             ] ;
         } catch (\Exception $e) {
              throw new \Exception($e->getMessage());
         }
-
     }
 
     public function getAll(array $filters = [], int $limit = 10)
@@ -45,8 +44,8 @@ class CustomerService
         }
 
         // فلترة حسب الحالة
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
+        if (!empty($filters['approval_status'])) {
+            $query->where('approval_status', $filters['approval_status']);
         }
 
         // فلترة حسب التحقق من الايميل

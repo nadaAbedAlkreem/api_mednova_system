@@ -22,46 +22,46 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
        $this->call([
-                AdminSeeder::class,
-//           MedicalSpecialtieSeeder::class,
-//           DeviceSeeder::class,
+//                AdminSeeder::class,
+           MedicalSpecialtieSeeder::class,
+           DeviceSeeder::class,
          ]);
         // جلب التخصصات التي تم إنشاؤها
-//        $specialties = MedicalSpecialtie::all();
-////
-////        // 🔹 أنشئ عملاء من نوع (Therapist)
-//        Customer::factory(10)->create([
-//            'type_account' => 'therapist',
-//        ])->each(function ($customer) use ($specialties) {
-//            Therapist::factory()->create([
-//                'customer_id' => $customer->id,
-//                'medical_specialties_id' => $specialties->random()->id,
-//            ]);
+        $specialties = MedicalSpecialtie::all();
 //
-//            Location::factory()->create(['customer_id' => $customer->id]);
-//        });
-//
-////         🔹 أنشئ عملاء من نوع (Rehabilitation Center)
-//        Customer::factory(5)->create([
-//            'type_account' => 'rehabilitation_center',
-//        ])->each(function ($customer) use ($specialties) {
-//            RehabilitationCenter::factory()->create([
-//                'customer_id' => $customer->id,
-//            ]);
-//
-//            // اربط المركز بتخصصات عشوائية
-//            $centerSpecialties = $specialties->random(rand(1, 3))->pluck('id')->toArray();
-//            foreach ($centerSpecialties as $specialtyId) {
-//                DB::table('rehabilitation_specialist_specialty')->insert([
-//                    'customer_id' => $customer->id,
-//                    'specialty_id' => $specialtyId,
-//                    'created_at' => now(),
-//                    'updated_at' => now(),
-//                ]);
-//            }
-//
-//            Location::factory()->create(['customer_id' => $customer->id]);
-//        });
+//        // 🔹 أنشئ عملاء من نوع (Therapist)
+        Customer::factory(10)->create([
+            'type_account' => 'therapist',
+        ])->each(function ($customer) use ($specialties) {
+            Therapist::factory()->create([
+                'customer_id' => $customer->id,
+                'medical_specialties_id' => $specialties->random()->id,
+            ]);
+
+            Location::factory()->create(['customer_id' => $customer->id]);
+        });
+
+//         🔹 أنشئ عملاء من نوع (Rehabilitation Center)
+        Customer::factory(5)->create([
+            'type_account' => 'rehabilitation_center',
+        ])->each(function ($customer) use ($specialties) {
+            RehabilitationCenter::factory()->create([
+                'customer_id' => $customer->id,
+            ]);
+
+            // اربط المركز بتخصصات عشوائية
+            $centerSpecialties = $specialties->random(rand(1, 3))->pluck('id')->toArray();
+            foreach ($centerSpecialties as $specialtyId) {
+                DB::table('rehabilitation_specialist_specialty')->insert([
+                    'customer_id' => $customer->id,
+                    'specialty_id' => $specialtyId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            Location::factory()->create(['customer_id' => $customer->id]);
+        });
 ////
 ////        // 🔹 أنشئ عملاء من نوع (Patient)
         Customer::factory(10)->create([

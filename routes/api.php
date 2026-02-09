@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Consultation\ConsultationController;
 use App\Http\Controllers\Api\Consultation\MessageController;
 use App\Http\Controllers\Api\Consultation\ScheduleController;
 use App\Http\Controllers\Api\Consultation\ZoomWebhookController;
+use App\Http\Controllers\Api\ControlPanel\UserDepartment\UserController;
 use App\Http\Controllers\Api\Customer\ReportController;
 use App\Http\Controllers\Api\Device\DeviceController;
 use App\Http\Controllers\Api\Device\DeviceRequestController;
@@ -91,15 +92,22 @@ use Illuminate\Support\Facades\Route;
              {
                  Route::post('/login', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'login'])->name('login-control');
              });
-
-            Route::prefix('users')->group(function ()
-            {
-//                Route::get('/', [::class, 'get']);
-            });
-
-
              Route::middleware(['auth:admin'])->group(function () {
                  Route::post('/logout', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'logout']);
+                 Route::prefix('users')->group(function () {
+                     Route::get('/', [UserController::class, 'getAll']);
+                     Route::get('/{id}', [UserController::class, 'getById']);
+
+//                Route::put('{id}', [UserController::class, 'update']);
+//                Route::delete('{id}', [UserController::class, 'destroy']);
+                 });
+
+                 Route::prefix('programs')->group(function () {
+                     Route::get('/', [ProgramController::class, 'index']);
+                     Route::post('{id}/approve', [ProgramController::class, 'approve']);
+                     Route::post('{id}/reject', [ProgramController::class, 'reject']);
+                 });
+
              });
         });
 

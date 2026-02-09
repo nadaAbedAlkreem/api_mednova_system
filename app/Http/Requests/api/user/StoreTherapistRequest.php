@@ -93,8 +93,8 @@ class StoreTherapistRequest extends FormRequest
                     }
                 }
             ],
-            'video_consultation_price' => ['required', 'numeric', 'min:0'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0'],
+            'video_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
             'currency' => ['required', 'string', 'size:3'],
            ];
     }
@@ -120,6 +120,9 @@ class StoreTherapistRequest extends FormRequest
             'birth_date.date' => __('validation.date', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.before_or_equal' => __('validation.before_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.after_or_equal' => __('validation.after_or_equal', ['attribute' => __('validation.attributes.birth_date')]),
+
+            'video_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'chat_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.chat_consultation_price')]),
 
             'gender.required' => __('validation.required', ['attribute' => __('validation.attributes.gender')]),
             'gender.in' => __('validation.in', ['attribute' => __('validation.attributes.gender')]),

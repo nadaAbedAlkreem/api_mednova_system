@@ -54,7 +54,7 @@ class RehabilitationCenterSeeder extends Seeder
                 'type_account' => 'rehabilitation_center',
                 'image' => $centerImage,
 //                'image' => 'https://demoapplication.jawebhom.com/storage/patient_profile_images/5d8f71ad-0d97-4e0e-95c3-07f1a16ecb32.jpg',
-                'status' => 'active',
+                'approval_status' => 'approved',
                 'is_online' => false,
                 'last_active_at' => now(),
             ]);

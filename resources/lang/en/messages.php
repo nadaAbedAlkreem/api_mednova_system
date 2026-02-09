@@ -23,6 +23,8 @@ return [
         'max' => 'Users cannot exceed 4.',
 
     ],
+    'CUSTOMER_BLOCKED' => '',
+    'CUSTOMER_UNBLOCKED0' => '' ,
     'operation accomplished successfully' => 'Operation accomplished successfully',
     'INVALID_LEVEL'=> 'invalid level',
     'NO_IDS_PROVIDED' => 'NO IDS PROVIDED' ,

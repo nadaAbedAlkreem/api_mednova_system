@@ -51,8 +51,9 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'commercial_registration_file' => 'required_if:has_commercial_registration,true|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'commercial_registration_authority' => 'required_if:has_commercial_registration,true|string|max:255',
 
-            'video_consultation_price' => [ 'numeric', 'min:0'],
-            'chat_consultation_price' => [ 'numeric', 'min:0'],
+            'video_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+
             'currency' => ['string', 'size:3'],
             'timezone' => [Rule::in(\DateTimeZone::listIdentifiers())],
 
@@ -135,6 +136,10 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
 
             'gender.in'       => __('validation.in', ['attribute' => __('validation.attributes.gender')]),
+
+            'video_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'chat_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+
 
             'birth_date.date'     => __('validation.date', ['attribute' => __('validation.attributes.birth_date')]),
             'birth_date.before'   => __('validation.before', ['attribute' => __('validation.attributes.birth_date'), 'date' => __('validation.attributes.today')]),

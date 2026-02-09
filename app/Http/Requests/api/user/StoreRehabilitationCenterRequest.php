@@ -57,8 +57,8 @@ class StoreRehabilitationCenterRequest extends FormRequest
 //            ///schedule
             'day_of_week' => 'required|array',
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'video_consultation_price' => ['required', 'numeric', 'min:0'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0'],
+            'video_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
             'currency' => ['required', 'string', 'size:3'],
 
             'start_time_morning' => [
@@ -133,6 +133,10 @@ class StoreRehabilitationCenterRequest extends FormRequest
         return [
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
+
+            'video_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.video_consultation_price')]),
+            'chat_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.chat_consultation_price')]),
+
 
             'year_establishment.required' => __('validation.required', ['attribute' => __('validation.attributes.year_establishment')]),
             'year_establishment.digits' => __('validation.digits', ['attribute' => __('validation.attributes.year_establishment'), 'digits' => 4]),
