@@ -23,8 +23,19 @@ return [
         'max' => 'Users cannot exceed 4.',
 
     ],
-    'CUSTOMER_BLOCKED' => '',
-    'CUSTOMER_UNBLOCKED0' => '' ,
+    'welcome_notification' => '🎉 Congratulations! You have been officially accepted to the Mednova platform. Welcome to our community and we look forward to your experience with us!',
+    'rejected_notification' => '⚠️ We regret to inform you that your application has not been accepted on the Mednova platform at this time. You may review the reason for the rejection and contact us for more information. Thank you for your interest, and we wish you success.',
+
+    'CANNOT_REJECT_APPROVED_ACCOUNT' => 'An approved account cannot be rejected. You may block or suspend the account instead.',
+
+    'CUSTOMER_BLOCKED' => 'The customer account has been blocked successfully.',
+    'CUSTOMER_UNBLOCKED' => 'The customer account has been unblocked successfully.',
+    'CUSTOMER_NOT_FOUND' => 'Customer not found.',
+    'INVALID_STATUS' => 'Invalid status value.',
+    'CANNOT_APPROVE_BLOCKED' => 'Cannot approve a blocked account.',
+    'EMAIL_NOT_VERIFIED' => 'Cannot approve account. Email is not verified.',
+    'PROFILE_NOT_COMPLETED' => 'Cannot approve account. Profile is not completed.',
+    'CUSTOMER_CANNOT_BE_DELETED_HAS_ACTIVE_RELATIONS' => 'This account cannot be deleted because it contains consultations or data linked to accounts.',
     'operation accomplished successfully' => 'Operation accomplished successfully',
     'INVALID_LEVEL'=> 'invalid level',
     'NO_IDS_PROVIDED' => 'NO IDS PROVIDED' ,

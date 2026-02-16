@@ -97,9 +97,11 @@ use Illuminate\Support\Facades\Route;
                  Route::prefix('users')->group(function () {
                      Route::get('/', [UserController::class, 'getAll']);
                      Route::get('/{id}', [UserController::class, 'getById']);
-
+//                     Route::patch('{id}/block', [UserController::class, 'toggleBlock']);
+                     Route::patch('{id}/status', [UserController::class, 'updateApprovalStatus']);
+                     Route::patch('{id}/status-account', [UserController::class, 'updateAccountStatus']);
 //                Route::put('{id}', [UserController::class, 'update']);
-//                Route::delete('{id}', [UserController::class, 'destroy']);
+                     Route::delete('{id}', [UserController::class, 'destroy']);
                  });
 
                  Route::prefix('programs')->group(function () {

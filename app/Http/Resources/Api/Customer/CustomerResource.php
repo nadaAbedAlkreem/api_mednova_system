@@ -38,18 +38,10 @@ class CustomerResource extends JsonResource
                 'is_banned' => $this->is_banned ,
                 'timezone'=> $this->timezone ?? app('config')->get('app.timezone') ,
                 'email_verified_at'=> $this->email_verified_at,
-
+                'phone_verified_at' => $this->phone_verified_at
 
 
             ] ;
     }
-    private function isProfileCompleted(): bool
-    {
-        return match ($this->type_account) {
-            'patient' => $this->relationLoaded('patient') && $this->patient !== null,
-            'therapist' => $this->relationLoaded('therapist') && $this->therapist !== null,
-            'rehabilitation_center' => $this->relationLoaded('rehabilitationCenter') && $this->rehabilitationCenter !== null,
-            default => false,
-        };
-    }
+
 }

@@ -21,9 +21,9 @@ class RepositoryServiceProvider extends ServiceProvider
     {
 
 
-        $this->app->bind(IOmnixSubscribeRepositories::class, OmnixSubscribeRepository::class);
-        $this->app->bind(IOmnixNotificationRepositories::class, OmnixWhatsAppNotificationRepository::class);
-        $this->app->bind(IOmnixWebhookRepositories::class, OmnixWebhookRepository::class);
+//        $this->app->bind(IOmnixSubscribeRepositories::class, OmnixSubscribeRepository::class);
+//        $this->app->bind(IOmnixNotificationRepositories::class, OmnixWhatsAppNotificationRepository::class);
+//        $this->app->bind(IOmnixWebhookRepositories::class, OmnixWebhookRepository::class);
 
         foreach($this->getModels() as $model){
               $this->app->bind(

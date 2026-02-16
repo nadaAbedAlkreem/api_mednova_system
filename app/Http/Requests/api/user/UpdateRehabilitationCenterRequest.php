@@ -51,8 +51,8 @@ class UpdateRehabilitationCenterRequest extends FormRequest
             'commercial_registration_file' => 'required_if:has_commercial_registration,true|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'commercial_registration_authority' => 'required_if:has_commercial_registration,true|string|max:255',
 
-            'video_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'video_consultation_price' => ['numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['numeric', 'min:0' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
 
             'currency' => ['string', 'size:3'],
             'timezone' => [Rule::in(\DateTimeZone::listIdentifiers())],

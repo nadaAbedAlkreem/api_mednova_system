@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\AccountStatus;
+use App\Enums\ConsultantType;
+use App\Enums\StatusType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,13 +15,13 @@ class Customer extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasApiTokens, HasFactory,  SoftDeletes;
-    const TYPE_PATIENT = 'patient';
-    const TYPE_THERAPIST = 'therapist';
-    const TYPE_CENTER = 'rehabilitation_center';
+//    const TYPE_PATIENT = 'patient';
+//    const TYPE_THERAPIST = 'therapist';
+//    const TYPE_CENTER = 'rehabilitation_center';
 
-    const STATUS_PENDING = 'pending';
-    const STATUS_APPROVED = 'approved';
-    const STATUS_REJECTED = 'rejected';
+//    const STATUS_PENDING = 'pending';
+//    const STATUS_APPROVED = 'approved';
+//    const STATUS_REJECTED = 'rejected';
     protected $fillable = [
         'full_name',
         'email',
@@ -32,22 +35,30 @@ class Customer extends Authenticatable
         'fcm_token' ,
         'is_online' ,
         'last_active_at' ,
-        'is_banned' ,
+        'account_status',
+//        'is_banned' ,
         'type_account',
         'approval_status',
+        'reason',
         'timezone',
         'email_verified_at',
+        'phone_verified_at'
     ];
+
+    public function accountReviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AccountReview::class, 'customer_id');
+    }
 
 
     public function complainantReport(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Customer::class, 'customer_id');
+        return $this->hasMany(Report::class, 'customer_id');
     }
 
     public function reported(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Customer::class, 'reported_customers_id');
+        return $this->hasMany(Report::class, 'reported_customers_id');
     }
     public function senderMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -107,7 +118,7 @@ class Customer extends Authenticatable
     // علاقة طلبات الحجوزات
     public function appointmentRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(AppointmentRequest::class);
+        return $this->hasMany(AppointmentRequest::class , 'consultant_id' , 'patient_id');
     }
     public function schedules(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -125,7 +136,7 @@ class Customer extends Authenticatable
     // علاقة طلبات الاستشارة فيديو
     public function consultationVideoRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ConsultationVideoRequest::class);
+        return $this->hasMany(ConsultationVideoRequest::class  ,'patient_id');
     }
     public function consultationVideoRequestsForConsultant(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -162,10 +173,11 @@ class Customer extends Authenticatable
             }
         });
         static::deleting(function ($customer) {
+            $customer->account_status = AccountStatus::DELETED;
+            $customer->save();
             $customer->location()->each(function ($location) {
                 $location->delete();
             });
-
             $customer->therapist()->each(function ($therapist) {
                 $therapist->delete();
             });
@@ -175,7 +187,6 @@ class Customer extends Authenticatable
             $customer->patient()->each(function ($patient) {
                 $patient->delete();
             });
-
             $customer->schedules()->each(function ($schedules) {
                 $schedules->delete();
             });
@@ -212,17 +223,15 @@ class Customer extends Authenticatable
             $customer->notifications()->each(function ($notifications) {
                 $notifications->delete();
             });
-
-            $customer->ratingReviewer()->each(function ($reviewer) {
-                $reviewer->delete();
-            });
-
+//            $customer->ratingReviewer()->each(function ($reviewer) {
+//                $reviewer->delete();
+//            });
             $customer->ratings()->each(function ($reviewee) {
                 $reviewee->delete();
             });
-            $customer->schedule()->each(function ($schedule) {
-                $schedule->delete();
-            });
+//            $customer->schedule()->each(function ($schedule) {
+//                $schedule->delete();
+//            });
             $customer->deviceRequests()->each(function ($deviceRequests) {
                 $deviceRequests->delete();
             });
@@ -233,25 +242,33 @@ class Customer extends Authenticatable
 
     public static function resolveDefaultStatus(string $type): string
     {
-        return $type === self::TYPE_PATIENT
-            ? self::STATUS_APPROVED
-            : self::STATUS_PENDING;
+        return $type === ConsultantType::PATIENT->value
+            ? StatusType::APPROVED->value
+            : StatusType::PENDING->value;
     }
 
     public function scopeSpecialistsAndCenters(Builder $query): Builder
     {
         return $query->whereIn('type_account', [
-            self::TYPE_THERAPIST,
-            self::TYPE_CENTER,
+            ConsultantType::THERAPIST->value,
+            ConsultantType::REHABILITATION_CENTER->value,
         ]);
     }
     public function scopeActiveVerified($query)
     {
         return $query
-            ->where('approval_status', self::STATUS_APPROVED)
+            ->where('approval_status', StatusType::APPROVED->value)
             ->whereNotNull('email_verified_at')
-            ->where('is_banned', false);
+            ->where('account_status', AccountStatus::ACTIVE->value);
     }
-
+    public function isProfileCompleted(): bool
+    {
+        return match ($this->type_account) {
+            ConsultantType::PATIENT => $this->patient !== null,
+            ConsultantType::THERAPIST => $this->therapist !== null,
+            ConsultantType::REHABILITATION_CENTER => $this->rehabilitationCenter !== null,
+            default => false,
+        };
+    }
 
 }

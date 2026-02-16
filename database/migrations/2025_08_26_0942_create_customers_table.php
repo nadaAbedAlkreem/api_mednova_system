@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestamp('last_active_at')->nullable();
             $table->boolean('is_banned')->default(false);
             $table->enum('type_account' , ['therapist' ,'rehabilitation_center' , 'patient']);
-            $table->enum('status' , ['active' , 'not_active'])->default('not_active');
+            $table->enum('status' , ['active' , 'not_active'])->default('not_active'); //edit of column to approval_status and edit enum to approved - pending - rejected
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

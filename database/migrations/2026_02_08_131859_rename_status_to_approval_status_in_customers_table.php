@@ -36,10 +36,11 @@ return new class extends Migration
                 ->change();
         });
 
-        // 4️⃣ إعادة تسمية العمود
+//             4️⃣ إعادة تسمية العمود
         Schema::table('customers', function (Blueprint $table) {
-            $table->renameColumn('status', 'approval_status');
+                $table->renameColumn('status', 'approval_status');
         });
+
     }
 
     /**

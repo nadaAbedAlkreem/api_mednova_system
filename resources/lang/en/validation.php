@@ -166,6 +166,16 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'approval_status' => [
+            'required' => 'Please select the request status.',
+            'in' => 'The selected status is invalid.',
+        ],
+
+        'reason' => [
+            'required_if' => 'Please provide a rejection reason before continuing.',
+            'max' => 'The rejection reason may not be greater than :max characters.',
+        ],
+
     ],
 
     /*
