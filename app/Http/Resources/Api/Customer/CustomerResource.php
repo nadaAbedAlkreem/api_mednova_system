@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\Customer;
 
 use App\Http\Resources\Api\Consultation\ScheduleResource;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,6 +16,17 @@ class CustomerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $timezone = $this->timezone ;
+        if($timezone != null)
+        {
+            $schedules = $this->whenLoaded('schedules')->map(function($schedule) use ($timezone) {
+                $schedule->timezone = $timezone;
+                return $schedule;
+            });
+        }else{
+            $schedules = $this->whenLoaded('schedules');
+        }
+
          return
             [
                 'id' => $this->id ,
@@ -30,7 +42,7 @@ class CustomerResource extends JsonResource
                 'therapist_details' => new TherapistResource($this->whenLoaded('therapist')),
                 'center_details' => new CenterResource($this->whenLoaded('rehabilitationCenter')),
                 'medicalSpecialties' => MedicalSpecialtyResource::collection($this->whenLoaded('medicalSpecialties')),
-                'schedules' =>  ScheduleResource::collection($this->whenLoaded('schedules')),
+                'schedules' => ScheduleResource::collection($schedules),
                 'average_rating' => $this->average_rating ,
                 'total_reviews'=> $this->total_reviews   ,
                 'is_completed' => $this->isProfileCompleted(),
