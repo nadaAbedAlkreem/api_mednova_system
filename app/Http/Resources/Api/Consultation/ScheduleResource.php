@@ -16,10 +16,11 @@ class ScheduleResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        dd($request->all());
 //        $customer = Auth('api')->user();
 //        dd($customer);
 //        $timezone =$customer['timezone'];
+        $timezone = $this->timezone;
+        dd($timezone);
          return
             [
                 'id' => $this->id ,
