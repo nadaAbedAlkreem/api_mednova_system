@@ -16,6 +16,10 @@ class CustomerResource extends JsonResource
     public function toArray(Request $request): array
     {
         $timezone = $this->timezone ;
+        $schedules = $this->whenLoaded('schedules')->map(function($schedule) use ($timezone) {
+            $schedule->timezone = $timezone;
+            return $schedule;
+        });
          return
             [
                 'id' => $this->id ,
@@ -31,10 +35,7 @@ class CustomerResource extends JsonResource
                 'therapist_details' => new TherapistResource($this->whenLoaded('therapist')),
                 'center_details' => new CenterResource($this->whenLoaded('rehabilitationCenter')),
                 'medicalSpecialties' => MedicalSpecialtyResource::collection($this->whenLoaded('medicalSpecialties')),
-                'schedules' => ScheduleResource::collection($this->whenLoaded('schedules'))
-                    ->map(function ($schedule) use ($timezone) {
-                        $schedule->timezone = $timezone;
-                        return $schedule;}),
+                'schedules' => ScheduleResource::collection($schedules),
                 'average_rating' => $this->average_rating ,
                 'total_reviews'=> $this->total_reviews   ,
                 'is_completed' => $this->isProfileCompleted(),
