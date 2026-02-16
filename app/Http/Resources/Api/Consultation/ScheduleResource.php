@@ -20,7 +20,6 @@ class ScheduleResource extends JsonResource
 //        dd($customer);
 //        $timezone =$customer['timezone'];
         $timezone = $this->timezone;
-        dd($timezone);
          return
             [
                 'id' => $this->id ,
