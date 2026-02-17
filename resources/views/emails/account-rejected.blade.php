@@ -2,24 +2,24 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>بخصوص طلب التسجيل - مدنوفا للاستشارات الطبية</title>
+    <title>Regarding Your Registration Request - Mednova Medical Consultations</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
     <tr>
         <td style="padding: 30px;">
-            <h2 style="color: #333333; margin-bottom: 20px;">مرحباً {{ $user->full_name }}،</h2>
+            <h2 style="color: #333333; margin-bottom: 20px;">Hello {{ $user->full_name }},</h2>
 
             <p style="color: #555555; line-height: 1.6;">
-                نشكرك على اهتمامك بالتسجيل في منصة <strong>مدنوفا للاستشارات الطبية</strong>.
+                Thank you for your interest in registering on the <strong>Mednova Medical Consultations</strong> platform.
             </p>
 
             <p style="color: #555555; line-height: 1.6;">
-                بعد مراجعة طلب إنشاء الحساب والبيانات المرفقة، نود إعلامك بأنه لم يتم قبول طلب التسجيل في الوقت الحالي.
+                After reviewing your account registration request and the submitted information, we regret to inform you that your registration request has not been approved at this time.
             </p>
 
             @if(!empty($reason))
-                <p style="margin-top: 20px; font-weight: bold; color: #e74c3c;">سبب الرفض:</p>
+                <p style="margin-top: 20px; font-weight: bold; color: #e74c3c;">Reason for rejection:</p>
 
                 <p style="background-color:#f8f8f8; border-left:4px solid #e74c3c; padding:15px; border-radius:4px; color:#555555;">
                     {{ $reason }}
@@ -27,30 +27,31 @@
             @endif
 
             <p style="color: #555555; line-height: 1.6; margin-top: 20px;">
-                يمكنك تعديل بيانات ملفك الشخصي واستكمال المعلومات المطلوبة من خلال الرابط أدناه:
+                You may update your profile information and complete the required details using the link below:
             </p>
 
             <p style="text-align: center; margin: 30px 0;">
                 <a href="{{ url($url) }}"
                    style="display: inline-block; background-color: #007BFF; color: white; font-weight: bold; padding: 12px 25px; text-decoration: none; border-radius: 6px; transition: background-color 0.3s;">
-                    تعديل الملف الشخصي
+                    Edit Profile
                 </a>
             </p>
 
             <p style="color: #555555; line-height: 1.6;">
-                بعد تحديث البيانات، سيتم إعادة مراجعة طلبك مرة أخرى. في حال كان لديك أي استفسار، لا تتردد في التواصل مع فريق الدعم عبر المنصة.
+                Once your information has been updated, your request will be reviewed again. If you have any questions, please feel free to contact the support team through the platform.
             </p>
 
             <p style="color: #555555; line-height: 1.6; margin-top: 30px;">
-                مع تمنياتنا لك بالتوفيق،<br>
-                <strong>فريق مدنوفا للاستشارات الطبية</strong>
+                Best wishes,<br>
+                <strong>Mednova Medical Consultations Team</strong>
             </p>
 
             <p style="color: #999999; font-size: 12px; margin-top: 30px;">
-                إذا لم تكن قد تقدمت بهذا الطلب، يرجى تجاهل هذا البريد.
+                If you did not submit this request, please ignore this email.
             </p>
         </td>
     </tr>
 </table>
 </body>
 </html>
+```
