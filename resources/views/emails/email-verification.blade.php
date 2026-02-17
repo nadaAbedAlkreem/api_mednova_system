@@ -6,7 +6,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #ffffff; color: #333333; line-height: 1.6;">
 
-<p>Hi {{ $user->name }},</p>
+<p>Hi {{ $user->full_name }},</p>
 
 <p>Thank you for registering with <strong>{{ config('app.name') }}</strong>.</p>
 <p>To verify your email address and activate your account, please click the link below:</p>

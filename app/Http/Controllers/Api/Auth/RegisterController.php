@@ -49,18 +49,24 @@ class RegisterController extends Controller
      }
 
 
-    public function verifyEmail(Request $request): JsonResponse
+    public function verifyEmail(Request $request)
    {
        try {
            $token = $request->query('token');
            $customerId = decrypt($token);
            $customer = $this->customerRepository->findOrFail($customerId);
-           if($customer->email_verified_at != null){
-               throw new \Exception(__('messages.EMAIL_PRE_VERIFIED'));
+
+           if ($customer->email_verified_at) {
+               return redirect()->to(
+                   config('app.frontend_url') . '/login?message=already_verified'
+               );
            }
            $customer->email_verified_at = now();
            $customer->save();
-           return $this->successResponse(__('messages.EMAIL_VERIFICATION_SUCCESSFUL'), [], 202, app()->getLocale());
+
+           return redirect()->to(
+               config('app.frontend_url') . '/login?message=verified'
+           );
        }catch (\Exception $exception){
            return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500, app()->getLocale());
        }
