@@ -19,10 +19,13 @@ class CustomerResource extends JsonResource
         $timezone = $this->timezone ;
         if($timezone != null)
         {
-            $schedules = $this->whenLoaded('schedules')->map(function($schedule) use ($timezone) {
-                $schedule->timezone = $timezone;
-                return $schedule;
+            $schedules = $this->whenLoaded('schedules', function () use ($timezone) {
+                return $this->schedules->map(function ($schedule) use ($timezone) {
+                    $schedule->timezone = $timezone;
+                    return $schedule;
+                });
             });
+
         }else{
             $schedules = $this->whenLoaded('schedules');
         }
