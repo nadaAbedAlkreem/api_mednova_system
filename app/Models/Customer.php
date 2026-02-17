@@ -261,12 +261,12 @@ class Customer extends Authenticatable
             ->whereNotNull('email_verified_at')
             ->where('account_status', AccountStatus::ACTIVE->value);
     }
-    public function isProfileCompleted(): bool
+    public function isProfileCompleted()
     {
         return match ($this->type_account) {
-            ConsultantType::PATIENT => $this->patient !== null,
-            ConsultantType::THERAPIST => $this->therapist !== null,
-            ConsultantType::REHABILITATION_CENTER => $this->rehabilitationCenter !== null,
+            ConsultantType::PATIENT->value => $this->patient !== null,
+            ConsultantType::THERAPIST->value => $this->therapist !== null,
+            ConsultantType::REHABILITATION_CENTER->value => $this->rehabilitationCenter !== null,
             default => false,
         };
     }

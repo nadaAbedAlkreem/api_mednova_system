@@ -89,7 +89,7 @@ class UserController extends Controller
                     'reason.max' => 'سبب الرفض يجب ألا يتجاوز 1000 حرف.',
                 ]);
             $statusEnum = StatusType::from($request->input('approval_status'));
-            $customer = $this->customerRepositories->findOne($id);
+            $customer = $this->customerRepositories->findWith($id , ['patient' , 'rehabilitationCenter' , 'therapist']);
             if (!$customer) {
                 return $this->errorResponse(__('messages.CUSTOMER_NOT_FOUND'), [], 404);
             }
