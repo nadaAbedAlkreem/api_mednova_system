@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\Customer;
 
+use App\Enums\ConsultantType;
 use App\Http\Resources\Api\Consultation\ScheduleResource;
 use App\Models\Program;
 use Illuminate\Http\Request;
@@ -29,8 +30,7 @@ class CustomerResource extends JsonResource
         }else{
             $schedules = $this->whenLoaded('schedules');
         }
-
-         return
+          return
             [
                 'id' => $this->id ,
                 'image' =>  ($this->image)  ,
@@ -58,5 +58,6 @@ class CustomerResource extends JsonResource
 
             ] ;
     }
+
 
 }

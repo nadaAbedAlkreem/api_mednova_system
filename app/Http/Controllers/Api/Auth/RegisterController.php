@@ -55,18 +55,10 @@ class RegisterController extends Controller
            $token = $request->query('token');
            $customerId = decrypt($token);
            $customer = $this->customerRepository->findOrFail($customerId);
-
-           if ($customer->email_verified_at) {
-               return redirect()->to(
-                   config('app.frontend_url') . '/login?message=already_verified'
-               );
-           }
+           if ($customer->email_verified_at) {return redirect()->to(config('app.frontend_url') . '/login?message=already_verified');}
            $customer->email_verified_at = now();
            $customer->save();
-
-           return redirect()->to(
-               config('app.frontend_url') . '/login?message=verified'
-           );
+           return redirect()->to(config('app.frontend_url') . '/login?message=verified');
        }catch (\Exception $exception){
            return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500, app()->getLocale());
        }
