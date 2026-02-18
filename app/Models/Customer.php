@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 class Customer extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use HasApiTokens, HasFactory,  SoftDeletes;
+    use HasApiTokens, HasFactory, SoftDeletes;
+
 //    const TYPE_PATIENT = 'patient';
 //    const TYPE_THERAPIST = 'therapist';
 //    const TYPE_CENTER = 'rehabilitation_center';
@@ -26,15 +27,15 @@ class Customer extends Authenticatable
         'full_name',
         'email',
         'password',
-        'gender' ,
-        'phone' ,
-        'birth_date' ,
-        'image' ,
-        'provider' ,
-        'provider_id' ,
-        'fcm_token' ,
-        'is_online' ,
-        'last_active_at' ,
+        'gender',
+        'phone',
+        'birth_date',
+        'image',
+        'provider',
+        'provider_id',
+        'fcm_token',
+        'is_online',
+        'last_active_at',
         'account_status',
 //        'is_banned' ,
         'type_account',
