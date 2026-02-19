@@ -61,7 +61,7 @@ class StoreConsultationRequest extends FormRequest
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
             $patient = \App\Models\Customer::find($this->patient_id);
-            $patientTimezone = $patient->timezone ?? config('app.timezone');
+            $patientTimezone =  $this->timezone  ?? $patient->timezone ;
             // تحويل وقت البدء إلى UTC
             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
             $statuses = [
