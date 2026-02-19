@@ -64,7 +64,7 @@ class StoreConsultationRequest extends FormRequest
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
             // تحويل وقت البدء إلى UTC
-            dd($this->requested_time);
+            dd($this);
             $requestedTimeUtc = TimezoneService::toUTC($this->requested_time, $patientTimezone);
             dd($this->requested_time , TimezoneService::toUTC($this->requested_time, $patientTimezone));
 
