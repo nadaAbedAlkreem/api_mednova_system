@@ -36,7 +36,7 @@ class StoreConsultationRequest extends FormRequest
             'consultant_nature'=>'required|in:chat,video',
             'requested_day'=>'required_if:consultant_nature,video|string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
             'requested_time'=>'required_if:consultant_nature,video|date_format:Y-m-d H:i',
-            'timezone' => ['required',Rule::in(\DateTimeZone::listIdentifiers())],
+            'timezone' => ['required_if:consultant_nature,video',Rule::in(\DateTimeZone::listIdentifiers())],
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
 
