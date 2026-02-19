@@ -51,6 +51,9 @@ class StoreConsultationRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if ($validator->fails()) {
+                return;
+            }
              $patient = \App\Models\Customer::find($this->patient_id);
             $consultant = \App\Models\Customer::find($this->consultant_id);
 
