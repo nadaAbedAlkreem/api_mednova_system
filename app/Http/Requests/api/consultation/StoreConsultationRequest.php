@@ -65,7 +65,7 @@ class StoreConsultationRequest extends FormRequest
             $patientTimezone =  $this->timezone  ;
             // تحويل وقت البدء إلى UTC
             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
-            dd($this->timezone , $requestedTimeUtc);
+            dd($this['requested_time'] , TimezoneService::toUTC($this['requested_time'], $patientTimezone));
 
             $statuses = [
                 'pending'  => __('messages.consultation_pending'),
