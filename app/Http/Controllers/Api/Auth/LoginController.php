@@ -10,6 +10,7 @@ use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -25,6 +26,7 @@ class LoginController extends Controller
     {
            try {
               $credentials = $request->only('email', 'password');
+              Log::info('test - webhook');
               $token = $this->authService->login($credentials);
               $customer = Auth::guard('api')->user();
               if(!$customer['email_verified_at'])
