@@ -63,11 +63,6 @@ class StoreConsultationRequest extends FormRequest
             }
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
-            Log::info('testt');
-            Log::info('testt');
-            Log::info('testt');
-
-
             // تحويل وقت البدء إلى UTC
             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
             $statuses = [
