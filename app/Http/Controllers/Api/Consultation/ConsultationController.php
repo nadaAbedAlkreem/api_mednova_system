@@ -46,7 +46,7 @@ class ConsultationController extends Controller
     public function getStatusRequest(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $user = auth()->user();
+            $user = auth('api')->user();
             if(!$user instanceof Customer){
                 throw new \Exception('Get Current User  Failed');
             }

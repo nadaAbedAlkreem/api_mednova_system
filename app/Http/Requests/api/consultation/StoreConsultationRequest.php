@@ -8,6 +8,7 @@ use App\Models\ConsultationVideoRequest;
 use App\Services\Api\Customer\TimezoneService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class StoreConsultationRequest extends FormRequest
@@ -61,7 +62,12 @@ class StoreConsultationRequest extends FormRequest
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
             $patient = \App\Models\Customer::find($this->patient_id);
-            $patientTimezone = $patient->timezone ?? config('app.timezone');
+            $patientTimezone =  $this->timezone  ;
+            Log::info('testt');
+            Log::info('testt');
+            Log::info('testt');
+
+
             // تحويل وقت البدء إلى UTC
             $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
             $statuses = [
