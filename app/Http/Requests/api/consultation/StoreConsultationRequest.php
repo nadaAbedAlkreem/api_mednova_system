@@ -30,7 +30,8 @@ class StoreConsultationRequest extends FormRequest
      */
     public function rules(): array
     {
-         return [
+
+        return [
             'patient_id' => 'required|exists:customers,id,deleted_at,NULL',
             'consultant_id' => 'required|exists:customers,id,deleted_at,NULL',
             'consultant_type'=>'required|in:therapist,rehabilitation_center',
@@ -41,8 +42,6 @@ class StoreConsultationRequest extends FormRequest
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
 
-
-
         ];
     }
 
@@ -51,6 +50,7 @@ class StoreConsultationRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+
              $patient = \App\Models\Customer::find($this->patient_id);
             $consultant = \App\Models\Customer::find($this->consultant_id);
 
@@ -64,7 +64,9 @@ class StoreConsultationRequest extends FormRequest
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
             // تحويل وقت البدء إلى UTC
-            $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $patientTimezone);
+            if ($this->filled('requested_time') && $this->filled('timezone') && $this->filled($this['requested_day'])) {
+                $requestedTimeUtc = TimezoneService::toUTC($this->requested_time, $patientTimezone);
+
             $statuses = [
                 'pending'  => __('messages.consultation_pending'),
                 'accepted' => __('messages.consultation_accepted'),
@@ -117,13 +119,15 @@ class StoreConsultationRequest extends FormRequest
 
                     // التحقق أن اليوم يطابق التاريخ
                     $actualDay = $requestedAt->format('l');
-                    if ($actualDay !== $this['requested_day']) {
-                        $validator->errors()->add(
-                            'requested_day',
-                            "اليوم المدخل ({$this['requested_day']}) لا يطابق اليوم الفعلي لتاريخ الاستشارة ($actualDay)."
-                        );
-                    }
 
+                       if ($actualDay !== $this['requested_day']) {
+                           $validator->errors()->add(
+                               'requested_day',
+                               "اليوم المدخل ({$this['requested_day']}) لا يطابق اليوم الفعلي لتاريخ الاستشارة ($actualDay)."
+                           );
+                       }
+
+                 }
                 }
 
         });
