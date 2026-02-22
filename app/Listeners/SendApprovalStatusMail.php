@@ -24,13 +24,13 @@ class SendApprovalStatusMail
 
         if ($event->status === StatusType::APPROVED) {
             Mail::to($event->customer)
-                ->send(new AccountApprovedMail($event->customer, $url));
+                ->queue(new AccountApprovedMail($event->customer, $url));
             Log::info('Approved', [$event->customer]);
 
         }
         if ($event->status === StatusType::REJECTED) {
             Mail::to($event->customer)
-                ->send(new AccountRejectedMail(
+                ->queue(new AccountRejectedMail(
                     $event->customer,
                     $url,
                     $event->reason
