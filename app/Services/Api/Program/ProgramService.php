@@ -36,8 +36,8 @@ class ProgramService
             $query->where('status', $filters['status']);
         }
 
-        if (!isset($filters['is_approved'])) {
-            $query->whereNotNull('is_approved');
+        if (isset($filters['is_approved'])) {
+            $query->where('is_approved', $filters['is_approved']);
         }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
