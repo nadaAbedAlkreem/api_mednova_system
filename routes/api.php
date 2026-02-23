@@ -99,8 +99,21 @@ use Illuminate\Support\Facades\Route;
 
                  Route::prefix('programs')->group(function () {
                      Route::get('/', [ProgramController::class, 'index']);
+                     Route::get('{id}', [ProgramController::class, 'show']);
                      Route::post('{id}/approve', [ProgramController::class, 'approve']);
                      Route::post('{id}/reject', [ProgramController::class, 'reject']);
+                     Route::post('/', [ProgramController::class, 'store']);
+                     Route::post('update', [ProgramController::class, 'update']);
+                     Route::delete('{id}', [ProgramController::class, 'destroy']);
+                     Route::get('{id}/publish', [ProgramController::class, 'publish']);
+
+                 });
+
+                 //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+                 Route::prefix('/videos')->group(function () {
+                     Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+                     Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+                     Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
                  });
 
              });
