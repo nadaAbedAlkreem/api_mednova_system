@@ -31,7 +31,7 @@ class ProgramService
 
     public function getAll(array $filters = [], int $limit = 10)
     {
-        $query = $this->model->with('creator')->query();
+        $query = $this->model->query()->with('creator');
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
