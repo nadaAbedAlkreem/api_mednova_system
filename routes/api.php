@@ -98,7 +98,7 @@ use Illuminate\Support\Facades\Route;
                  });
 
                  Route::prefix('programs')->group(function () {
-                     Route::get('/', [ProgramController::class, 'index']);
+                     Route::get('/', [ProgramController::class, 'getAll']);
                      Route::get('{id}', [ProgramController::class, 'show']);
                      Route::post('{id}/approve', [ProgramController::class, 'approve']);
                      Route::post('{id}/reject', [ProgramController::class, 'reject']);
