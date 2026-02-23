@@ -79,7 +79,7 @@ class ForgotPasswordController extends Controller
 
          // Send the reset link via email or phone
          if ($request->verification_method === 'email') {
-             Mail::to($customer->email)->send(new RestPasswordMail($token));
+             Mail::to($customer->email)->queue(new RestPasswordMail($token));
          }
 //         elseif ($request->verification_method === 'phone') {
 //             $this->smsService->sendSms($user->phone, "Your verification code is: $token");
