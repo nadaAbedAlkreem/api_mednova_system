@@ -53,9 +53,8 @@ class CustomerService
         if (!empty($filters['approval_status'])) {
             $query->where('approval_status', $filters['approval_status']);
         }
-
-        if (!empty($filters['verified'])) {
-            $query->whereNotNull('email_verified_at');
+        if (isset($filters['verified'])) {
+            $query->where('verified', $filters['verified']);
         }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
