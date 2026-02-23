@@ -99,13 +99,13 @@ use Illuminate\Support\Facades\Route;
 
                  Route::prefix('programs')->group(function () {
                      Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
-                     Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'show']);
-                     Route::post('{id}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'approve']);
-                     Route::post('{id}/reject', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'reject']);
-                     Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'store']);
-                     Route::post('update', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'update']);
-                     Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'destroy']);
-                     Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class::class, 'publish']);
+                     Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
+                     Route::post('{id}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
+                     Route::post('{id}/reject', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'reject']);
+                     Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
+                     Route::post('update', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']);
+                     Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
+                     Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
 
                  });
 
