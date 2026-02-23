@@ -83,7 +83,7 @@ class ProgramController extends Controller
             if (! $program) {
                 return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
             }
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($program), 200);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new \App\Http\Resources\Api\Program\ProgramResource($program), 200);
         } catch (\Exception $e) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }

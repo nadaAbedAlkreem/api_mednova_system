@@ -54,5 +54,17 @@ class ProgramController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    public function show($programId): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $program = $this->programRepositories->findWithDetails($programId);
+            if (! $program) {
+                return $this->errorResponse(__('messages.PROGRAM_NOT_FOUND'), [], 404);
+            }
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ProgramResource($program), 200);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+        }
+    }
 
 }
