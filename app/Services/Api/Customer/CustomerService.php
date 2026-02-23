@@ -54,10 +54,11 @@ class CustomerService
             $query->where('approval_status', $filters['approval_status']);
         }
         if (isset($filters['verified'])) {
-            $query->whereNull(
-                'email_verified_at',
-                !$filters['verified']
-            );
+            if ($filters['verified']) {
+                $query->whereNotNull('email_verified_at'); // متحقق
+            } else {
+                $query->whereNull('email_verified_at'); // غير متحقق
+            }
         }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
