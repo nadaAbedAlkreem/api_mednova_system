@@ -17,7 +17,6 @@ class ProgramResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        dd('aa');
         return
         [
 

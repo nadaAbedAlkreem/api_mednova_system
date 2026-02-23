@@ -29,7 +29,6 @@ class ProgramController extends Controller
     public function getAll(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            dd('ss');
               $limit = $request->query('limit') ?? 10;
               $filters = $request->only(['search', 'status', 'is_approved']);
               $programs = $this->programService->getAll($filters, $limit);
