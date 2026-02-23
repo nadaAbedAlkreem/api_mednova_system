@@ -98,9 +98,22 @@ use Illuminate\Support\Facades\Route;
                  });
 
                  Route::prefix('programs')->group(function () {
-                     Route::get('/', [ProgramController::class, 'index']);
-                     Route::post('{id}/approve', [ProgramController::class, 'approve']);
-                     Route::post('{id}/reject', [ProgramController::class, 'reject']);
+                     Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
+                     Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
+                     Route::post('{id}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
+                     Route::post('{id}/reject', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'reject']);
+                     Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
+                     Route::post('update', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']);
+                     Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
+                     Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
+
+                 });
+
+                 //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+                 Route::prefix('/videos')->group(function () {
+                     Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+                     Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+                     Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
                  });
 
              });

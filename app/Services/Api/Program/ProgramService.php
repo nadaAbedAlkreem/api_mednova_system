@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Api\Customer;
+namespace App\Services\Api\Program;
 
 use App\Enums\AccountStatus;
 use App\Enums\StatusType;
@@ -7,68 +7,45 @@ use App\Events\CustomerApprovalStatusChanged;
 use App\Mail\AccountApprovedMail;
 use App\Mail\AccountRejectedMail;
 use App\Models\Customer;
+use App\Models\Program;
 use App\Repositories\IAccountReviewRepositories;
 use App\Repositories\ICustomerRepositories;
+use App\Repositories\IProgramRepositories;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
-class CustomerService
+class ProgramService
 {
 
-    protected Customer $model;
-    protected ICustomerRepositories $customerRepository;
-    protected IAccountReviewRepositories $accountReviewRepositories;
+    protected Program $model;
+    protected IProgramRepositories $programRepositories;
 
-    public function __construct(ICustomerRepositories $customerRepository  , IAccountReviewRepositories $accountReviewRepositories, Customer $customer)
+    public function __construct(IProgramRepositories $programRepositories ,Program $program)
     {
-        $this->customerRepository = $customerRepository;
-        $this->model = $customer;
-        $this->accountReviewRepositories = $accountReviewRepositories;
+        $this->programRepositories = $programRepositories;
+        $this->model = $program;
 
-    }
-
-    public function register($data): array
-    {
-        try {
-            $customer = $this->customerRepository->create($data);
-            $customerToken =  $customer->createToken('API Token')->plainTextToken;
-            return [
-                'access_token' =>  'Bearer '.$customerToken ,
-                'customer' => $customer
-            ] ;
-        } catch (\Exception $e) {
-             throw new \Exception($e->getMessage());
-        }
     }
 
     public function getAll(array $filters = [], int $limit = 10)
     {
-        $query = $this->model->query();
-        $query->where('account_status', AccountStatus::ACTIVE);
-        if (!empty($filters['type_account'])) {
-            $query->where('type_account', $filters['type_account']);
+        $query = $this->model->query()->with('creator');
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
         }
-        if (!empty($filters['approval_status'])) {
-            $query->where('approval_status', $filters['approval_status']);
-        }
-        if (isset($filters['verified'])) {
-            if ($filters['verified']) {
-                $query->whereNotNull('email_verified_at'); // متحقق
-            } else {
-                $query->whereNull('email_verified_at'); // غير متحقق
-            }
+
+        if (isset($filters['is_approved'])) {
+            $query->where('is_approved', $filters['is_approved']);
         }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function($q) use ($search) {
-                $q->where('full_name', 'LIKE', "%{$search}%")
-                    ->orWhere('email', 'LIKE', "%{$search}%")
-                    ->orWhere('phone', 'LIKE', "%{$search}%");
+                $q->where('title_ar', 'LIKE', "%{$search}%")
+                    ->orWhere('description_ar', 'LIKE', "%{$search}%");
             });
         }
-
         return $query->paginate($limit);
     }
 
