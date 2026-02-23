@@ -17,8 +17,10 @@ class ProgramResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        dd('aa');
         return
         [
+
                  'id' => $this->id ,
 //                'service_provider' => new CustomerResource($this->whenLoaded('customer')),
                 'creator' => new AdminResource($this->whenLoaded('creator')),
