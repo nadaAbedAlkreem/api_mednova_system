@@ -52,7 +52,8 @@ class CustomerResource extends JsonResource
                 'approval_status' => $this->approval_status ,
                 'timezone'=> $this->timezone ?? app('config')->get('app.timezone') ,
                 'email_verified_at'=> $this->email_verified_at,
-                'phone_verified_at' => $this->phone_verified_at
+                'phone_verified_at' => $this->phone_verified_at ,
+                'created_at' => $this->created_at
 
 
             ] ;

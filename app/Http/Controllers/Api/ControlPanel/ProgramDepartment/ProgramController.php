@@ -59,14 +59,35 @@ class ProgramController extends Controller
         }
     }
 
+
+    public function approve(Program $program)
+    {
+        try {
+            $program = $this->programService->approveProgram($program);
+            return $this->successResponse(__('messages.PROGRAM_APPROVED_SUCCESSFULLY'), new ProgramResource($program));
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), [], 400);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProgramRequest $request): \Illuminate\Http\JsonResponse
+//    public function store(StoreProgramRequest $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $program = $this->programRepositories->create($request->getData());
+//            $program->load('creator');
+//            return $this->successResponse(__('messages.CREATE_SUCCESS'), new ProgramResource($program), 201);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
+
+    public function store(StoreProgramRequest $request)
     {
         try {
-            $program = $this->programRepositories->create($request->getData());
-            $program->load('creator');
+            $program = $this->programService->createProgramWithVideos($request->validated());
+
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ProgramResource($program), 201);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

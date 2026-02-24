@@ -19,6 +19,8 @@ class Program extends Model
         'title_en',
         'description_ar',
         'description_en',
+        'what_you_will_learn_ar',
+        'what_you_will_learn_en',
         'cover_image',
         'price',
         'currency',
