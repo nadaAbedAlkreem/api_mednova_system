@@ -13,7 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->enum('status', [
+            $table->renameColumn('status', 'approval_status');
+        });
+
+        // 2️⃣ السماح بكل القيم مؤقتًا
+        Schema::table('customers', function (Blueprint $table) {
+            $table->enum('approval_status', [
                 'active',
                 'not_active',
                 'pending',
@@ -22,23 +27,22 @@ return new class extends Migration
             ])->default('pending')->change();
         });
 
-        // 2️⃣ تحويل البيانات القديمة
-        DB::table('customers')->where('status', 'active')
-            ->update(['status' => 'approved']);
+        // 3️⃣ تحويل البيانات القديمة
+        DB::table('customers')
+            ->where('approval_status', 'active')
+            ->update(['approval_status' => 'approved']);
 
-        DB::table('customers')->where('status', 'not_active')
-            ->update(['status' => 'pending']);
+        DB::table('customers')
+            ->where('approval_status', 'not_active')
+            ->update(['approval_status' => 'pending']);
 
-        // 3️⃣ حذف القيم القديمة من enum
+        // 4️⃣ حذف القيم القديمة من enum
         Schema::table('customers', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected'])
-                ->default('pending')
-                ->change();
-        });
-
-//             4️⃣ إعادة تسمية العمود
-        Schema::table('customers', function (Blueprint $table) {
-                $table->renameColumn('status', 'approval_status');
+            $table->enum('approval_status', [
+                'pending',
+                'approved',
+                'rejected'
+            ])->default('pending')->change();
         });
 
     }

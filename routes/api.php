@@ -80,43 +80,6 @@ use Illuminate\Support\Facades\Route;
             Route::post('handle',[ZoomWebhookController::class, 'handle']);
         });
         Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
-        Route::prefix('control-panel')->group(function () {
-             Route::prefix('auth')->group(function ()
-             {
-                 Route::post('/login', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'login'])->name('login-control');
-             });
-             Route::middleware(['auth:admin'])->group(function () {
-                 Route::post('/logout', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'logout']);
-                 Route::prefix('users')->group(function () {
-                     Route::get('/', [UserController::class, 'getAll']);
-                     Route::get('/{id}', [UserController::class, 'getById']);
-//                     Route::patch('{id}/block', [UserController::class, 'toggleBlock']);
-                     Route::patch('{id}/status', [UserController::class, 'updateApprovalStatus']);
-                     Route::patch('{id}/status-account', [UserController::class, 'updateAccountStatus']);
-//                Route::put('{id}', [UserController::class, 'update']);
-                     Route::delete('{id}', [UserController::class, 'destroy']);
-                 });
-
-                 Route::prefix('programs')->group(function () {
-                     Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
-                     Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
-                     Route::post('{id}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
-                     Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
-                     Route::post('update', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']);
-                     Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
-                     Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
-
-                 });
-
-                 //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
-                 Route::prefix('/videos')->group(function () {
-                     Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-                     Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
-                     Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
-                 });
-
-             });
-        });
 
         Route::middleware(['auth:api'])->group(function () {
             Route::post('/logout', [LoginController::class, 'logout']);
@@ -222,4 +185,43 @@ use Illuminate\Support\Facades\Route;
             });
 
         });
+
+
+
+        Route::prefix('control-panel')->group(function () {
+                Route::prefix('auth')->group(function ()
+                {
+                    Route::post('/login', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'login'])->name('login-control');
+                });
+                Route::middleware(['auth:admin'])->group(function () {
+                    Route::post('/logout', [\App\Http\Controllers\Api\ControlPanel\Auth\LoginController::class, 'logout']);
+                    Route::prefix('users')->group(function () {
+                        Route::get('/', [UserController::class, 'getAll']);
+                        Route::get('/{id}', [UserController::class, 'getById']);
+            //                     Route::patch('{id}/block', [UserController::class, 'toggleBlock']);
+                        Route::patch('{id}/status', [UserController::class, 'updateApprovalStatus']);
+                        Route::patch('{id}/status-account', [UserController::class, 'updateAccountStatus']);
+            //                Route::put('{id}', [UserController::class, 'update']);
+                        Route::delete('{id}', [UserController::class, 'destroy']);
+                    });
+
+                    Route::prefix('programs')->group(function () {
+                        Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
+                        Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
+                        Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
+                        Route::patch('{program}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
+                        Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
+                        Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
+                        Route::prefix('/videos')->group(function () {
+                            Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+                            Route::post('/{videoId}', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+                            Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+                        });
+
+                    });
+
+                    //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+
+                });
+            });
 
