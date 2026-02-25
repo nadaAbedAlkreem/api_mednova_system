@@ -10,7 +10,7 @@ class VideoConsultationStatusService
 {
     protected ZoomMeetingService $zoomMeetingService;
 //    private const REMINDER_LEVELS = [200, 300, 700];
-    private const REMINDER_LEVELS = [10, 30, 60]; // بالدقائق
+    private const REMINDER_LEVELS = [1, 30, 60]; // بالدقائق
 
     public function __construct(ZoomMeetingService $zoomMeetingService)
     {

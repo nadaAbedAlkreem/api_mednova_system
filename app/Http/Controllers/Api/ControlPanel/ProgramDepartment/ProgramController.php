@@ -87,13 +87,22 @@ class ProgramController extends Controller
     {
         try {
             $program = $this->programService->createProgramWithVideos($request->validated());
-
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ProgramResource($program), 201);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
-
+    public function update(UpdateProgramRequest $request, Program $program): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $program = $this->programService->updateProgramWithVideos(
+                $program,
+                $request);
+            return $this->successResponse(__('messages.UPDATE_SUCCESS'), new ProgramResource($program));
+        } catch (\Exception $exception) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+        }
+    }
     /**
      * Display the specified resource.
      */
@@ -121,15 +130,15 @@ class ProgramController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProgramRequest $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $program = $this->programRepositories->update($request->getData(), $request['program_id']);
-            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-        }
-    }
+//    public function update(UpdateProgramRequest $request): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $program = $this->programRepositories->update($request, $request['program_id']);
+//            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
 
     /**
      * Remove the specified resource from storage.

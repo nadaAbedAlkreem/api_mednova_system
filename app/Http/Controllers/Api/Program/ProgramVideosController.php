@@ -9,6 +9,7 @@ use App\Http\Resources\Api\Program\ProgramResource;
 use App\Models\Program;
 use App\Models\ProgramVideos;
 use App\Repositories\IProgramVideosRepositories;
+use App\Services\Api\Customer\UploadService;
 use App\Traits\ResponseTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -80,14 +81,36 @@ class ProgramVideosController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProgramVideosRequest $request): \Illuminate\Http\JsonResponse
+    public function update(UpdateProgramVideosRequest $request, ProgramVideos $video)
     {
         try {
-            $video =$this->programVideosRepositories->update($request->getData() , $request['video_id']);
-            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201,);
-        }catch (\Exception $exception){
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
+            $data = $request->validated();
+            if ($request->hasFile('video_path')) {
+                $uploadService = new UploadService();
+                $path = $uploadService->upload(
+                    $request->file('video_path'),
+                    'program_videos',
+                    'public',
+                    'videos'
+                );
+                $data['video_path'] = asset('storage/' . $path);
+            }
+
+            $video->update($data);
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.UPDATE_SUCCESS'),
+                'data' => $video->fresh()
+            ]);
+
+        } catch (\Exception $exception) {
+
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.ERROR_OCCURRED'),
+                'error' => $exception->getMessage()
+            ], 500);
         }
     }
 
