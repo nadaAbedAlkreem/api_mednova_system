@@ -25,6 +25,7 @@ class ProgramResource extends JsonResource
                 'creator' => new AdminResource($this->whenLoaded('creator')),
                 'title' => $this->title_ar ,
                 'description' => $this->description_ar ,
+                'what_you_will_learn' => $this->what_you_will_learn_ar,
                 'cover_image' => $this->cover_image ,
                 'videos'=> VideoResource::collection($this->whenLoaded('videos')),
                 'price' => $this->price ,

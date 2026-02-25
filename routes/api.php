@@ -206,18 +206,19 @@ use Illuminate\Support\Facades\Route;
                     });
 
                     Route::prefix('programs')->group(function () {
-                        Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
-                        Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
-                        Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
-                        Route::post('/{program}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']);
-                        Route::patch('{program}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
-                        Route::put('program-videos/{video}', [ProgramVideosController::class, 'update']);
-                        Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
+                        Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']); // done
+                        Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']); //done
+                        Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);// done
+                        Route::post('/{program}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']); //done
+                        Route::patch('{program}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']); // done
+                        Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']); // done
                         Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
                         Route::prefix('/videos')->group(function () {
                             Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-                            Route::post('/{videoId}', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+                            Route::post('{video}', [ProgramVideosController::class, 'update']); // done
                             Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+                            Route::get('{videoId}', [ProgramVideosController::class, 'show']); //done
+
                         });
 
                     });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\api\program\StoreProgramVideosRequest;
 use App\Http\Requests\api\program\UpdateProgramVideosRequest;
 use App\Http\Resources\Api\Program\ProgramResource;
+use App\Http\Resources\Api\Program\VideoResource;
 use App\Models\Program;
 use App\Models\ProgramVideos;
 use App\Repositories\IProgramVideosRepositories;
@@ -65,9 +66,17 @@ class ProgramVideosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProgramVideos $programVideos)
+    public function show($programVideos)
     {
-        //
+        try {
+            $video = $this->programVideosRepositories->findOne($programVideos);
+            if (!$video) {
+                return $this->errorResponse(__('messages.VIDEO_NOT_FOUND'), [], 404);
+            }
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new VideoResource($video), 200);
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -84,33 +93,15 @@ class ProgramVideosController extends Controller
     public function update(UpdateProgramVideosRequest $request, ProgramVideos $video)
     {
         try {
-
             $data = $request->validated();
             if ($request->hasFile('video_path')) {
                 $uploadService = new UploadService();
-                $path = $uploadService->upload(
-                    $request->file('video_path'),
-                    'program_videos',
-                    'public',
-                    'videos'
-                );
-                $data['video_path'] = asset('storage/' . $path);
-            }
-
-            $video->update($data);
-            return response()->json([
-                'success' => true,
-                'message' => __('messages.UPDATE_SUCCESS'),
-                'data' => $video->fresh()
-            ]);
-
+                $path = $uploadService->upload($request->file('video_path'), 'program_videos', 'public', 'videos');
+                $data['video_path'] = asset('storage/' . $path);}
+                $video->update($data);
+            return response()->json(['success' => true, 'message' => __('messages.UPDATE_SUCCESS'), 'data' => $video->fresh()]);
         } catch (\Exception $exception) {
-
-            return response()->json([
-                'success' => false,
-                'message' => __('messages.ERROR_OCCURRED'),
-                'error' => $exception->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => __('messages.ERROR_OCCURRED'), 'error' => $exception->getMessage()], 500);
         }
     }
 
