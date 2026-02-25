@@ -31,7 +31,8 @@ class VideoConsultationStatusService
 
         foreach ($consultations as $consultation) {
 //            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
+//            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
+            $minutes = Carbon::parse($consultation->created_at)->diffInSeconds($now);
 
             Log::info('pending-check', [
                 'consultation_id' => $consultation->id,
@@ -157,7 +158,8 @@ class VideoConsultationStatusService
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
             $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
 //            $seconds = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
+//            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
+            $minutes = Carbon::parse($timeBecameActive)->diffInSeconds($now);
 
             Log::info('$minutes' .$minutes);
 
