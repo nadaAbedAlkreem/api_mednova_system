@@ -209,7 +209,9 @@ use Illuminate\Support\Facades\Route;
                         Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']);
                         Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']);
                         Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);
+                        Route::post('/{program}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']);
                         Route::patch('{program}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']);
+                        Route::put('program-videos/{video}', [ProgramVideosController::class, 'update']);
                         Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']);
                         Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
                         Route::prefix('/videos')->group(function () {
