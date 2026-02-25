@@ -11,7 +11,7 @@ class ProgramVideos extends Model
     /** @use HasFactory<\Database\Factories\ProgramVideosFactory> */
     use HasFactory ,SoftDeletes;
     protected $table = 'program_videos';
-    protected $fillable = ['program_id', 'title_ar' ,'description_ar', 'description_en', 'title_en' , 'video_path' , 'duration_minute', 'order' , 'is_program_intro'];
+    protected $fillable = ['program_id', 'title_ar' ,'description_ar', 'description_en', 'title_en' , 'video_path' , 'duration_minute', 'order' , 'is_program_intro' , 'is_free'];
     public function program()
     {
         return $this->belongsTo(Program::class);

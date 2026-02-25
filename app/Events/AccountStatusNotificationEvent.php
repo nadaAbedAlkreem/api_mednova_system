@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Enums\StatusType;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +17,7 @@ class AccountStatusNotificationEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return ['customer.' . $this->customerId];
+        return new PrivateChannel('customer.' . $this->customerId);
     }
 
     public function broadcastAs()

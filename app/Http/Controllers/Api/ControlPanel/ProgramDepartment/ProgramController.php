@@ -95,9 +95,7 @@ class ProgramController extends Controller
     public function update(UpdateProgramRequest $request, Program $program): \Illuminate\Http\JsonResponse
     {
         try {
-            $program = $this->programService->updateProgramWithVideos(
-                $program,
-                $request);
+            $program = $this->programService->updateProgramWithVideos($program, $request);
             return $this->successResponse(__('messages.UPDATE_SUCCESS'), new ProgramResource($program));
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
@@ -118,27 +116,6 @@ class ProgramController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Program $program)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-//    public function update(UpdateProgramRequest $request): \Illuminate\Http\JsonResponse
-//    {
-//        try {
-//            $program = $this->programRepositories->update($request, $request['program_id']);
-//            return $this->successResponse(__('messages.UPDATE_SUCCESS'), [], 201);
-//        } catch (\Exception $exception) {
-//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-//        }
-//    }
 
     /**
      * Remove the specified resource from storage.

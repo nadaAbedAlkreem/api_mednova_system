@@ -39,18 +39,17 @@ class UpdateProgramVideosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'video_id' => 'required|exists:program_videos,id,deleted_at,NULL',
-            'video.title_ar' => 'nullable|string|max:255',
-            'videos.*.what_you_will_learn_ar' => 'string|max:255',
+//            'program_id' => 'required|exists:programs,id,deleted_at,NULL',
+            'title_ar' => 'sometimes|string|max:255',
 //            'videos.*.what_you_will_learn_en' => 'required|string|max:255',
-            'videos.*.description_ar' => 'string|max:255',
+            'description_ar' => 'sometimes|string|max:255',
 //            'videos.*.description_en' => 'required|string|max:255',
-            'video.duration_minute' => 'nullable|integer|min:0',
-            'video.order' => 'nullable|integer|min:0',
+            'duration_minute' => 'sometimes|integer|min:0',
+            'order' => 'sometimes|integer|min:0',
  //            'video.title_en' => 'nullable|string|max:255',
-            'video.video_path' => 'nullable|file|mimes:mp4,mov,avi|max:512000',
-            'videos.*.is_program_intro' => 'nullable|boolean',
-            'video.is_free' => 'nullable|boolean',
+            'video_path' => 'sometimes|file|mimes:mp4,mov,avi|max:512000',
+            'is_program_intro' => 'sometimes|boolean',
+            'is_free' => 'sometimes|boolean',
         ];
     }
 
@@ -58,8 +57,8 @@ class UpdateProgramVideosRequest extends FormRequest
     {
         return [
             // برنامج الفيديو
-            'video_id.required' => __('validation.required', ['attribute' => __('validation.attributes.video_id')]),
-            'video_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.video_id')]),
+            'program_id.required' => __('validation.required', ['attribute' => __('validation.attributes.program_id')]),
+            'program_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.program_id')]),
 
             'video.title_ar.string' => __('validation.string', ['attribute' => __('validation.attributes.video_title_ar')]),
             'video.title_ar.max' => __('validation.max.string', ['attribute' => __('validation.attributes.video_title_ar'), 'max' => 255]),
@@ -88,19 +87,19 @@ class UpdateProgramVideosRequest extends FormRequest
     }
 
 
-    public function getData()
-    {
-        $uploadService = new UploadService();
-        $data= $this::validated();
-        if (isset($data['video_path'])) {
-                 if ($this->hasFile("video_path")) {
-                    $path = $uploadService->upload(
-                        $this->file("video_path"), 'program_video', 'public', 'videos');
-                    $data['video_path'] = asset('storage/' . $path);
-            }
-        }
-        return $data;
-    }
+//    public function getData()
+//    {
+//        $uploadService = new UploadService();
+//        $data= $this::validated();
+//        if (isset($data['video_path'])) {
+//                 if ($this->hasFile("video_path")) {
+//                    $path = $uploadService->upload(
+//                        $this->file("video_path"), 'program_video', 'public', 'videos');
+//                    $data['video_path'] = asset('storage/' . $path);
+//            }
+//        }
+//        return $data;
+//    }
 
 
 

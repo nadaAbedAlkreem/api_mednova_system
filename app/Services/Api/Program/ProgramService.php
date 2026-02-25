@@ -184,7 +184,6 @@ class ProgramService
 
         $program->update([
             'is_approved' => true,
-            'status' => 'published',
         ]);
 
         return $program->fresh();
@@ -193,27 +192,16 @@ class ProgramService
     public function updateProgramWithVideos(Program $program,  $request): Program
     {
         return DB::transaction(function () use ($program, $request) {
-
-            // تحديث صورة الغلاف لو موجودة
-            if ($request->hasFile('cover_image')) {
+            $data = $request->validated();
+            if ($request->hasFile('cover_image'))
+            {
                 $uploadService = new UploadService();
-                $path = $uploadService->upload(
-                    $request->file('cover_image'),
-                    'program_images',
-                    'public',
-                    'programs'
-                );
-
+                $path = $uploadService->upload($request->file('cover_image'), 'program_images', 'public', 'programs');
                 $data['cover_image'] = asset('storage/' . $path);
             }
-
-            if (!empty($data['creator_id'])) {
-                $data['creator_type'] = \App\Models\Admin::class;
-            }
+            if (!empty($data['creator_id'])) {$data['creator_type'] = \App\Models\Admin::class;}
             $program->update($data);
-
             $program->load(['videos', 'creator']);
-
             return $program;
         });
     }
