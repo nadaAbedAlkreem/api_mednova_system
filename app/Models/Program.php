@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProgramStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,7 +26,7 @@ class Program extends Model
         'price',
         'currency',
         'status',
-        'is_approved'
+//        'is_approved'
     ];
     protected $appends = [
         'total_duration_minutes',
@@ -36,8 +37,8 @@ class Program extends Model
     ];
     public function scopePublic(Builder $query): Builder
     {
-        return $query->where('status', 'published')
-            ->where('is_approved', true);
+        return $query->where('status', ProgramStatus::Approved );
+//            ->where('is_approved', true);
     }
     public function getTotalDurationMinutesAttribute(): int
     {
@@ -64,7 +65,74 @@ class Program extends Model
             });
         });
     }
+    public function approve(): void
+    {
+        if (!$this->canBeApproved()) {
+            throw new \DomainException(__('messages.PROGRAM_NOT_READY_FOR_APPROVAL'));
+        }
 
+        $this->update([
+            'status' => ProgramStatus::Approved->value,
+        ]);
+    }
+    public function reject(?string $reason = null): void
+    {
+        if ($this->status === ProgramStatus::Rejected->value) {
+            throw new \DomainException(__('messages.PROGRAM_ALREADY_REJECTED'));
+        }
+
+        if ($this->status === ProgramStatus::Approved->value) {
+            throw new \DomainException(__('messages.APPROVED_PROGRAM_CANNOT_BE_REJECTED'));
+        }
+
+        $this->update([
+            'status' => ProgramStatus::Rejected->value,
+            // 'rejection_reason' => $reason //
+        ]);
+    }
+    public function canBeApproved(): bool
+    {
+        return $this->hasRequiredArabicData()
+            && $this->hasAtLeastOneVideo()
+            && $this->hasValidVideosData()
+            && $this->hasIntroVideo()
+            && $this->hasValidVideoOrdering();
+    }
+    protected function hasRequiredArabicData(): bool
+    {
+        return !empty($this->title_ar)
+            && !empty($this->description_ar)
+            && !empty($this->what_you_will_learn_ar);
+    }
+    protected function hasAtLeastOneVideo(): bool
+    {
+        return $this->videos()->count() > 0;
+    }
+    protected function hasValidVideosData(): bool
+    {
+        return !$this->videos()->where(function ($q) {
+            $q->whereNull('title_ar')
+                ->orWhereNull('video_path')
+                ->orWhereNull('duration_minute');
+        })->exists();
+    }
+    protected function hasIntroVideo(): bool
+    {
+        return $this->videos()
+                ->where('is_program_intro', true)
+                ->count() === 1;
+    }
+    protected function hasValidVideoOrdering(): bool
+    {
+        $orders = $this->videos()
+            ->orderBy('order')
+            ->pluck('order')
+            ->toArray();
+        if (count($orders) !== count(array_unique($orders))) {
+            return false;
+        }
+        return $orders === range(1, count($orders));
+    }
     public function ratings()
     {
         return $this->morphMany(Rating::class, 'reviewee');

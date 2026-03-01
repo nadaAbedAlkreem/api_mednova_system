@@ -16,6 +16,19 @@ return [
         'in' => 'The nature of the challenge must be determined, whether individual enter (I) or enter (T) team.',
     ],
     'unique' => 'unique ',
+    'PROGRAM_ALREADY_APPROVED' => 'This program has already been approved.',
+
+    'PROGRAM_ALREADY_REJECTED' => 'This program has already been rejected.',
+
+    'APPROVED_PROGRAM_CANNOT_BE_REJECTED' => 'An approved program cannot be rejected.',
+
+    'PROGRAM_NOT_READY_FOR_APPROVAL' => 'The program is not ready for approval. Please complete all required information before submitting it for approval.',
+
+    'PROGRAM_APPROVED_SUCCESSFULLY' => 'The program has been approved successfully.',
+
+    'PROGRAM_REJECTED_SUCCESSFULLY' => 'The program has been rejected successfully.',
+
+    'INVALID_STATUS_TRANSITION' => 'The requested status transition is not allowed.',
 
     'name' => [
         'required' => 'Name field is required.',

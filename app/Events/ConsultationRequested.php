@@ -20,7 +20,7 @@ class ConsultationRequested
         $this->consultation = $consultation->load(['patient', 'consultant']);
         $this->message = $message;
         $this->eventType = $eventType;
-        Log::info('Listener executed for ConsultationRequested', [
+        Log::info('Listener executed for ConsultationRequested -----', [
             'consultation_id' => $consultation->id,
           ]);
     }

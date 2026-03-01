@@ -28,7 +28,7 @@ class SendConsultationNotification
         $eventType = $event->eventType;
         $message = $event->message;
 
-        Log::info('Listener executed for Consultation Event', [
+        Log::info('Listener executed for Consultation Event -----------', [
             'consultation_id' => $consultation->id,
             'event_type' => $eventType,
         ]);

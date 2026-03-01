@@ -2,6 +2,7 @@
 namespace App\Services\Api\Program;
 
 
+use App\Enums\ProgramStatus;
 use App\Models\ProgramEnrollment;
 
 
@@ -14,8 +15,7 @@ class EnrollmentService
 
         $topEnrolled = ProgramEnrollment::query()
             ->whereHas('program', function ($query) {
-                $query->where('is_approved', 1)
-                    ->where('status', 'published');
+                $query->where('status', ProgramStatus::Approved );
             })
             ->with([
                 'program' => function ($query) {
