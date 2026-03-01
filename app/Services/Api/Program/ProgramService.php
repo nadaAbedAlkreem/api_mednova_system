@@ -49,7 +49,10 @@ class ProgramService
                     ->orWhere('description_ar', 'LIKE', "%{$search}%");
             });
         }
-        return $query->paginate($limit);
+        $results = $query->orderBy('id', 'desc')->paginate($limit); // الترتيب من الأحدث للأقدم
+        $results->appends($filters);
+        return $results;
+
     }
 
     public function approve(Program $program): Program

@@ -32,7 +32,16 @@ class ProgramController extends Controller
               $limit = $request->query('limit') ?? 10;
               $filters = $request->only(['search', 'status', 'is_approved']);
               $programs = $this->programService->getAll($filters, $limit);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ProgramResource::collection($programs), 200);
+            return $this->successResponse(
+                __('messages.DATA_RETRIEVED_SUCCESSFULLY'),
+                ProgramResource::collection($programs) ,200 ,[
+                'current_page' => $programs->currentPage(),
+                'per_page' => $programs->perPage(),
+                'total' => $programs->total(),
+                'last_page' => $programs->lastPage(),
+                'from' => $programs->firstItem(),
+                'to' => $programs->lastItem(),
+                'has_more_pages' => $programs->hasMorePages()]);
         } catch (\Exception $e) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'),['error' => $e->getMessage()],500);
         }

@@ -34,7 +34,7 @@ class ProgramEnrollmentController extends Controller
     {
         try {
             $reviewees = $this->enrollmentService->handle($request);
-            return $this->successResponse('DATA_RETRIEVED_SUCCESSFULLY', ProgramResource::collection($reviewees) , 202, app()->getLocale());
+            return $this->successResponse('DATA_RETRIEVED_SUCCESSFULLY', ProgramResource::collection($reviewees) , 202);
         }catch (\Exception $exception){
             return $this->errorResponse('ERROR_OCCURRED', ['error' => $exception->getMessage()], 500);
         }
