@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -79,7 +80,7 @@ use Illuminate\Support\Facades\Route;
 //        {
 //            Route::post('handle',[ZoomWebhookController::class, 'handle']);
 //        });
-Route::get('/api/zoom-webhook/handle', function (Request $request) {
+Route::get('/zoom-webhook/handle', function (Request $request) {
     if ($request->has('validationToken')) {
         return response($request->query('validationToken'), 200)
             ->header('Content-Type', 'text/plain');
