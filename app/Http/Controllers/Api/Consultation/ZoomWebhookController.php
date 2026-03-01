@@ -61,7 +61,7 @@ class ZoomWebhookController extends Controller
         }
 
 //         After validation: handle real events
-       $this->zoomWebhookService->handleEvent($request->all());
+//       $this->zoomWebhookService->handleEvent($request->all());
 
         Log::info('ZoomWebhook Event:', $request->all());
 
