@@ -76,17 +76,11 @@ use Illuminate\Support\Facades\Route;
             Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
             Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
         });
-//        Route::prefix('zoom-webhook')->group(function ()
-//        {
-//            Route::post('handle',[ZoomWebhookController::class, 'handle']);
-//        });
-Route::get('/zoom-webhook/handle', function (Request $request) {
-    if ($request->has('validationToken')) {
-        return response($request->query('validationToken'), 200)
-            ->header('Content-Type', 'text/plain');
-    }
-    return response()->json(['message' => 'OK'], 200);
-});
+        Route::prefix('zoom-webhook')->group(function ()
+        {
+            Route::post('handle',[ZoomWebhookController::class, 'handle']);
+        });
+
         Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
 
         Route::middleware(['auth:api'])->group(function () {
