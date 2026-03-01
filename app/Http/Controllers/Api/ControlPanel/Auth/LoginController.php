@@ -27,13 +27,9 @@ class LoginController extends Controller
               $credentials = $request->only('email', 'password');
               $token = $this->adminRepo->login($credentials);
               $admin = Auth::guard('admin')->user();
-              return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
-                   [
-                   'access_token' =>'Bearer ' . $token,
-                   'admin' => new  AdminResource($admin),
-               ], 202,app()->getLocale());
+              return $this->successResponse('LOGGED_IN_SUCCESSFULLY', ['access_token' =>'Bearer ' . $token, 'admin' => new  AdminResource($admin),], 202);
           } catch (\Exception $e) {
-              return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
+              return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
           }
     }
 
