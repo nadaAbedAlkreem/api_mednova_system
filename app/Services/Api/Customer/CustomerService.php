@@ -62,14 +62,18 @@ class CustomerService
         }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'LIKE', "%{$search}%")
                     ->orWhere('email', 'LIKE', "%{$search}%")
                     ->orWhere('phone', 'LIKE', "%{$search}%");
             });
         }
 
-        return $query->paginate($limit);
+        $results = $query->orderBy('id', 'desc')->paginate($limit); // الترتيب من الأحدث للأقدم
+        $results->appends($filters);
+        return $results;
+
+
     }
 
 

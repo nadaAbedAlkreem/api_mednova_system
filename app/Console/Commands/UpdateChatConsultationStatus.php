@@ -45,18 +45,18 @@ class UpdateChatConsultationStatus extends Command
             ->where('status', $status)
             ->whereNotNull($timeField)
             ->whereNull('ended_at')
-//            ->where('created_at', '<',  now()->subHours(6))
-            ->where($timeField, '<',  now()->subHours(6))
+//            ->where($timeField, '<',  now()->subHours(6))
             ->chunkById(100, function ($consultations) use ($now, $shouldRemind, $status, $timeField) {
                 foreach ($consultations as $consultation) {
                      $timeValue = $consultation->$timeField;
 //                    if (!($timeValue instanceof Carbon)) {
 //                        $timeValue = Carbon::parse($timeValue);
 //                    }
-//                    $secondsSince = $timeValue->diffInSeconds($now);
+                    $hoursSince = $timeValue->diffInSeconds($now);
                     if ($timeValue) {
 //                        $secondsSince = $now->getTimestamp() - $timeValue->getTimestamp();
-                        $hoursSince = $timeValue->diffInHours($now);
+//                        $hoursSince = $timeValue->diffInHours($now);
+                        $hoursSince = $now->getTimestamp() - $timeValue->getTimestamp();
 
                     } else {
                         continue;

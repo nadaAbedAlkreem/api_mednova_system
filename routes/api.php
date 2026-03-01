@@ -75,10 +75,17 @@ use Illuminate\Support\Facades\Route;
             Route::post('store-response-command', [GloveCommandController::class, 'receiveResponseCommand']);
             Route::post('receive-bio-readings', [GloveDataController::class, 'store']);
         });
-        Route::prefix('zoom-webhook')->group(function ()
-        {
-            Route::post('handle',[ZoomWebhookController::class, 'handle']);
-        });
+//        Route::prefix('zoom-webhook')->group(function ()
+//        {
+//            Route::post('handle',[ZoomWebhookController::class, 'handle']);
+//        });
+Route::get('/api/zoom-webhook/handle', function (Request $request) {
+    if ($request->has('validationToken')) {
+        return response($request->query('validationToken'), 200)
+            ->header('Content-Type', 'text/plain');
+    }
+    return response()->json(['message' => 'OK'], 200);
+});
         Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
 
         Route::middleware(['auth:api'])->group(function () {
@@ -211,8 +218,8 @@ use Illuminate\Support\Facades\Route;
                         Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);// done
                         Route::post('/{program}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'update']); //done
                         Route::patch('{program}/approve', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'approve']); // done
+                        Route::patch('{program}/reject', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'reject']); // done
                         Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']); // done
-                        Route::get('{id}/publish', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'publish']);
                         Route::prefix('/videos')->group(function () {
                             Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
                             Route::post('{video}', [ProgramVideosController::class, 'update']); // done

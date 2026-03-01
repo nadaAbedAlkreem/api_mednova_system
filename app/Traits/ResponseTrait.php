@@ -15,7 +15,7 @@ trait ResponseTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    public function successResponse($messageCode,  $data = [], $statusCode = 200  , $lang = 'ar'): \Illuminate\Http\JsonResponse
+    public function successResponse($messageCode,  $data = [],  $statusCode = 200  , $pagination = null, $lang = 'ar'): \Illuminate\Http\JsonResponse
     {
 //        $message = Messages::getMessage($messageCode   , $lang);
         $status = HttpStatus::getHttpStatus($statusCode);
@@ -24,6 +24,7 @@ trait ResponseTrait
             'success' => true,
             'message' => $messageCode,
             'data' => $data,
+            'pagination' => $pagination,
             'status' => $status
         ], $statusCode);
     }

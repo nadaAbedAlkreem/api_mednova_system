@@ -39,9 +39,9 @@ class ProgramService
             $query->where('status', $filters['status']);
         }
 
-        if (isset($filters['is_approved'])) {
-            $query->where('is_approved', $filters['is_approved']);
-        }
+//        if (isset($filters['is_approved'])) {
+//            $query->where('is_approved', $filters['is_approved']);
+//        }
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function($q) use ($search) {
@@ -50,6 +50,24 @@ class ProgramService
             });
         }
         return $query->paginate($limit);
+    }
+
+    public function approve(Program $program): Program
+    {
+        if ($program->status === ProgramStatus::Approved->value) {
+            throw new \Exception(__('messages.PROGRAM_ALREADY_APPROVED'));
+        }
+
+        $program->approve();
+
+        return $program->fresh();
+    }
+
+    public function reject(Program $program, ?string $reason = null): Program
+    {
+        $program->reject($reason);
+
+        return $program->fresh();
     }
 
 
@@ -138,7 +156,7 @@ class ProgramService
             }
 
             $data['status'] = $data['status'] ?? 'draft';
-            $data['is_approved'] = $data['is_approved'] ?? false;
+//            $data['is_approved'] = $data['is_approved'] ?? false;
 
             $programData = collect($data)->except('videos')->toArray();
             $program = Program::create($programData);
@@ -167,24 +185,20 @@ class ProgramService
         });
     }
 
-    public function approveProgram(Program $program): Program
+    public function updateCourseStatus(Program $program): Program
     {
-        if ($program->is_approved) {
+        if ($program->status === ProgramStatus::Approved->value) {
             throw new \Exception(__('messages.PROGRAM_ALREADY_APPROVED'));
         }
-
-        if ($program->status === ProgramStatus::Archived->value) {
-            throw new \Exception(__('messages.CANNOT_APPROVE_ARCHIVED_PROGRAM'));
-        }
-
-        if ($program->status === ProgramStatus::Draft->value) {
-            throw new \Exception(__('messages.CANNOT_APPROVE_DRAFT_PROGRAM'));
+        if ($program->status === ProgramStatus::Rejected->value) {
+            throw new \Exception(__('messages.PROGRAM_ALREADY_REJECTED'));
         }
 
 
-        $program->update([
-            'is_approved' => true,
-        ]);
+//
+//        $program->update([
+//            'is_approved' => true,
+//        ]);
 
         return $program->fresh();
     }

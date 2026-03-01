@@ -14,10 +14,20 @@ return [
     'CANNOT_REJECT_APPROVED_ACCOUNT' => 'لا يمكن رفض الحساب بعد اعتماده. يمكنك حظر الحساب أو إيقافه بدلاً من ذلك.',
     'CUSTOMER_CANNOT_BE_DELETED_HAS_ACTIVE_RELATIONS' => 'لا يمكن حذف هذا الحساب لأنه يحتوي على استشارات أو بيانات مرتبطة نشطة.',
     'PROGRAM_ALREADY_APPROVED' => 'البرنامج تم اعتماده مسبقاً.',
+    'PROGRAM_ALREADY_REJECTED' => 'البرنامج تم رفضه مسبقاً.',
     'PROGRAM_APPROVED_SUCCESSFULLY' => 'البرنامج تم اعتماده بنجاح ',
 
     'CANNOT_APPROVE_ARCHIVED_PROGRAM' => 'لا يمكن اعتماد برنامج مؤرشف.',
 
+    'APPROVED_PROGRAM_CANNOT_BE_REJECTED' => 'لا يمكن رفض برنامج تم اعتماده.',
+
+    'PROGRAM_NOT_READY_FOR_APPROVAL' => 'البرنامج غير جاهز للاعتماد. يرجى استكمال جميع البيانات المطلوبة قبل طلب الاعتماد.',
+
+    'PROGRAM_REJECTED_SUCCESSFULLY' => 'تم رفض البرنامج بنجاح.',
+
+    'INVALID_STATUS_TRANSITION' => 'لا يمكن تغيير حالة البرنامج إلى الحالة المطلوبة.',
+
+    'REJECTION_REASON_REQUIRED' => 'سبب الرفض مطلوب.',
     'CANNOT_APPROVE_DRAFT_PROGRAM' => 'لا يمكن اعتماد برنامج بحالة مسودة. يجب نشره أولاً.',
     'CUSTOMER_BLOCKED' => 'تم حظر حساب العميل بنجاح.',
     'CUSTOMER_UNBLOCKED' => 'تم رفع الحظر عن حساب العميل بنجاح.',

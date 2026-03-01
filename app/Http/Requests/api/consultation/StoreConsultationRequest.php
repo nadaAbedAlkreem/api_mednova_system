@@ -49,9 +49,8 @@ class StoreConsultationRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
-
-             $patient = \App\Models\Customer::find($this->patient_id);
+            $validator->after(function ($validator) {
+            $patient = \App\Models\Customer::find($this->patient_id);
             $consultant = \App\Models\Customer::find($this->consultant_id);
 
             if ($patient && $patient->type_account !== 'patient') {
@@ -63,26 +62,23 @@ class StoreConsultationRequest extends FormRequest
             }
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
-            // تحويل وقت البدء إلى UTC
-            if ($this->filled('requested_time') && $this->filled('timezone') && $this->filled($this['requested_day'])) {
-                $requestedTimeUtc = TimezoneService::toUTC($this->requested_time, $patientTimezone);
-
-            $statuses = [
-                'pending'  => __('messages.consultation_pending'),
-                'accepted' => __('messages.consultation_accepted'),
-                'active'   => __('messages.consultation_active'),
-            ];
-
+            $statuses =
+                [
+                    'pending'  => __('messages.consultation_pending'),
+                    'accepted' => __('messages.consultation_accepted'),
+                    'active'   => __('messages.consultation_active'),
+                ];
             if($this['consultant_nature'] == 'chat')
-               {
-                   $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
-                       ->where('consultant_id', $this->consultant_id)
-                       ->whereIn('status', array_keys($statuses))
-                       ->first();
-                   if ($exists) {
-                       $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
-                   }
-               }elseif($this['consultant_nature'] == 'video')
+            {
+                 $exists =  ConsultationChatRequest::where('patient_id', $this->patient_id)
+                        ->where('consultant_id', $this->consultant_id)
+                        ->whereIn('status', array_keys($statuses))
+                        ->first();
+                  if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
+            }
+            if ($this->filled('requested_time') && $this->filled('timezone') && $this->filled('requested_day')) {
+               $requestedTimeUtc = TimezoneService::toUTC($this->requested_time, $patientTimezone);
+               if($this['consultant_nature'] == 'video')
                 {
                     $exists = ConsultationVideoRequest::where('patient_id', $this->patient_id)
                         ->where('consultant_id', $this->consultant_id)
@@ -91,18 +87,9 @@ class StoreConsultationRequest extends FormRequest
                         })
                         ->whereIn('status', array_keys($statuses))
                         ->first();
-                    if ($exists) {
-
-                        $validator->errors()->add('duplicate_request', $statuses[$exists->status]);
-                    }
-
-
-                    // وقت الآن حسب منطقة المريض
+                    if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
                     $nowPatientTime = Carbon::now($patientTimezone);
-
-                    try {
-                        $requestedAt = Carbon::parse($this['requested_time']);
-                    } catch (\Exception $e) {
+                    try {$requestedAt = Carbon::parse($this['requested_time']);} catch (\Exception $e) {
                         $validator->errors()->add(
                             'requested_time',
                             'صيغة التاريخ/الوقت غير صحيحة.'

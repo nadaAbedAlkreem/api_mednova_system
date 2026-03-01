@@ -41,30 +41,26 @@ class ProgramController extends Controller
 
 
 
-
-    public function publish($id): \Illuminate\Http\JsonResponse
+    public function approve(Program $program): \Illuminate\Http\JsonResponse
     {
         try {
-            $program = $this->programRepositories->findOrFail($id);
-            if(!$program->is_approved)
-            {
-                return $this->errorResponse(__('messages.NOT_APPROVED'), [], 422);
-            }
-            $program->status = 'published';
-            $program->save();
-            return $this->successResponse(__('messages.SUCCESS_PUBLISHED'),  new ProgramResource($program), 201);
-
-        }catch (\Exception $e){
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+            $program = $this->programService->approve($program);
+            return $this->successResponse(__('messages.PROGRAM_APPROVED_SUCCESSFULLY'), new ProgramResource($program));
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), [], 400);
         }
     }
 
-
-    public function approve(Program $program)
+    public function reject(Program $program): \Illuminate\Http\JsonResponse
     {
         try {
-            $program = $this->programService->approveProgram($program);
-            return $this->successResponse(__('messages.PROGRAM_APPROVED_SUCCESSFULLY'), new ProgramResource($program));
+            $program = $this->programService->reject($program);
+
+            return $this->successResponse(
+                __('messages.PROGRAM_REJECTED_SUCCESSFULLY'),
+                new ProgramResource($program)
+            );
+
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), [], 400);
         }

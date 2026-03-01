@@ -31,7 +31,7 @@ class ProgramResource extends JsonResource
                 'price' => $this->price ,
                 'currency' => $this->currency,
                 'status'=>$this->status ,
-                'is_approved'=> $this->is_approved ,
+//                'is_approved'=> $this->is_approved ,
             ];
     }
 }

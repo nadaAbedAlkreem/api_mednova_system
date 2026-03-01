@@ -10,7 +10,7 @@ class VideoConsultationStatusService
 {
     protected ZoomMeetingService $zoomMeetingService;
 //    private const REMINDER_LEVELS = [200, 300, 700];
-    private const REMINDER_LEVELS = [1, 30, 60]; // بالدقائق
+    private const REMINDER_LEVELS = [10, 30, 60]; // بالدقائق
 
     public function __construct(ZoomMeetingService $zoomMeetingService)
     {
@@ -22,32 +22,15 @@ class VideoConsultationStatusService
         $consultations = ConsultationVideoRequest::with(['patient', 'consultant'])
             ->where('status', 'pending')
             ->get();
-        Log::info("consultations-pending: ." .$consultations);
 
         if ($consultations->isEmpty()) {
-            Log::info("No pending consultations to process.");
             return;
         }
 
         foreach ($consultations as $consultation) {
 //            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-//            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
-            $minutes = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-
-            Log::info('pending-check', [
-                'consultation_id' => $consultation->id,
-                'status' => $consultation->status,
-                'created_at' => (string)$consultation->created_at,
-                'now' => (string)$now,
-                'seconds' => $minutes,
-                'last_reminder_level' => $consultation->last_reminder_level,
-            ]);
-
+            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
             $this->handlePendingReminders($consultation, $minutes );
-
-//            if ($seconds >= 24 * 3600) {
-//                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
-//            }
             if ($minutes >=  24 * 3600) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
             }
@@ -57,37 +40,14 @@ class VideoConsultationStatusService
     private function handlePendingReminders($consultation, int $minutes ): void
     {
         foreach (self::REMINDER_LEVELS as $level) {
-            Log::info('pending-check', [
-                'consultation_id' => $consultation->id,
-                'status' => $consultation->status,
-                'created_at' => (string)$consultation->created_at,
-                'seconds' => $minutes,
-                'last_reminder_level' => $consultation->last_reminder_level,
-            ]);
-
             if ($minutes >= $level && $consultation->last_reminder_level < $level) {
                 $this->sendReminder($consultation, "يوجد الاستشارة في حالة انتظار الموافقة منذ {$minutes}  يجب عليك توجه اما قبول او رفضها ثانية" , 'requested');
-
                 $consultation->update([
                     'last_reminder_level' => $level,
                     'last_reminder_sent_at' => now(),
                 ]);
-                Log::info('pending-check', [
-                    'consultation_id' => $consultation->id,
-                    'status' => $consultation->status,
-                    'created_at' => (string)$consultation->created_at,
-                    'seconds' => $minutes,
-                    'last_reminder_level' => $consultation->last_reminder_level,
-                ]);
                 break;
             }
-            Log::info('pending-check', [
-                'consultation_id' => $consultation->id,
-                'status' => $consultation->status,
-                'created_at' => (string)$consultation->created_at,
-                'seconds' => $minutes,
-                'last_reminder_level' => $consultation->last_reminder_level,
-            ]);
         }
     }
 
@@ -117,27 +77,16 @@ class VideoConsultationStatusService
 
     public function processActive(Carbon $now): void
     {
-        $consultations = ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant', 'activities'])
-            ->where('status', 'active')
-            ->get();
-        Log::info('processActive  : nada99 ' . json_encode($consultations));
-
+        $consultations = ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant', 'activities'])->where('status', 'active')->get();
         foreach ($consultations as $consultation) {
-            Log::info('processActive  : nada99 ' . json_encode($consultation));
-
             if (!$consultation->appointmentRequest)
-            {Log::info('appointmentRequest  : nada99 ' . json_encode($consultation));
-            continue;}
-
+            {continue;}
             $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
-
             if ($now->gte($endTime)) {
-                Log::info('end-api-zoom-platform go to ' . json_encode($consultation));
                 $this->endApiZoomPlatform($consultation);
                 $this->endMeeting($consultation);
                 continue;
             }
-
             $this->processActivityReminders($consultation, $now);
         }
     }
@@ -145,7 +94,6 @@ class VideoConsultationStatusService
     private function endApiZoomPlatform(ConsultationVideoRequest $consultation): void
     {
         try {
-            Log::info('end-api-zoom-platform' . json_encode($consultation));
             $this->zoomMeetingService->endMeetingLinkZoom($consultation);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
@@ -158,19 +106,12 @@ class VideoConsultationStatusService
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
             $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
 //            $seconds = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-//            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
-            $minutes = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-
-            Log::info('$minutes' .$minutes);
-
-            Log::info('$timeBecameActive' . $timeBecameActive);
+            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
             foreach (self::REMINDER_LEVELS as $level) {
                 if ($minutes >= $level && $consultation->last_reminder_level < $level) {
                     $doctorName = $consultation->consultant->full_name ?? 'المستشار';
                     $patientName = $consultation->patient->full_name ?? 'المريض';
                     $message = "تنبيه بانضمام أطراف إلى الاستشارة. المستشار: {$doctorName}، المريض: {$patientName}.";
-                    Log::info('$timeBecameActive -- $message' . $message);
-
                     $this->sendReminder($consultation, $message);
 
                     $consultation->update([
@@ -184,64 +125,15 @@ class VideoConsultationStatusService
         }
     }
 
-//        foreach ($consultation->activities as $activity)
-//        {
-//
-//            if ($activity->status !== 'joined') {
-//                continue;
-//            }
-//
-//            $seconds = $activity->joined_at
-//                ? Carbon::parse($activity->joined_at)->diffInSeconds($now)
-//                : null;
-//
-//            if (!$seconds) continue;
-//
-//            foreach (self::REMINDER_LEVELS as $level) {
-//                if ($seconds >= $level && $activity->last_reminder_level < $level) {
-//
-//                    $this->sendReminder(
-//                        $consultation,
-//                        "{$activity->role} لم يتفاعل خلال {$level} ثانية"
-//                    );
-//
-//                    $consultation->update([
-//                        'last_reminder_level' => $level,
-//                        'last_reminder_sent_at' => now(),
-//                    ]);
-//
-//                    break;
-//                }
-//            }
-//
-//            if ($seconds >= 3600) {
-//                $this->cancel($consultation, "عدم تفاعل {$activity->role} خلال ساعة");
-//            }
-//        }
-
-
-
-//    private function finalizeActiveSession($consultation): void
-//    {
-//        if ($this->bothParticipantsInteracted($consultation)) {
-//            $this->complete($consultation);
-//        } else {
-//            $this->cancel($consultation, "لم يتفاعل الطرفان بشكل كافٍ قبل انتهاء الوقت");
-//        }
-//    }
 
 
     private function bothParticipantsInteracted($consultation): bool
     {
         $activities = $consultation->activities;
-
         if ($activities->count() < 2) return false;
-
         foreach ($activities as $activity) {
-
             if (!$activity->joined_at) return false;
              $left = $activity->left_at ?? now();
-
              if(Carbon::parse($activity->joined_at)->diffInMinutes($left) < 5) {
                 return false;
             }
@@ -253,8 +145,6 @@ class VideoConsultationStatusService
 
     public function sendReminder($consultation, string $message , $eventType ='reminder_for_all' ): void
     {
-        Log::info('video zoom reminder', ['consultation_id' => $consultation->id]);
-
         event(new \App\Events\ConsultationRequested(
             $consultation,
             "تنبيه: {$message}",
@@ -272,7 +162,7 @@ class VideoConsultationStatusService
         ]);
 
         $consultation->update([
-            'status' =>'end',
+            'status' =>'completed',
         ]);
 
         $patient  = $consultation->patient->full_name  ?? 'patient';
