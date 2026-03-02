@@ -11,6 +11,7 @@ class VideoConsultationStatusService
     protected ZoomMeetingService $zoomMeetingService;
 //    private const REMINDER_LEVELS = [200, 300, 700];
     private const REMINDER_LEVELS = [10, 30, 60]; // بالدقائق
+    private const REMINDER_LEVELS_PENDING = [6 ,12,23];
 
     public function __construct(ZoomMeetingService $zoomMeetingService)
     {
@@ -27,26 +28,19 @@ class VideoConsultationStatusService
             return;
         }
 
-        foreach ($consultations as $consultation) {
-//            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-            $minutes = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-//            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
-            $this->handlePendingReminders($consultation, $minutes );
-//            if ($minutes >=  24 * 3600) {
-//                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
-//            }
-
-            if ($minutes >=  120 ) {
-                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
-            }
+        foreach ($consultations as $consultation)
+        {
+            $hours = Carbon::parse($consultation->created_at)->diffInHours($now);
+            $this->handlePendingReminders($consultation, $hours );
+            if ($hours >= 24) {$this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');}
         }
     }
 
-    private function handlePendingReminders($consultation, int $minutes ): void
+    private function handlePendingReminders($consultation, int $hours ): void
     {
-        foreach (self::REMINDER_LEVELS as $level) {
-            if ($minutes >= $level && $consultation->last_reminder_level < $level) {
-                $this->sendReminder($consultation, "يوجد الاستشارة في حالة انتظار الموافقة منذ {$minutes}  يجب عليك توجه اما قبول او رفضها ثانية" , 'requested');
+        foreach (self::REMINDER_LEVELS_PENDING as $level) {
+            if ($hours >= $level && $consultation->last_reminder_level < $level) {
+                $this->sendReminder($consultation, "يوجد الاستشارة في حالة انتظار الموافقة منذ {$hours}  يجب عليك توجه اما قبول او رفضها ساعة" , 'requested');
                 $consultation->update([
                     'last_reminder_level' => $level,
                     'last_reminder_sent_at' => now(),
@@ -110,8 +104,8 @@ class VideoConsultationStatusService
     {
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
             $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
-            $minutes = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-//            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
+//            $minutes = Carbon::parse($timeBecameActive)->diffInSeconds($now);
+            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
             foreach (self::REMINDER_LEVELS as $level) {
                 if ($minutes >= $level && $consultation->last_reminder_level < $level) {
                     $doctorName = $consultation->consultant->full_name ?? 'المستشار';

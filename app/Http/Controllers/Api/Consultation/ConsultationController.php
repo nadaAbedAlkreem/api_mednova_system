@@ -70,7 +70,7 @@ class ConsultationController extends Controller
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(),$request['id']),
                 default => throw new \Exception('Invalid consultation nature')
             };
-            if ($consultantNature === ConsultationType::VIDEO->value && $request->status === 'approved') {
+            if (($consultantNature === ConsultationType::VIDEO->value) && ($request->status === 'accepted')) {
                 $consultation->load('appointmentRequest');
                 $appointmentDateTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
                 if ($appointmentDateTime->isPast()) {return $this->errorResponse(__('messages.NO_CONSULTATION_ALLOWED'), [], 422);}
