@@ -36,7 +36,7 @@ class VideoConsultationStatusService
 //                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
 //            }
 
-            if ($minutes >=  24 ) {
+            if ($minutes >=  120 ) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
             }
         }
