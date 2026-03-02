@@ -28,8 +28,9 @@ class VideoConsultationStatusService
         }
 
         foreach ($consultations as $consultation) {
-//            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
-            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
+            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
+            $minutes = Carbon::parse($consultation->created_at)->diffInSeconds($now);
+//            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
             $this->handlePendingReminders($consultation, $minutes );
             if ($minutes >=  24 * 3600) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
@@ -105,8 +106,8 @@ class VideoConsultationStatusService
     {
         if ($consultation->activities == null || $consultation->activities->count() == 0) {
             $timeBecameActive = $consultation->updated_at; // أو created_at وقت تغيير الحالة لـ active
-//            $seconds = Carbon::parse($timeBecameActive)->diffInSeconds($now);
-            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
+            $minutes = Carbon::parse($timeBecameActive)->diffInSeconds($now);
+//            $minutes = Carbon::parse($timeBecameActive)->diffInMinutes($now);
             foreach (self::REMINDER_LEVELS as $level) {
                 if ($minutes >= $level && $consultation->last_reminder_level < $level) {
                     $doctorName = $consultation->consultant->full_name ?? 'المستشار';
