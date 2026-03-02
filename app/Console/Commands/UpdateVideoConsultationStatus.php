@@ -25,7 +25,6 @@ class UpdateVideoConsultationStatus extends Command
 
     public function handle(VideoConsultationStatusService $service)
     {
-        Log::info('7777: ');
         $now = Carbon::now();
         $service->processPending($now);
         $service->processAccepted($now);

@@ -16,6 +16,7 @@ return [
     'PROGRAM_ALREADY_APPROVED' => 'البرنامج تم اعتماده مسبقاً.',
     'PROGRAM_ALREADY_REJECTED' => 'البرنامج تم رفضه مسبقاً.',
     'PROGRAM_APPROVED_SUCCESSFULLY' => 'البرنامج تم اعتماده بنجاح ',
+    'NO_CONSULTATION_ALLOWED' => 'لا يمكن قبول الاستشارة لأن موعدها قد انتهى',
 
     'CANNOT_APPROVE_ARCHIVED_PROGRAM' => 'لا يمكن اعتماد برنامج مؤرشف.',
 
