@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Consultation;
 
+use App\Enums\ConsultationType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\CheckDependenciesDataRequest;
 use App\Http\Requests\api\consultation\StoreConsultationRequest;
@@ -69,7 +70,13 @@ class ConsultationController extends Controller
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(),$request['id']),
                 default => throw new \Exception('Invalid consultation nature')
             };
-            if ($consultantNature === 'video') {
+            if ($consultantNature === ConsultationType::VIDEO->value && $request->status === 'approved') {
+                $consultation->load('appointmentRequest');
+                $appointmentDateTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
+                if ($appointmentDateTime->isPast()) {return $this->errorResponse(__('messages.NO_CONSULTATION_ALLOWED'), [], 422);}
+            }
+
+            if ($consultantNature === ConsultationType::VIDEO->value) {
                 $consultation->load('appointmentRequest');
                 if($request['status'] == 'cancelled' || $consultation->status == 'completed' || $consultation->status == 'approved')
                 {
