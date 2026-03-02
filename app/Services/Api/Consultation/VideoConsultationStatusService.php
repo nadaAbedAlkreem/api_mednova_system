@@ -28,11 +28,15 @@ class VideoConsultationStatusService
         }
 
         foreach ($consultations as $consultation) {
-            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
+//            $seconds = Carbon::parse($consultation->created_at)->diffInSeconds($now);
             $minutes = Carbon::parse($consultation->created_at)->diffInSeconds($now);
 //            $minutes = Carbon::parse($consultation->created_at)->diffInMinutes($now);
             $this->handlePendingReminders($consultation, $minutes );
-            if ($minutes >=  24 * 3600) {
+//            if ($minutes >=  24 * 3600) {
+//                $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
+//            }
+
+            if ($minutes >=  24 ) {
                 $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
             }
         }
