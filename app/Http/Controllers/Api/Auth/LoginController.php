@@ -11,11 +11,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use function Sentry\configureScope;
 
 class LoginController extends Controller
 {
-    use ResponseTrait ;
+    use ResponseTrait;
+
     protected CustomerAuthService $authService;
+
     public function __construct(CustomerAuthService $authService)
     {
         $this->authService = $authService;
@@ -24,25 +27,30 @@ class LoginController extends Controller
 
     public function login(LoginUserRequest $request): JsonResponse
     {
-           try {
-              $credentials = $request->only('email', 'password');
-              Log::info('test - webhook');
-              $token = $this->authService->login($credentials);
-              $customer = Auth::guard('api')->user();
-              if(!$customer['email_verified_at'])
-              {
-                  throw new \Exception(__('messages.EMAIL_NOT_VERIFIED'));
-              }
-              $customer->load(['location','patient','therapist' ,'therapist.specialty','rehabilitationCenter' ,'medicalSpecialties','schedules']);
-              return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
-                   [
-                   'access_token' =>'Bearer ' . $token,
-                   'user' => new CustomerResource($customer),
+        try {
+            $credentials = $request->only('email', 'password');
+            Log::info('test - webhook');
+            $token = $this->authService->login($credentials);
+            $customer = Auth::guard('api')->user();
+            configureScope(function ($scope) use ($customer) {
+                $scope->setUser([
+                    'id' =>$customer->id,
+                    'email' =>$customer->email,
+                ]);
+            });
+            if (!$customer['email_verified_at']) {
+                throw new \Exception(__('messages.EMAIL_NOT_VERIFIED'));
+            }
+            $customer->load(['location', 'patient', 'therapist', 'therapist.specialty', 'rehabilitationCenter', 'medicalSpecialties', 'schedules']);
+            return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
+                [
+                    'access_token' => 'Bearer ' . $token,
+                    'user' => new CustomerResource($customer),
 
-               ], 202,app()->getLocale());
-          } catch (\Exception $e) {
-              return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
-          }
+                ], 202, app()->getLocale());
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
+        }
     }
 
 
@@ -50,6 +58,6 @@ class LoginController extends Controller
     {
         $apiUser = Auth::guard('api')->user();
         $apiUser->currentAccessToken()->delete();
-        return $this->successResponse(__('messages.LOGGED_OUT_SUCCESSFULLY') ,[] ,200, app()->getLocale());
+        return $this->successResponse(__('messages.LOGGED_OUT_SUCCESSFULLY'), [], 200, app()->getLocale());
     }
 }

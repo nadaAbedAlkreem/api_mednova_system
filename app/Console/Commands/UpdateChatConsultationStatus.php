@@ -86,7 +86,7 @@ class UpdateChatConsultationStatus extends Command
         $levels = [
             1 => 6, // بعد 6 ساعة
             2 => 12, // بعد 12 ساعة
-            3 => 24, // بعد 24 ساعة
+            3 => 23, // بعد 23 ساعة
         ];
 
         foreach ($levels as $level => $limit) {

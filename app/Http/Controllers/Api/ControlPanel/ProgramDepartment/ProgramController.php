@@ -34,7 +34,8 @@ class ProgramController extends Controller
               $programs = $this->programService->getAll($filters, $limit);
             return $this->successResponse(
                 __('messages.DATA_RETRIEVED_SUCCESSFULLY'),
-                ProgramResource::collection($programs) ,200 ,[
+                ProgramResource::collection($programs) ,200 ,
+                [
                 'current_page' => $programs->currentPage(),
                 'per_page' => $programs->perPage(),
                 'total' => $programs->total(),
