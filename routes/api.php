@@ -92,6 +92,9 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/update', [PatientController::class, 'update']);
 
             });
+            Route::get('/debug-sentry', function () {
+                throw new Exception('My first Sentry error!');
+            });
             Route::prefix('therapist')->group(function ()
             {
                 Route::get('/', [TherapistController::class, 'get']);
@@ -229,4 +232,5 @@ use Illuminate\Support\Facades\Route;
 
                 });
             });
+
 

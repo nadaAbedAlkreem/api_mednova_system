@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "ext-curl": "*",
+        "ext-fileinfo": "*",
         "dedoc/scramble": "^0.12.34",
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^12.0",
@@ -16,9 +17,9 @@
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "^7.2",
+        "sentry/sentry-laravel": "^4.21",
         "symfony/filesystem": "^7.4",
-        "yajra/laravel-datatables-oracle": "^12.4",
-        "ext-fileinfo": "*"
+        "yajra/laravel-datatables-oracle": "^12.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",

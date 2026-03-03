@@ -10,6 +10,7 @@ use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use function Sentry\configureScope;
 
 class LoginController extends Controller
 {
@@ -27,6 +28,12 @@ class LoginController extends Controller
               $credentials = $request->only('email', 'password');
               $token = $this->adminRepo->login($credentials);
               $admin = Auth::guard('admin')->user();
+               configureScope(function ($scope) use ($admin) {
+                   $scope->setUser([
+                       'id' =>$admin->id,
+                       'email' =>$admin->email,
+                   ]);
+               });
               return $this->successResponse('LOGGED_IN_SUCCESSFULLY', ['access_token' =>'Bearer ' . $token, 'admin' => new  AdminResource($admin),], 202);
           } catch (\Exception $e) {
               return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
