@@ -220,7 +220,7 @@ use Illuminate\Support\Facades\Route;
                         Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']); // done
                         Route::prefix('/videos')->group(function () {
                             Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-                            Route::post('{video}', [ProgramVideosController::class, 'update']); // done
+                            Route::post('update/{video}', [ProgramVideosController::class, 'update']); // done
                             Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
                             Route::get('{videoId}', [ProgramVideosController::class, 'show']); //done
 
