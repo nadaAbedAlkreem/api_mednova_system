@@ -140,13 +140,13 @@ use Illuminate\Support\Facades\Route;
 
             });
 
-        //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
-            Route::prefix('/videos')->group(function () {
-                    Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-                    Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
-                    Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
-        //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
-                });
+//        //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+//            Route::prefix('/videos')->group(function () {
+//                    Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+//                    Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
+//                    Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
+//        //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
+//                });
             Route::prefix('{program}/review-requests')->group(function () {
         //            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
         //            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
@@ -219,7 +219,7 @@ use Illuminate\Support\Facades\Route;
                         Route::patch('{program}/reject', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'reject']); // done
                         Route::delete('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'destroy']); // done
                         Route::prefix('/videos')->group(function () {
-                            Route::post('/', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
+                            Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
                             Route::post('{video}', [ProgramVideosController::class, 'update']); // done
                             Route::delete('{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
                             Route::get('{videoId}', [ProgramVideosController::class, 'show']); //done
