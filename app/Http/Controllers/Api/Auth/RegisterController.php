@@ -39,9 +39,9 @@ class RegisterController extends Controller
             }
             $token = encrypt($customer->id);
             $url = url("api/auth/verify-email?token={$token}");
-            Mail::to($response['customer'])->queue(new App\Mail\VerificationEmailMail($customer,$url));
+            Mail::to($customer->email)->queue(new App\Mail\VerificationEmailMail($customer,$url));
             DB::commit();
-            return $this->successResponse('CREATE_USER_SUCCESSFULLY', ['access_token' =>  $response['access_token'], 'user' => new CustomerResource($response['customer']),], 201, app()->getLocale());
+            return $this->successResponse('CREATE_USER_SUCCESSFULLY', ['access_token' =>  $response['access_token'], 'user' => new CustomerResource($response['customer'])], 201);
         } catch (\Exception $e) {
             DB::rollBack();
              return $this->errorResponse('ERROR_OCCURRED', ['error' => $e->getMessage()], 500, app()->getLocale());

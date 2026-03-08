@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,27 +12,28 @@ class VerificationEmailMail extends Mailable  implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $userId; // تخزين ID فقط
+    public $userName; // تخزين الاسم
+    public $userEmail; // تخزين الإيميل
     public $verificationUrl;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($user, $verificationUrl)
+    public function __construct(Customer $user, $verificationUrl)
     {
-        $this->user = $user;
+        // خذي فقط البيانات التي تحتاجينها
+        $this->userId = $user->id;
+        $this->userName = $user->name;
+        $this->userEmail = $user->email;
         $this->verificationUrl = $verificationUrl;
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
+        // الآن استخدمي البيانات المخزنة
         return $this->subject('Verify Your Email Address')
             ->view('emails.email-verification')
             ->with([
-                'user' => $this->user,
+                'userName' => $this->userName,
+                'userEmail' => $this->userEmail,
                 'verificationUrl' => $this->verificationUrl,
             ]);
     }

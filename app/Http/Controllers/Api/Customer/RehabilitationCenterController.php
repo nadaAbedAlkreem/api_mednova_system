@@ -83,6 +83,7 @@ class RehabilitationCenterController extends Controller
                 $center->medicalSpecialties()->sync($request['specialty_id']);
 
             }
+            dd($data['schedule']);
             if (!empty($data['schedule'])) {
                 $hasActiveConsultation = Customer::where('id', $request['customer_id'])
                     ->where(function ($query) {

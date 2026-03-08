@@ -14,12 +14,9 @@ return new class extends Migration
     {
         Schema::table('programs', function (Blueprint $table) {
             DB::table('programs')->where('status', 'published')->update(['status' => 'draft']);
-
                 $table->enum('status', ['draft','pending','approved','rejected','archived'])
                     ->default('draft')
                      ->change();
-
-
                 $table->dropColumn('is_approved');
             });
     }

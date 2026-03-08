@@ -134,9 +134,7 @@ class UpdateRehabilitationCenterRequest extends FormRequest
         return [
             'customer_id.required' => __('validation.required', ['attribute' => __('validation.attributes.customer_id')]),
             'customer_id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.customer_id')]),
-
             'gender.in'       => __('validation.in', ['attribute' => __('validation.attributes.gender')]),
-
             'video_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.video_consultation_price')]),
             'chat_consultation_price.regex' => __('validation.regex', ['attribute' => __('validation.attributes.chat_consultation_price')]),
 
