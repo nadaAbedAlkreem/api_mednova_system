@@ -167,7 +167,7 @@ use Illuminate\Support\Facades\Route;
             Route::prefix('center')->group(function ()
             {
                 Route::post('/store', [RehabilitationCenterController::class, 'store']);
-                Route::post('/update', [RehabilitationCenterController::class, 'update']);
+                Route::post('/update', [RehabilitationCenterController::class, 'update']); // test
             });
             Route::prefix('device-request')->group(function () {
                 Route::post('/store', [DeviceRequestController::class, 'store']);
