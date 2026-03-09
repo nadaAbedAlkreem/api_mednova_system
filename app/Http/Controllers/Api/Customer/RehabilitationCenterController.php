@@ -83,28 +83,12 @@ class RehabilitationCenterController extends Controller
                 $center->medicalSpecialties()->sync($request['specialty_id']);
 
             }
-            if (!empty($data['schedule'])) {
-                $hasActiveConsultation = Customer::where('id', $request['customer_id'])
-                    ->where(function ($query) {
-                        $query->whereHas('receivedConsultations', function ($q) {
-                            $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
-                                ->whereIn('status', ['active', 'accepted', 'pending']);
-                        })
-                            ->orWhereHas('consultationVideoRequestsForConsultant', function ($q) {
-                                $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
-                                    ->whereIn('status', ['active', 'accepted', 'pending']);
-                            });
-                    })
-                    ->exists();
-                if ($hasActiveConsultation) {
-                    throw new \Exception('لا يمكن تحديث المواعيد بسبب وجود استشارات نشطة أو مقبولة أو معلقة.');
-                }
-                 $this->schedulerService->update(
+            $this->schedulerService->update(
                     $request->customer_id,
                     ConsultantType::REHABILITATION_CENTER,
                     $data['schedule']
                 );
-            }
+
             DB::commit();
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 200,);
         }catch (\Exception $e) {

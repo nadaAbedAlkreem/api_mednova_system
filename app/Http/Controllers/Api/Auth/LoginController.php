@@ -29,25 +29,14 @@ class LoginController extends Controller
     {
         try {
             $credentials = $request->only('email', 'password');
-            Log::info('test - webhook');
             $token = $this->authService->login($credentials);
             $customer = Auth::guard('api')->user();
-            configureScope(function ($scope) use ($customer) {
-                $scope->setUser([
-                    'id' =>$customer->id,
-                    'email' =>$customer->email,
-                ]);
-            });
+            configureScope(function ($scope) use ($customer) {$scope->setUser(['id' =>$customer->id, 'email' =>$customer->email]);});
             if (!$customer['email_verified_at']) {
                 throw new \Exception(__('messages.EMAIL_NOT_VERIFIED'));
             }
             $customer->load(['location', 'patient', 'therapist', 'therapist.specialty', 'rehabilitationCenter', 'medicalSpecialties', 'schedules']);
-            return $this->successResponse('LOGGED_IN_SUCCESSFULLY',
-                [
-                    'access_token' => 'Bearer ' . $token,
-                    'user' => new CustomerResource($customer),
-
-                ], 202, app()->getLocale());
+            return $this->successResponse('LOGGED_IN_SUCCESSFULLY', ['access_token' => 'Bearer ' . $token, 'user' => new CustomerResource($customer)], 202, app()->getLocale());
         } catch (\Exception $e) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500, app()->getLocale());
         }
