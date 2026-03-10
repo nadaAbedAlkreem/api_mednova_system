@@ -92,28 +92,7 @@ class TherapistController extends Controller
 //            $therapistData = array_filter($therapistData, fn($value) => !is_null($value) && $value !== '');
             $this->therapistRepositories->updateWhere($data['therapist'], ['customer_id' => $request['customer_id']]);
             $this->locationRepositories->updateWhere($data['location'],['customer_id'=>$request['customer_id']] );
-            if (!empty($data['schedule'])) {
-                $hasActiveConsultation = Customer::where('id', $request['customer_id'])
-                    ->where(function ($query) {
-                        $query->whereHas('receivedConsultations', function ($q) {
-                            $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
-                                ->whereIn('status', ['active', 'accepted', 'pending']);
-                        })
-                            ->orWhereHas('consultationVideoRequestsForConsultant', function ($q) {
-                                $q->where('consultant_type', ConsultantType::REHABILITATION_CENTER)
-                                    ->whereIn('status', ['active', 'accepted', 'pending']);
-                            });
-                    })
-                    ->exists();
-                if ($hasActiveConsultation) {
-                    throw new \Exception('لا يمكن تحديث المواعيد بسبب وجود استشارات نشطة أو مقبولة أو معلقة.');
-                }
-                $this->schedulerService->update(
-                    $request->customer_id,
-                    ConsultantType::THERAPIST,
-                    $data['schedule']
-                );
-            }
+            if (!empty($data['schedule'])) {$this->schedulerService->update($request->customer_id, ConsultantType::THERAPIST, $data['schedule']);}
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 201,);
         }catch (\Exception $e) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
