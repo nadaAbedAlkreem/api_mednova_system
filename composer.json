@@ -19,6 +19,9 @@
         "pusher/pusher-php-server": "^7.2",
         "sentry/sentry-laravel": "^4.21",
         "symfony/filesystem": "^7.4",
+        "symfony/http-client": "^7.4",
+        "symfony/mailgun-mailer": "^7.4",
+        "symfony/postmark-mailer": "^7.4",
         "yajra/laravel-datatables-oracle": "^12.4"
     },
     "require-dev": {

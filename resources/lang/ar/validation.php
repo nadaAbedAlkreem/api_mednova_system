@@ -195,6 +195,7 @@ return [
         'formatted_address' => 'العنوان الكامل',
         'region' => 'المنطقة',
         'city' => 'المدينة',
+        'today' => 'اليوم ' ,
         'country' => 'البلد',
         'district' => 'الحي',
         'postal_code' => 'الرمز البريدي',

@@ -29,7 +29,7 @@ class SendApprovalStatusMail
 
         }
         if ($event->status === StatusType::REJECTED) {
-            Mail::to($event->customer)
+            Mail::to($event->customer->email)
                 ->queue(new AccountRejectedMail(
                     $event->customer,
                     $url,

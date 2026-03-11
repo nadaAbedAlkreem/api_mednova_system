@@ -81,14 +81,8 @@ class RehabilitationCenterController extends Controller
             if (!empty($request['specialty_id'])) {
                 $center = $this->customerRepositories->findOrFail($request['customer_id'] );
                 $center->medicalSpecialties()->sync($request['specialty_id']);
-
             }
-            $this->schedulerService->update(
-                    $request->customer_id,
-                    ConsultantType::REHABILITATION_CENTER,
-                    $data['schedule']
-                );
-
+            if (!empty($data['schedule'])) {$this->schedulerService->update($request->customer_id, ConsultantType::REHABILITATION_CENTER, $data['schedule']);}
             DB::commit();
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 200,);
         }catch (\Exception $e) {

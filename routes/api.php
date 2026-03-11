@@ -30,7 +30,6 @@ use App\Http\Controllers\Api\Customer\RatingController;
 use App\Http\Controllers\Api\Customer\RehabilitationCenterController;
 use App\Http\Controllers\Api\Customer\TherapistController;
 use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 
