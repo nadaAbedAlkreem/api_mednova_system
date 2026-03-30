@@ -17,4 +17,14 @@ class UserPackage extends Model
         'ends_at' ,
         'is_active' ,
     ];
+
+     public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+     {
+        return $this->belongsTo(Customer::class, 'customer_id');
+     }
+
+    public function package(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Package::class, 'package_id');
+    }
 }

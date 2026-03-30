@@ -29,6 +29,7 @@ class ConsultationChatRequestResource extends JsonResource
                 'consultant_message_count' => $this->consultant_message_count ?? 0,
                 'first_patient_message_at' => $this->first_patient_message_at  ,
                 'first_consultant_reply_at' => $this->first_consultant_reply_at ,
+                'unread_messages_count' => $this->unread_messages_count ,
                 'started_at' => $this->started_at ,
                 'ended_at' => $this->ended_at ,
              ] ;

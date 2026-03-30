@@ -578,7 +578,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
 
 
-    public function getWhereIn( $col,array $data, $orderBy = ['column' => 'id', 'dir' => 'DESC'])
+    public function getWhereIn($col,array $data, $orderBy = ['column' => 'id', 'dir' => 'DESC'])
     {
         return $this->model->whereIn($col,$data)->orderBy($orderBy['column'], $orderBy['dir'])->get();
     }

@@ -15,14 +15,6 @@ class Customer extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasApiTokens, HasFactory, SoftDeletes;
-
-//    const TYPE_PATIENT = 'patient';
-//    const TYPE_THERAPIST = 'therapist';
-//    const TYPE_CENTER = 'rehabilitation_center';
-
-//    const STATUS_PENDING = 'pending';
-//    const STATUS_APPROVED = 'approved';
-//    const STATUS_REJECTED = 'rejected';
     protected $fillable = [
         'full_name',
         'email',
@@ -37,7 +29,6 @@ class Customer extends Authenticatable
         'is_online',
         'last_active_at',
         'account_status',
-//        'is_banned' ,
         'type_account',
         'approval_status',
         'reason',
@@ -50,6 +41,7 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(AccountReview::class, 'customer_id');
     }
+
 
 
     public function complainantReport(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -147,7 +139,7 @@ class Customer extends Authenticatable
     // علاقة باقات المستخدم
     public function userPackages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(UserPackage::class);
+        return $this->hasMany(UserPackage::class, 'customer_id');
     }
 
     // علاقة البرامج المشترك بها
