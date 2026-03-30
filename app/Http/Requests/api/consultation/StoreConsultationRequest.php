@@ -61,7 +61,7 @@ class StoreConsultationRequest extends FormRequest
 
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
-           if ($consultant && $consultant->status == AccountStatus::INACTIVE->value) {
+           if ($consultant && $consultant->account_status !== AccountStatus::ACTIVE->value) {
                     $validator->errors()->add(
                         'consultant_id',
                         __('messages.consultant_not_available')
