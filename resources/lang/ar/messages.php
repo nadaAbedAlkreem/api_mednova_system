@@ -21,7 +21,8 @@ return [
     'PROGRAM_APPROVED_SUCCESSFULLY' => 'البرنامج تم اعتماده بنجاح ',
     'Pre_Subscription_Restrictions' => 'تم اشتراك بنجاح مسبقا لهذا المستشار ' ,
     'consultant_not_available' => 'نعتذر منك المستشار غير نشط الان حاول مرة اخرى مع مستشار اخر' ,
-    'The account was previously disabled.' => 'تم تعطيل الحساب مسبقا ',
+    'pre_package_disabled' => 'تم تعطيل الحساب مسبقا ',
+    'PACKAGE_NOT_FOUND' => 'الباقة غير موجودة ',
     'NO_CONSULTATION_ALLOWED' => 'لا يمكن قبول الاستشارة لأن موعدها قد انتهى',
 
     'CANNOT_APPROVE_ARCHIVED_PROGRAM' => 'لا يمكن اعتماد برنامج مؤرشف.',

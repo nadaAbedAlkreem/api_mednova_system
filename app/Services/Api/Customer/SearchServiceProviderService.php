@@ -61,6 +61,7 @@ class SearchServiceProviderService
         }
         $query->withAvg('ratings as average_rating', 'rating')
             ->withCount('ratings as total_reviews')
+            ->orderBy('created_at', 'desc')
             ->with(['location', 'therapist','therapist.specialty', 'rehabilitationCenter', 'medicalSpecialties']);
 
         return $query->paginate($limit ?? 10);
