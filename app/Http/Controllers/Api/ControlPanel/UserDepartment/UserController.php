@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Api\ControlPanel\UserDepartment;
 use App\Enums\AccountStatus;
 use App\Enums\StatusType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\ControlPanel\Subscribtion\UserPackageResource;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Repositories\ICustomerRepositories;
+use App\Repositories\IUserPackageRepositories;
 use App\Services\Api\Customer\CustomerService;
 use App\Traits\ResponseTrait;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -19,13 +23,15 @@ class UserController extends Controller
     use ResponseTrait;
 
     protected ICustomerRepositories $customerRepositories;
+    protected IUserPackageRepositories $userPackageRepositories;
     protected CustomerService $customerService;
 
 
-    public function __construct(ICustomerRepositories $customerRepositories, CustomerService $customerService)
+    public function __construct(ICustomerRepositories $customerRepositories, CustomerService $customerService , IUserPackageRepositories $userPackageRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->customerService = $customerService;
+        $this->userPackageRepositories = $userPackageRepositories;
     }
 
     public function getAll(Request $request): \Illuminate\Http\JsonResponse
@@ -63,23 +69,7 @@ class UserController extends Controller
         }
     }
 
-//    public function toggleBlock($id): \Illuminate\Http\JsonResponse
-//    {
-//        try {
-//            $customer = $this->customerRepositories->findOne($id);
-//            if (!$customer) {
-//                return $this->errorResponse(__('messages.CUSTOMER_NOT_FOUND'), [], 404);
-//            }
-//            $customer->is_banned = !$customer->is_banned;
-//            $customer->save();
-//            return $this->successResponse(
-//                $customer->is_banned ? __('messages.CUSTOMER_BLOCKED') : __('messages.CUSTOMER_UNBLOCKED'), ['is_banned' => $customer->is_banned],
-//                200
-//            );
-//        } catch (\Exception $e) {
-//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
-//        }
-//    }
+
 
     public function updateApprovalStatus(Request $request, $id): \Illuminate\Http\JsonResponse
     {
@@ -133,6 +123,50 @@ class UserController extends Controller
         }
     }
 
+
+    function assignTemporaryPackage($userId): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $now = Carbon::now();
+            $endsAt = $now->copy()->addMonth();
+            $customer = $this->customerRepositories->findOrFail($userId);
+            if (!$customer->isProfileCompleted() || !$customer->email_verified_at || !($customer->approval_status == StatusType::APPROVED->value)) {
+                throw new \Exception(__('messages.Subscription_Restrictions'));
+            }
+            $preSubscribedConsultant  = $this->userPackageRepositories->getWhere(['is_active' =>  1 , 'customer_id' =>$userId ]);
+            if ($preSubscribedConsultant->isNotEmpty()) {
+                throw new \Exception(__('messages.Pre_Subscription_Restrictions'));
+            }
+            $userPackage = $this->userPackageRepositories->create([
+                    'customer_id' => $userId,
+                    'package_id' => 1,
+                    'starts_at' => $now,
+                    'ends_at' => $endsAt,
+                    'is_active' => 1,
+                ]);
+            $userPackage->customer->update(['account_status' => AccountStatus::ACTIVE->value]);
+            return $this->successResponse(__('messages.Successful_Subscriber'), new UserPackageResource($userPackage), 200);
+        }catch (ModelNotFoundException $e) {
+            return $this->errorResponse(__('messages.USER_NOT_FOUND'), [], 404);
+
+        } catch (\Exception $e) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+        }
+    }
+//    public function subscribedUsers(): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $today = Carbon::now();
+//            $subscribedUsers = Customer::whereHas('userPackages', function($query) use ($today) {
+//                $query->where('is_active', 1)
+//                    ->where('starts_at', '<=', $today)
+//                    ->where('ends_at', '>=', $today);
+//            })->get();
+//            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), CustomerResource::collection($subscribedUsers), 201);
+//        } catch (\Exception $e) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+//        }
+//    }
     public function destroy($id): \Illuminate\Http\JsonResponse
     {
         try {
@@ -165,3 +199,20 @@ class UserController extends Controller
     }
 
 }
+//    public function toggleBlock($id): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            $customer = $this->customerRepositories->findOne($id);
+//            if (!$customer) {
+//                return $this->errorResponse(__('messages.CUSTOMER_NOT_FOUND'), [], 404);
+//            }
+//            $customer->is_banned = !$customer->is_banned;
+//            $customer->save();
+//            return $this->successResponse(
+//                $customer->is_banned ? __('messages.CUSTOMER_BLOCKED') : __('messages.CUSTOMER_UNBLOCKED'), ['is_banned' => $customer->is_banned],
+//                200
+//            );
+//        } catch (\Exception $e) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+//        }
+//    }

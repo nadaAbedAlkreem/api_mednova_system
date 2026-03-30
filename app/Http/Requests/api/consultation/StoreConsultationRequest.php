@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\api\consultation;
 
+use App\Enums\AccountStatus;
 use App\Models\AppointmentRequest;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
@@ -60,6 +61,13 @@ class StoreConsultationRequest extends FormRequest
 
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
+           if ($consultant && $consultant->status !== AccountStatus::ACTIVE->value) {
+                    $validator->errors()->add(
+                        'consultant_id',
+                        __('messages.consultant_not_available')
+                    );
+                }
+
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
             $statuses =

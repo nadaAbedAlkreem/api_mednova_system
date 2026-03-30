@@ -49,6 +49,7 @@ class CustomerResource extends JsonResource
                 'average_rating' => $this->average_rating ,
                 'total_reviews'=> $this->total_reviews   ,
                 'is_completed' => $this->isProfileCompleted(),
+                'account_status' => $this->account_status ,
                 'approval_status' => $this->approval_status ,
                 'timezone'=> $this->timezone ?? app('config')->get('app.timezone') ,
                 'email_verified_at'=> $this->email_verified_at,

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Device\DeviceRequestController;
 use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
+use App\Http\Controllers\Api\Package\UserPackageController;
 use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
 use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
@@ -136,13 +137,6 @@ use Illuminate\Support\Facades\Route;
 
             });
 
-//        //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
-//            Route::prefix('/videos')->group(function () {
-//                    Route::post('/store', [ProgramVideosController::class, 'store']);          // إضافة فيديو done
-//                    Route::post('/update', [ProgramVideosController::class, 'update']);     // تعديل فيديوdone
-//                    Route::delete('delete/{videoId}', [ProgramVideosController::class, 'destroy']); // حذف فيديوdone
-//        //            Route::post('order', [ProgramVideosController::class, 'updateOrder']); // تعديل ترتيب الفيديوهات
-//                });
             Route::prefix('{program}/review-requests')->group(function () {
         //            Route::get('/', [ProgramReviewRequestController::class, 'index']); // قائمة الطلبات الخاصة بالبرنامج
         //            Route::post('', [ProgramReviewRequestsController::class, 'store']);  // إنشاء طلب مراجعةdone
@@ -199,14 +193,13 @@ use Illuminate\Support\Facades\Route;
                     Route::prefix('users')->group(function () {
                         Route::get('/', [UserController::class, 'getAll']);
                         Route::get('/{id}', [UserController::class, 'getById']);
-            //                     Route::patch('{id}/block', [UserController::class, 'toggleBlock']);
                         Route::patch('{id}/status', [UserController::class, 'updateApprovalStatus']);
                         Route::patch('{id}/status-account', [UserController::class, 'updateAccountStatus']);
-            //                Route::put('{id}', [UserController::class, 'update']);
+                        Route::patch('{id}/temporary-subscription', [UserController::class, 'assignTemporaryPackage']);
                         Route::delete('{id}', [UserController::class, 'destroy']);
                     });
-
-                    Route::prefix('programs')->group(function () {
+                    Route::prefix('programs')->group(function ()
+                    {
                         Route::get('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'getAll']); // done
                         Route::get('{id}', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'show']); //done
                         Route::post('/', [\App\Http\Controllers\Api\ControlPanel\ProgramDepartment\ProgramController::class, 'store']);// done
@@ -221,10 +214,14 @@ use Illuminate\Support\Facades\Route;
                             Route::get('{videoId}', [ProgramVideosController::class, 'show']); //done
 
                         });
-
                     });
 
-                    //        Route::post('{program}/archive', [ProgramController::class, 'archive']);        // أرشفة البرنامج
+                    Route::prefix('subscription')->group(function ()
+                    {
+                        Route::get('/subscribing-users', [UserPackageController::class , 'subscribedUsers']); // done
+                        Route::patch('/subscribing-users/{subscriberId}', [UserPackageController::class, 'accountDeactivation']); // حذف فيديوdone
+
+                    });
 
                 });
             });

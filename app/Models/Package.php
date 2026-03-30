@@ -37,4 +37,5 @@ class Package extends Model
     {
         return $this->belongsToMany(Feature::class, 'package_feature')->withPivot('is_enabled','value')->withTimestamps();
     }
+
 }
