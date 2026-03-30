@@ -4,18 +4,23 @@ namespace App\Http\Controllers\Api\ControlPanel\UserDepartment;
 
 use App\Enums\AccountStatus;
 use App\Enums\StatusType;
+use App\Events\TemporaryPackageAssigned;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\ControlPanel\Subscribtion\UserPackageResource;
 use App\Http\Resources\Api\Customer\CustomerResource;
+use App\Mail\SubscriptionActivatedMail;
 use App\Models\Customer;
 use App\Repositories\ICustomerRepositories;
 use App\Repositories\IUserPackageRepositories;
 use App\Services\Api\Customer\CustomerService;
+use App\Services\Api\Package\PackageService;
 use App\Traits\ResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
@@ -25,13 +30,15 @@ class UserController extends Controller
     protected ICustomerRepositories $customerRepositories;
     protected IUserPackageRepositories $userPackageRepositories;
     protected CustomerService $customerService;
+    protected PackageService $packageService;
 
 
-    public function __construct(ICustomerRepositories $customerRepositories, CustomerService $customerService , IUserPackageRepositories $userPackageRepositories)
+    public function __construct(PackageService $packageService ,ICustomerRepositories $customerRepositories, CustomerService $customerService , IUserPackageRepositories $userPackageRepositories)
     {
         $this->customerRepositories = $customerRepositories;
         $this->customerService = $customerService;
         $this->userPackageRepositories = $userPackageRepositories;
+        $this->packageService = $packageService;
     }
 
     public function getAll(Request $request): \Illuminate\Http\JsonResponse
@@ -123,36 +130,56 @@ class UserController extends Controller
         }
     }
 
-
-    function assignTemporaryPackage($userId): \Illuminate\Http\JsonResponse
+    public function assignTemporaryPackage(int $userId): \Illuminate\Http\JsonResponse
     {
         try {
-            $now = Carbon::now();
-            $endsAt = $now->copy()->addMonth();
-            $customer = $this->customerRepositories->findOrFail($userId);
-            if (!$customer->isProfileCompleted() || !$customer->email_verified_at || !($customer->approval_status == StatusType::APPROVED->value)) {
-                throw new \Exception(__('messages.Subscription_Restrictions'));
-            }
-            $preSubscribedConsultant  = $this->userPackageRepositories->getWhere(['is_active' =>  1 , 'customer_id' =>$userId ]);
-            if ($preSubscribedConsultant->isNotEmpty()) {
-                throw new \Exception(__('messages.Pre_Subscription_Restrictions'));
-            }
-            $userPackage = $this->userPackageRepositories->create([
-                    'customer_id' => $userId,
-                    'package_id' => 1,
-                    'starts_at' => $now,
-                    'ends_at' => $endsAt,
-                    'is_active' => 1,
-                ]);
-            $userPackage->customer->update(['account_status' => AccountStatus::ACTIVE->value]);
+            DB::beginTransaction();
+            $userPackage = $this->packageService->assignTemporaryPackage($userId);
+            DB::commit();
             return $this->successResponse(__('messages.Successful_Subscriber'), new UserPackageResource($userPackage), 200);
-        }catch (ModelNotFoundException $e) {
-            return $this->errorResponse(__('messages.USER_NOT_FOUND'), [], 404);
-
+        } catch (ModelNotFoundException) {
+            DB::rollBack();return $this->errorResponse(__('messages.USER_NOT_FOUND'), [], 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
+
+
+//    function assignTemporaryPackage($userId): \Illuminate\Http\JsonResponse
+//    {
+//        try {
+//            db::beginTransaction();
+//            $now = Carbon::now();
+//            $endsAt = $now->copy()->addMonth();
+//            $customer = $this->customerRepositories->findOrFail($userId);
+//            if (!$customer->isProfileCompleted() || !$customer->email_verified_at || !($customer->approval_status == StatusType::APPROVED->value)) {
+//                throw new \Exception(__('messages.Subscription_Restrictions'));
+//            }
+//            $preSubscribedConsultant  = $this->userPackageRepositories->getWhere(['is_active' =>  1 , 'customer_id' =>$userId ]);
+//            if ($preSubscribedConsultant->isNotEmpty()) {
+//                throw new \Exception(__('messages.Pre_Subscription_Restrictions'));
+//            }
+//            $userPackage = $this->userPackageRepositories->create([
+//                    'customer_id' => $userId,
+//                    'package_id' => 1,
+//                    'starts_at' => $now,
+//                    'ends_at' => $endsAt,
+//                    'is_active' => 1,
+//                ]);
+//            $userPackage->customer->update(['account_status' => AccountStatus::ACTIVE->value]);
+//            $url = url("https://mednovacare.com/profile");
+//            event(new TemporaryPackageAssigned($customer, $url));
+//            db::commit();
+//            return $this->successResponse(__('messages.Successful_Subscriber'), new UserPackageResource($userPackage), 200);
+//        }catch (ModelNotFoundException $e) {
+//            db::rollBack();
+//            return $this->errorResponse(__('messages.USER_NOT_FOUND'), [], 404);
+//        } catch (\Exception $e) {
+//            db::rollBack();
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+//        }
+//    }
 //    public function subscribedUsers(): \Illuminate\Http\JsonResponse
 //    {
 //        try {

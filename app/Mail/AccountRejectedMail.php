@@ -27,7 +27,7 @@ class AccountRejectedMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('تم رفض حسابك بنجاح')
+        return $this->subject('Your account has been successfully declined')
             ->view('emails.account-rejected')
             ->with([
                 'user' => $this->user,

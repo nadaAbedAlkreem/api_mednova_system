@@ -24,7 +24,7 @@ class AccountApprovedMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('تم اعتماد حسابك بنجاح')
+        return $this->subject('Your account has been successfully approved')
             ->view('emails.account-approved')
             ->with([
                 'user' => $this->user,
