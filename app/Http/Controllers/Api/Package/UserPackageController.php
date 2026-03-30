@@ -94,7 +94,7 @@ class UserPackageController extends Controller
         try {
             $userPackage = $this->userPackageRepositories->findOne($id);
             if (!$userPackage) {return $this->errorResponse(__('messages.PACKAGE_NOT_FOUND'), [], 404);}
-            if (!$userPackage->is_active) {return $this->errorResponse(__('messages.pre_package_disabled'), [], 404);}
+            if (!$userPackage->is_active) {return $this->errorResponse(__('messages.pre_package_disabled'), [], 500);}
             $userPackage->update(['is_active' => 0, 'ends_at' => now()]);
             $userPackage->customer->update(['account_status' => AccountStatus::INACTIVE->value]);
             return $this->successResponse(__('messages.account_successfully_disabled'), [], 200);
