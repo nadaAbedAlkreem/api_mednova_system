@@ -163,6 +163,7 @@ class Customer extends Authenticatable
         static::creating(function ($customer) {
             if (empty($customer->approval_status) && !empty($customer->type_account)) {
                 $customer->approval_status = self::resolveDefaultStatus($customer->type_account);
+                $customer->account_status = self::resolveDefaultAccountStatus($customer->type_account);
             }
         });
         static::deleting(function ($customer) {
@@ -238,6 +239,12 @@ class Customer extends Authenticatable
         return $type === ConsultantType::PATIENT->value
             ? StatusType::APPROVED->value
             : StatusType::PENDING->value;
+    }
+    public static function resolveDefaultAccountStatus(string $type): string
+    {
+        return $type === ConsultantType::PATIENT->value
+            ? AccountStatus::ACTIVE->value
+            : AccountStatus::INACTIVE->value;
     }
 
     public function scopeSpecialistsAndCenters(Builder $query): Builder
