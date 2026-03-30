@@ -46,7 +46,7 @@ class CustomerService
     public function getAll(array $filters = [], int $limit = 10)
     {
         $query = $this->model->query();
-        $query->where('account_status', AccountStatus::ACTIVE);
+//        $query->where('account_status', AccountStatus::ACTIVE);
         if (!empty($filters['type_account'])) {
             $query->where('type_account', $filters['type_account']);
         }
