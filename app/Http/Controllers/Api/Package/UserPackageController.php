@@ -33,7 +33,7 @@ class UserPackageController extends Controller
             $limit = $request->query('limit') ?? 10;
             $today = Carbon::now();
 //            $subscribedUsers = $this->userPackageRepositories->paginateWhereWith(['is_active' => 1 ,['starts_at', '<=', $today], ['ends_at', '>=', $today]],['customer' , 'package'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
-            $filters = $request->only(['customer_name', 'email', 'is_active']);
+            $filters = $request->only(['search', 'type_account', 'approval_status', 'verified' , 'account_status']);
             $today = Carbon::now();
             $subscribedUsers = $this->userPackageRepositories->getFilteredSubscribedUsers($today,$filters, $limit);
 
