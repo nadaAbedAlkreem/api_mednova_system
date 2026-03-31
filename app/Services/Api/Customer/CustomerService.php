@@ -50,6 +50,9 @@ class CustomerService
         if (!empty($filters['type_account'])) {
             $query->where('type_account', $filters['type_account']);
         }
+        if (!empty($filters['account_status'])) {
+            $query->where('account_status', $filters['account_status']);
+        }
         if (!empty($filters['approval_status'])) {
             $query->where('approval_status', $filters['approval_status']);
         }

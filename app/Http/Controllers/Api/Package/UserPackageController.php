@@ -32,8 +32,12 @@ class UserPackageController extends Controller
         try {
             $limit = $request->query('limit') ?? 10;
             $today = Carbon::now();
-            $subscribedUsers = $this->userPackageRepositories->paginateWhereWith(['is_active' => 1 ,['starts_at', '<=', $today], ['ends_at', '>=', $today]],['customer' , 'package'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
-             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), UserPackageResource::collection($subscribedUsers), 202 , [
+//            $subscribedUsers = $this->userPackageRepositories->paginateWhereWith(['is_active' => 1 ,['starts_at', '<=', $today], ['ends_at', '>=', $today]],['customer' , 'package'] , ['column' => 'id', 'dir' => 'DESC'] , $limit);
+            $filters = $request->only(['customer_name', 'email', 'package_name', 'is_active']);
+            $today = Carbon::now();
+            $subscribedUsers = $this->userPackageRepositories->getFilteredSubscribedUsers($today,$filters, $limit);
+
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), UserPackageResource::collection($subscribedUsers), 202 , [
                  'current_page' => $subscribedUsers->currentPage(),
                  'per_page' => $subscribedUsers->perPage(),
                  'total' => $subscribedUsers->total(),
