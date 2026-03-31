@@ -31,8 +31,8 @@ class UserPackageRepository extends BaseRepository implements IUserPackageReposi
         // فلترة حسب اسم العميل
         if (!empty($filters['search'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
-                $q->where('full_name', 'LIKE', '%' . $filters['customer_name'] . '%');
-                $q->where('email', 'LIKE', '%' . $filters['email'] . '%');
+                $q->where('full_name', 'LIKE', '%' . $filters['search'] . '%');
+                $q->where('email', 'LIKE', '%' . $filters['search'] . '%');
             });
         }
         if (!empty($filters['account_status'])) {
