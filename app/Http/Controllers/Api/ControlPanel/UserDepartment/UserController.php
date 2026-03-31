@@ -45,7 +45,7 @@ class UserController extends Controller
     {
         try {
             $limit = $request->query('limit') ?? 10;
-            $filters = $request->only(['search', 'type_account', 'approval_status', 'verified']);
+            $filters = $request->only(['search', 'type_account', 'approval_status', 'verified' , 'account_status']);
             $customers = $this->customerService->getAll($filters, $limit);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), CustomerResource::collection($customers)  , 202 ,  [
                 'current_page' => $customers->currentPage(),
