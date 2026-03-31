@@ -35,12 +35,24 @@ class UserPackageRepository extends BaseRepository implements IUserPackageReposi
                 $q->where('email', 'LIKE', '%' . $filters['email'] . '%');
             });
         }
-        // فلترة حسب اسم الباكيج
-        if (!empty($filters['package_name'])) {
-            $query->whereHas('package', function ($q) use ($filters) {
-                $q->where('name', 'LIKE', '%' . $filters['package_name'] . '%');
-            });
+        if (!empty($filters['account_status'])) {
+            $query->where('account_status', $filters['account_status']);
         }
+        if (!empty($filters['type_account'])) {
+            $query->where('type_account', $filters['type_account']);
+        }
+
+        if (!empty($filters['approval_status'])) {
+            $query->where('approval_status', $filters['approval_status']);
+        }
+        if (isset($filters['verified'])) {
+            if ($filters['verified']) {
+                $query->whereNotNull('email_verified_at'); // متحقق
+            } else {
+                $query->whereNull('email_verified_at'); // غير متحقق
+            }
+        }
+
 
         $results = $query->orderBy('id', 'desc')->paginate($limit);
         $results->appends($filters); // للحفاظ على الفلاتر في روابط الباجينيشن
