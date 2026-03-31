@@ -35,22 +35,26 @@ class UserPackageRepository extends BaseRepository implements IUserPackageReposi
                 $q->where('email', 'LIKE', '%' . $filters['search'] . '%');
             });
         }
-        if (!empty($filters['account_status'])) {
-            $query->where('account_status', $filters['account_status']);
-        }
         if (!empty($filters['type_account'])) {
-            $query->where('type_account', $filters['type_account']);
+            $query->whereHas('customer', function ($q) use ($filters) {
+                $q->where('type_account', $filters['type_account']);
+            });
         }
 
         if (!empty($filters['approval_status'])) {
-            $query->where('approval_status', $filters['approval_status']);
+            $query->whereHas('customer', function ($q) use ($filters) {
+                $q->where('approval_status', $filters['approval_status']);
+            });
         }
         if (isset($filters['verified'])) {
-            if ($filters['verified']) {
-                $query->whereNotNull('email_verified_at'); // متحقق
-            } else {
-                $query->whereNull('email_verified_at'); // غير متحقق
-            }
+            $query->whereHas('customer', function ($q) use ($filters) {
+                if ($filters['verified']) {
+                    $q->whereNotNull('email_verified_at'); // متحقق
+                } else {
+                    $q->whereNull('email_verified_at'); // غير متحقق
+                }
+            });
+
         }
 
 
