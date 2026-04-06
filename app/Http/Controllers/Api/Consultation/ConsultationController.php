@@ -53,6 +53,7 @@ class ConsultationController extends Controller
                 consultationPrice: $consultant->$relation->$price, cardType: 'domestic');
             $this->authorize('createRequest', $consultant);
             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
+            dd($consultation);
             DB::commit();
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201);
         } catch (AuthorizationException $e) {

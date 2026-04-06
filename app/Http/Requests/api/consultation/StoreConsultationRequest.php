@@ -3,6 +3,9 @@
 namespace App\Http\Requests\api\consultation;
 
 use App\Enums\AccountStatus;
+use App\Enums\ConsultationType;
+use App\Enums\FinancialStatus;
+use App\Enums\StatusType;
 use App\Models\AppointmentRequest;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
@@ -184,7 +187,8 @@ class StoreConsultationRequest extends FormRequest
     public function getData()
     {
         $data= $this::validated();
-        $data['status'] =   $data['status'] ?? 'pending';
+        $data['status'] =   $data['status'] ?? StatusType::PENDING;
+        $data['financial_status'] =   $data['financial_status'] ?? FinancialStatus::UNPAID ;
          if (isset($data['requested_time'])) {
              // تحويل وقت البدء إلى UTC
              $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $this['timezone']);
