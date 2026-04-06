@@ -47,7 +47,7 @@ class ConsultationController extends Controller
             DB::beginTransaction();
             $type = $request['consultant_nature'];
             $relation = ($request['consultant_type'] == ConsultantType::THERAPIST->value ) ? 'therapist' : 'rehabilitationCenter'  ;
-            $price  = ($request['consultant_nature'] == ConsultationType::CHAT->value ) ? 'chat_consultation_price'  : 'video_consultation_price' ;
+            $price    = ($request['consultant_nature'] == ConsultationType::CHAT->value ) ? 'chat_consultation_price'  : 'video_consultation_price' ;
             $consultant = \App\Models\Customer::with($relation)->find($request['consultant_id']);
             $breakdown = PaymentFeeCalculator::calculateTotal(
                 consultationPrice: $consultant->$relation->$price, cardType: 'domestic');
