@@ -18,6 +18,7 @@ class HttpStatus
         "422" => "Unprocessable Entity"  ,
         "500" => "Internal Server Error"  ,
         "503" => "Service Unavailable . "  ,
+        "502" => "Gateway Timeout"  ,
         "401" => "Invalid credentials . "  ,
         "403" => "Forbidden error"  ,
     ];

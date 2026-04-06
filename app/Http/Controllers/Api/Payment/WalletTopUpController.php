@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\payment\WalletTopUpRequest;
+use App\Http\Requests\api\payment\PaymentIntentRequest;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\IWalletRepositories;
 use App\Services\Api\Payment\AmwalPayService;
 use App\Services\Api\Payment\FinancialOperationFactory;
-use App\Services\Api\Payment\PaymentIntentService;
+use App\Services\Api\Payment\ConsultationPaymentIntentService;
 use App\Services\Api\Payment\WalletTopUpService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -19,16 +19,16 @@ class WalletTopUpController extends Controller
 
     protected IWalletRepositories $walletRepository;
     protected AmwalPayService $amwalPayService;
-    protected PaymentIntentService $paymentIntentService;
+    protected ConsultationPaymentIntentService $consultationPaymentIntentService;
     protected IGatewayPaymentRepositories $gatewayPaymentRepositories;
     protected WalletTopUpService $financialTransactionService;
 
 
-    public function __construct(WalletTopUpService $financialTransactionService, IGatewayPaymentRepositories $gatewayPaymentRepositories, IWalletRepositories $walletRepository, AmwalPayService $amwalPayService, PaymentIntentService $paymentIntentService)
+    public function __construct(WalletTopUpService $financialTransactionService, IGatewayPaymentRepositories $gatewayPaymentRepositories, IWalletRepositories $walletRepository, AmwalPayService $amwalPayService, ConsultationPaymentIntentService $consultationPaymentIntentService)
     {
         $this->walletRepository = $walletRepository;
         $this->amwalPayService = $amwalPayService;
-        $this->paymentIntentService = $paymentIntentService;
+        $this->consultationPaymentIntentService = $consultationPaymentIntentService;
         $this->gatewayPaymentRepositories = $gatewayPaymentRepositories;
         $this->financialTransactionService = $financialTransactionService;
     }
@@ -58,17 +58,7 @@ class WalletTopUpController extends Controller
 //             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 //        }
 //    }
-    public function store(WalletTopUpRequest $request)
-    {
-        $customer = $request->user();
 
-        return $this->paymentIntentService->create(
-            owner: $customer,
-            amount: $request->amount,
-            paymentMethod: $request->payment_method,
-            purpose: 'wallet_top_up'
-        );
-    }
 
     public function handle(Request $request)
     {

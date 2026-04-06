@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Payment;
 
+use App\Exceptions\GatewayException;
 use App\Repositories\Eloquent\TransactionRepository;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\ITransactionRepositories;
@@ -36,77 +37,61 @@ class AmwalPayService
         $this->gatewayPaymentRepository = $gatewayPaymentRepository;
     }
 
-    public function createPaymentLinkByAmwalPay($data): object
+    public function createPaymentLink($data): object
     {
         try {
-            $tid = config('amwal.tid');
-            $mid = config('amwal.mid');
-            $currency = config('amwal.currency.OMR');
-            $url = config('amwal.redirectUrl');
-            $amwalBaseUrl = config('amwal.base_url');
-            $paymentMethod = config('amwal.payment_methods')[$data['payment_method']] ?? null;
-            if (!$paymentMethod) {
-                throw new \Exception('Invalid payment method');
-            }
-
-            $billerRef = Str::uuid()->toString();
+            $billerRef     = $data['biller_ref'];
+            $amount        = number_format($data['amount'], 3, '.', '');
+            $currency      = config('amwal.currency.OMR'); // 512
+            $tid           = config('amwal.tid');
+            $mid           = config('amwal.mid');
+            $amwalBaseUrl  = config('amwal.base_url');
+            $paymentMethod = config('amwal.payment_methods')['card']; // 1
 
             $payload = [
-                'billerRefNumber' => $billerRef,
-                'payerName' => $data['customer']->full_name,
-                'amount' => number_format($data['amount'], 3, '.', ''),
-                'currency' => $currency,
-                'paymentMethod' => $paymentMethod,
-
-                'notificationMethod' => 1,
-                'emailNotificationValue' => $data['customer']->email,
-                'smsNotificationValue' => '',
-
-                'terminalId' => $tid,
-                'merchantId' => $mid,
-
-                'expireDateTime' => '',
-                'maxNumberOfPayment' => 1,
-                'paymentViewType' => 1,
-
-                'redirectUrl' => $url . '/profile/consultations',
+                'billerRefNumber'        => $billerRef,
+                'payerName'              => $data['payer_name'],
+                'amount'                 => $amount,
+                'currency'               => $currency,
+                'paymentMethod'          => $paymentMethod,
+                'notificationMethod'     => 1,
+                'emailNotificationValue' => $data['email'],
+                'smsNotificationValue'   => '',
+                'terminalId'             => $tid,
+                'merchantId'             => $mid,
+                'expireDateTime'         => '',
+                'maxNumberOfPayment'     => 1,
+                'paymentViewType'        => 1,
+                'redirectUrl'            => config('amwal.redirectUrl') . 'profile/consultations',
             ];
 
-            // Generate secure hash
+            // ✅ نفس طريقة الكود القديم: hash على كل الـ payload
             $payload['secureHashValue'] = $this->generateSecureHash($payload);
-            Log::error('secureHashValue in  payment link : ' .  $payload['secureHashValue']);
 
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post(
-                $amwalBaseUrl . '/MerchantOrder/CreatePaymentLink',
-                $payload
-            );
-            if (!($response->successful() && ($response->json('success') === true))) {
-                throw new \Exception(__('messages.failed_to_initialize'));
+            $response = Http::timeout(30)
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post($amwalBaseUrl . '/MerchantOrder/CreatePaymentLink', $payload);
+
+            if ($response->failed()) {
+                throw new \Exception('HTTP error: ' . $response->status());
             }
-//            $this->gatewayPaymentRepository->create([
-//                'transaction_id' => null,
-//                'reference_type' => Customer::class,
-//                'reference_id' => $data['customer']->id,
-//                'gateway' => 'amwal',
-//                'gateway_transaction_id' => null,
-//                'gateway_reference' => $billerRef,
-//                'payment_method' => $data['payment_method'],
-//                'amount' => $data['amount'],
-//                'currency' => 'OMR',
-//                'status' => 'initiated',
-//                'response_message' => $response['message'] ?? null,
-//                'payload' => $response, // JSON column ممتاز
-//            ]);
+
+            $body = $response->json();
+
+            if (!($body['success'] ?? false)) {
+                throw new \Exception('Amwal Pay error: ' . ($body['message'] ?? 'Unknown'));
+            }
 
             return (object)[
-                'success' => $response->successful() && ($response->json('success') === true),
-                'payment_url' => $response->json('data'),
-                'raw' => $response->json(),
+                'success'     => true,
+                'checkoutUrl' => $body['data'],
+                'billerRef'   => $billerRef,
+                'raw'         => $body,
             ];
-        } catch (Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+
+        } catch (\Exception $exception) {
+            throw new GatewayException($exception->getMessage());
+
         }
     }
 
@@ -156,7 +141,8 @@ class AmwalPayService
                 $payload,
                 $paymentStatus,
                 $amountOMR,
-                $systemReference) {
+                $systemReference
+            ) {
                 // 7️⃣ إذا الدفع ناجح، أنشئ Transaction وحدث الـ Wallet
                 if ($paymentStatus === 'captured') {
 
@@ -198,7 +184,7 @@ class AmwalPayService
                         'gateway_transaction_id' => $systemReference,
                         'status' => $paymentStatus,
                         'payload' => $payload,
-                    ],$gatewayPayment->id);
+                    ], $gatewayPayment->id);
                     // تحديث رصيد الـ Wallet
                     $wallet->increment('balance', $amountOMR);
                     $wallet->increment('available_balance', $amountOMR);
@@ -224,10 +210,8 @@ class AmwalPayService
     {
         unset($payload['SecureHash'], $payload['secureHashValue']);
 
-        // ترتيب المفتاح alphabetically
         ksort($payload);
 
-        // تحويل كل القيمة إلى string صريح
         $baseString = collect($payload)
             ->map(fn($value, $key) => $value === null ? "{$key}=" : "{$key}={$value}")
             ->implode('&');
@@ -236,7 +220,6 @@ class AmwalPayService
 
         return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
-
     private function generateSecureHashForWebhook(array $payload): string
     {
         $allowedKeys = [
@@ -258,7 +241,7 @@ class AmwalPayService
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
 
         // 2️⃣ null → empty string
-        $filtered = array_map(fn ($v) => $v === null ? '' : (string)$v, $filtered);
+        $filtered = array_map(fn($v) => $v === null ? '' : (string)$v, $filtered);
 
         // 3️⃣ ترتيب أبجدي
         ksort($filtered);
@@ -275,9 +258,6 @@ class AmwalPayService
 
         return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
-
-
-
 
 
 }

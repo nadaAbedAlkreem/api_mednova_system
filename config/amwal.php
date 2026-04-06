@@ -16,6 +16,5 @@ return [
     'currency' => [
         'OMR' => 512,
     ],
-    'redirectUrl' => 'https://mednova-seven.vercel.app/',
-    'https://demoapplication.jawebhom.com/amwalpay/callback'
-];
+    'redirectUrl' => 'https://mednovacare.com/',
+ ];

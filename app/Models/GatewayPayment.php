@@ -14,12 +14,13 @@ class GatewayPayment extends Model
     protected $table = 'gateway_payments';
 
     protected $fillable = [
-        'transaction_id',
+//        'transaction_id',
         'reference_type',
         'reference_id',
         'gateway',
         'gateway_transaction_id',
         'gateway_reference',
+        'initiated_lock',
         'payment_method',
         'card_id',
         'bank_account_id',
@@ -41,9 +42,13 @@ class GatewayPayment extends Model
     /**
      * العلاقة مع جدول Transaction
      */
-    public function transaction()
+//    public function transaction()
+//    {
+//        return $this->belongsTo(Transaction::class);
+//    }
+    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->hasOne(Transaction::class, 'gateway_payment_id');
     }
     public function reference(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {

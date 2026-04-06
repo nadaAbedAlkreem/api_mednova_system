@@ -23,7 +23,6 @@ class ConsultationChatRequestResource extends JsonResource
                 'patient' => new CustomerResource($this->whenLoaded('patient')),
                 'consultant' => new CustomerResource($this->whenLoaded('consultant')) ,
                 'consultant_type' => $this->consultant_type ,
-                'status' => $this->status ,
                 'max_messages_for_patient' => $this->max_messages_for_patient ,
                 'patient_message_count' => $this->patient_message_count ?? 0  ,
                 'consultant_message_count' => $this->consultant_message_count ?? 0,

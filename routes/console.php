@@ -13,3 +13,4 @@ Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 //Schedule::command('app:check-pending-glove-commands')->everyFiveSeconds();
 //Schedule::command('consultations:check-status')->hourly(); in production
 Schedule::command('consultations:check-status')->everyFifteenSeconds();
+Schedule::command('payments:expire-stale')->everyFifteenMinutes();

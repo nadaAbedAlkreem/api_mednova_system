@@ -14,7 +14,7 @@ class Wallet extends Model
         'owner_type',
         'owner_id',
         'currency',
-        'balance',
+//        'balance',
         'available_balance',
         'pending_balance',
         'frozen_balance',
