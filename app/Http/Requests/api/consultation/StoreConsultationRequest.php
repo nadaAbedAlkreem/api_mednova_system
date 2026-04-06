@@ -46,6 +46,10 @@ class StoreConsultationRequest extends FormRequest
             'gateway_commission_rate'  => 'nullable|numeric|min:0|max:100',
             'gateway_commission_amount'=> 'nullable|numeric|min:0|max:99999999.99',
             'net_amount'               => 'nullable|numeric|min:0|max:99999999.99',
+            'financial_status' =>'nullable' ,
+            'review_deadline' =>'nullable',
+            'released_at' =>'nullable',
+
 
         ];
     }
