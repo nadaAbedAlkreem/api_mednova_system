@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Package\UserPackageController;
+use App\Http\Controllers\Api\Payment\GatewayPaymentController;
 use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
 use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
@@ -111,6 +112,10 @@ use Illuminate\Support\Facades\Route;
             });
             Route::prefix('consultation-request')->group(function ()
             {
+                Route::prefix('payment-gateway')->group(function () {
+                    Route::post('create-link-payment/{type}/{id}', [GatewayPaymentController::class, '__invoke']);
+
+                });
                 Route::post('/store', [ConsultationController::class, 'store']);
                 Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
                 Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
@@ -174,10 +179,7 @@ use Illuminate\Support\Facades\Route;
                 Route::get('enums', [ReportController::class, 'reportEnums']);
                 Route::post('store', [ReportController::class, 'store']);
             });
-            Route::prefix('payment-gateway')->group(function () {
-                Route::post('create-link-payment', [WalletTopUpController::class, 'store']);
 
-            });
 
         });
 

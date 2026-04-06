@@ -56,8 +56,6 @@ class UserPackageRepository extends BaseRepository implements IUserPackageReposi
             });
 
         }
-
-
         $results = $query->orderBy('id', 'desc')->paginate($limit);
         $results->appends($filters); // للحفاظ على الفلاتر في روابط الباجينيشن
         return $results;

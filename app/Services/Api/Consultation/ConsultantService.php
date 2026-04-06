@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use phpseclib3\File\ASN1\Maps\Characteristic_two;
 
 class ConsultantService
 {
@@ -27,10 +28,13 @@ class ConsultantService
         $this->appointmentRepo = $appointmentRepo;
     }
 
-    public function createConsultationByType(array $data, string $type)
+    public function createConsultationByType(array $data, string $type ,array $breakdown)
     {
-        return DB::transaction(function () use ($data, $type) {
-
+        return DB::transaction(function () use ($data, $type , $breakdown) {
+            $data['consultation_price'] = $breakdown['consultation_price'];
+            $data['gateway_commission_rate'] = $breakdown['gateway_commission_rate'];
+            $data['gateway_commission_amount'] = $breakdown['gateway_commission_amount'];
+            $data['net_amount'] = $breakdown['net_amount'];
             if ($type === 'chat') {
                 $consultation = $this->chatRepo->create($data);
                 $consultation->load(['patient', 'consultant']);
@@ -40,7 +44,6 @@ class ConsultantService
                 if (isset($data['requested_time'])) {
                     $data['confirmed_end_time'] = Carbon::parse($data['requested_time'])->addMinutes(60);
                 }
-
                 $appointment = $this->appointmentRepo->create($data);
                 $data['appointment_request_id'] = $appointment->id;
                 $consultation = $this->videoRepo->create($data);

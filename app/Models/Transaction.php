@@ -13,6 +13,7 @@ class Transaction extends Model
     protected $fillable = [
         'reference_type',
         'reference_id',
+        'gateway_payment_id',
         'transaction_type',
         'entry_type',
         'wallet_id',
@@ -39,11 +40,14 @@ class Transaction extends Model
         return $this->morphTo();
     }
 
-    public function gatewayPayment(): \Illuminate\Database\Eloquent\Relations\HasOne
+//    public function gatewayPayment(): \Illuminate\Database\Eloquent\Relations\HasOne
+//    {
+//        return $this->hasOne(GatewayPayment::class);
+//    }
+    public function gatewayPayment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasOne(GatewayPayment::class);
+        return $this->belongsTo(GatewayPayment::class, 'gateway_payment_id');
     }
-
     /**
      * Wallet related to this transaction
      */

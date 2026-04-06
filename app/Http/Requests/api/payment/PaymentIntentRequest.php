@@ -4,7 +4,7 @@ namespace App\Http\Requests\api\payment;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WalletTopUpRequest extends FormRequest
+class PaymentIntentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -81,6 +81,7 @@ class UserController extends Controller
     public function updateApprovalStatus(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {
+            DB::beginTransaction();
             $request->validate([
                 'approval_status' => 'required|in:pending,approved,rejected',
                 'reason' => 'required_if:approval_status,rejected|nullable|string|max:1000',
@@ -96,16 +97,20 @@ class UserController extends Controller
                 return $this->errorResponse(__('messages.CUSTOMER_NOT_FOUND'), [], 404);
             }
             $updatedCustomer = $this->customerService->updateApprovalStatus($customer, $statusEnum, $request->input('reason') ?? ' ');
+             DB::commit();
             return $this->successResponse(__('messages.UPDATE_STATUS_USER_ACTIVE'), ['approval_status' => $updatedCustomer->approval_status], 200);
         } catch (ValidationException $e) {
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), $e->errors(), 422);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
     public function updateAccountStatus(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {
+            DB::beginTransaction();
             $request->validate([
                 'account_status' => 'required|in:active,suspended,inactive,deleted,under_review',
                 'reason' => 'required_if:account_status,suspended|nullable|string|max:1000',
@@ -122,10 +127,13 @@ class UserController extends Controller
                 return $this->errorResponse(__('messages.CUSTOMER_NOT_FOUND'), [], 404);
             }
             $updatedCustomer = $this->customerService->updateAccountStatus($customer, $statusEnum, $request->input('reason') ?? ' ');
+            DB::commit();
             return $this->successResponse(__('messages.UPDATE_STATUS_USER_ACTIVE'), ['approval_status' => $updatedCustomer->account_status], 200);
         } catch (ValidationException $e) {
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), $e->errors(), 422);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }

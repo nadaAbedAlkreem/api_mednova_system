@@ -22,4 +22,15 @@ class GatewayPaymentRepository extends BaseRepository implements  IGatewayPaymen
             ->lockForUpdate()
             ->first();
     }
+
+    public function findInitiatedForReference(
+        string $referenceType,
+        int    $referenceId
+    ): ?GatewayPayment {
+        return GatewayPayment::where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->where('status', 'initiated')
+            ->latest()
+            ->first();
+    }
 }

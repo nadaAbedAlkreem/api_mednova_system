@@ -42,6 +42,10 @@ class StoreConsultationRequest extends FormRequest
             'timezone' => ['required_if:consultant_nature,video',Rule::in(\DateTimeZone::listIdentifiers())],
             'type_appointment'=>'required_if:consultant_nature,video|in:online,offline',
             'confirmed_end_time'=>'',
+            'consultation_price'       => 'nullable|numeric|min:0|max:99999999.99',
+            'gateway_commission_rate'  => 'nullable|numeric|min:0|max:100',
+            'gateway_commission_amount'=> 'nullable|numeric|min:0|max:99999999.99',
+            'net_amount'               => 'nullable|numeric|min:0|max:99999999.99',
 
         ];
     }
@@ -61,12 +65,12 @@ class StoreConsultationRequest extends FormRequest
 
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
-           if ($consultant && $consultant->account_status !== AccountStatus::ACTIVE->value) {
-                    $validator->errors()->add(
-                        'consultant_id',
-                        __('messages.consultant_not_available')
-                    );
-                }
+//           if ($consultant && $consultant->account_status !== AccountStatus::ACTIVE->value) {
+//                    $validator->errors()->add(
+//                        'consultant_id',
+//                        __('messages.consultant_not_available')
+//                    );
+//                }
 
             $patient = \App\Models\Customer::find($this->patient_id);
             $patientTimezone =  $this->timezone  ;
@@ -178,8 +182,6 @@ class StoreConsultationRequest extends FormRequest
         $data= $this::validated();
         $data['status'] =   $data['status'] ?? 'pending';
          if (isset($data['requested_time'])) {
-//             $patient = \App\Models\Customer::find($this->patient_id);
-//             $patientTimezone = $patient->timezone ;
              // تحويل وقت البدء إلى UTC
              $requestedTimeUtc = TimezoneService::toUTC($this['requested_time'], $this['timezone']);
              $data['requested_time'] = $requestedTimeUtc;

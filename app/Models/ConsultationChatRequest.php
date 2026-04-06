@@ -15,6 +15,9 @@ class ConsultationChatRequest extends Model
         'consultant_id' ,
         'consultant_type' ,
         'status' ,
+        'financial_status' ,
+        'review_deadline' ,
+        'released_at' ,
         'patient_message_count',
         'consultant_message_count' ,
         'first_patient_message_at' ,
@@ -24,8 +27,14 @@ class ConsultationChatRequest extends Model
         'ended_at' ,
         'action_by' ,
         'action_reason',
+        // Financial columns
+        'consultation_price',
+        'gateway_commission_rate',
+        'gateway_commission_amount',
+        'net_amount',
         'created_at',
         'updated_at',
+        'deleted_at',
 
     ];
     protected $casts = [
@@ -33,6 +42,10 @@ class ConsultationChatRequest extends Model
         'ended_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'consultation_price'       => 'decimal:2',
+        'gateway_commission_rate'  => 'decimal:2',
+        'gateway_commission_amount'=> 'decimal:2',
+        'net_amount'               => 'decimal:2',
     ];
 
     protected $dates = ['deleted_at'];
