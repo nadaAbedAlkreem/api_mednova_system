@@ -82,7 +82,7 @@ use Illuminate\Support\Facades\Route;
             Route::post('handle',[ZoomWebhookController::class, 'handle']);
         });
 
-        Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
+        Route::post('/amwalpay/callback', [GatewayPaymentController::class, 'handle']);
 
         Route::middleware(['auth:api'])->group(function () {
             Route::post('/logout', [LoginController::class, 'logout']);

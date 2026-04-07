@@ -60,24 +60,24 @@ class WalletTopUpController extends Controller
 //    }
 
 
-    public function handle(Request $request)
-    {
-        try {
-            $payload = $request->all();
-            $gatewayPayment = $this->gatewayPaymentRepositories->findByReference($payload['MerchantReference']);
-            if ($gatewayPayment->status !== 'initiated') {
-                return; // Idempotency
-            }
-            if ($payload['ResponseCode'] !== '00') {$gatewayPayment->update(['status' => 'failed']);return;}
-            // نجاح الدفع
-//        $this->financialTransactionService->execute($gatewayPayment, $payload);
-            $operation = FinancialOperationFactory::make('wallet_top_up');
-            $operation->execute(['gateway_payment' => $gatewayPayment, 'payload' => $payload]);
-            return $this->successResponse(__('messages.successful_capture_data_via_webhook'),[], 202);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-        }
-    }
+//    public function handle(Request $request)
+//    {
+//        try {
+//            $payload = $request->all();
+//            $gatewayPayment = $this->gatewayPaymentRepositories->findByReference($payload['MerchantReference']);
+//            if ($gatewayPayment->status !== 'initiated') {
+//                return; // Idempotency
+//            }
+//            if ($payload['ResponseCode'] !== '00') {$gatewayPayment->update(['status' => 'failed']);return;}
+//            // نجاح الدفع
+////        $this->financialTransactionService->execute($gatewayPayment, $payload);
+//            $operation = FinancialOperationFactory::make('wallet_top_up');
+//            $operation->execute(['gateway_payment' => $gatewayPayment, 'payload' => $payload]);
+//            return $this->successResponse(__('messages.successful_capture_data_via_webhook'),[], 202);
+//        } catch (\Exception $exception) {
+//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+//        }
+//    }
 
 
 //    public function captureDataViaWebhook(Request $request): \Illuminate\Http\JsonResponse
