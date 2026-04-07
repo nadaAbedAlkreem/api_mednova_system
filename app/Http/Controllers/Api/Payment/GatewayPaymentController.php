@@ -15,6 +15,7 @@ use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\IWalletRepositories;
 use App\Services\Api\Payment\AmwalPayService;
 use App\Services\Api\Payment\ConsultationPaymentIntentService;
+use App\Services\Api\Payment\FinancialOperationFactory;
 use App\Services\Api\Payment\PaymentFeeCalculator;
 use App\Services\Api\Payment\WalletTopUpService;
 use App\Traits\ResponseTrait;
@@ -23,6 +24,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class GatewayPaymentController extends Controller
@@ -103,6 +105,26 @@ class GatewayPaymentController extends Controller
                 'error' => $e->getMessage(),
             ]);
              return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' =>  $e->getMessage()], 500);
+        }
+    }
+
+
+    public function handle(Request $request)
+    {
+        try {
+            $payload = $request->all();
+            $gatewayPayment = $this->gatewayPaymentRepositories->findByReference($payload['MerchantReference']);
+            if ($gatewayPayment->status !== 'initiated') {
+                return; // Idempotency
+            }
+            if ($payload['ResponseCode'] !== '00') {$gatewayPayment->update(['status' => 'failed']);return;}
+            // نجاح الدفع
+//        $this->financialTransactionService->execute($gatewayPayment, $payload);
+            $operation = FinancialOperationFactory::make('wallet_top_up');
+            $operation->execute(['gateway_payment' => $gatewayPayment, 'payload' => $payload]);
+            return $this->successResponse(__('messages.successful_capture_data_via_webhook'),[], 202);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
 
