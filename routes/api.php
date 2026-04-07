@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Package\UserPackageController;
 use App\Http\Controllers\Api\Payment\GatewayPaymentController;
+use App\Http\Controllers\Api\Payment\AmwalWebhookController;
 use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
 use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
@@ -83,6 +84,7 @@ use Illuminate\Support\Facades\Route;
         });
 
         Route::post('/amwalpay/callback', [WalletTopUpController::class, 'handle']);
+        Route::post('/amwalpay/consultation/callback', [AmwalWebhookController::class, 'handleConsultation']);
 
         Route::middleware(['auth:api'])->group(function () {
             Route::post('/logout', [LoginController::class, 'logout']);
