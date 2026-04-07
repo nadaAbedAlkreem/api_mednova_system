@@ -7,8 +7,8 @@ use App\Models\Wallet;
 interface IWalletRepositories
 {
     public function getByOwner($ownerId): Wallet;
-    public function increaseAvailableBalance(Wallet $wallet, float $amount);
 
+    public function increaseAvailableBalance(Wallet $wallet, float $amount): Wallet;
 
-
+    public function increasePendingBalance(Wallet $wallet, float $amount): Wallet;
 }
