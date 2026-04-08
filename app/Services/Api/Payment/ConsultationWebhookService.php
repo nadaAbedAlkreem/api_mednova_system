@@ -26,7 +26,9 @@ readonly class ConsultationWebhookService
     public function processWebhook(array $payload): void
     {
         $this->validatePayload($payload);
-
+        Log::channel('financial')->info('consultation_webhook', [
+             'payload' => $payload,
+        ]);
         DB::transaction(function () use ($payload): void {
             $gatewayPayment = $this->gatewayPayments->findByReference($payload['MerchantReference']);
 
