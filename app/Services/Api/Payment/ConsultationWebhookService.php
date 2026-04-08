@@ -31,7 +31,9 @@ readonly class ConsultationWebhookService
         ]);
         DB::transaction(function () use ($payload): void {
             $gatewayPayment = $this->gatewayPayments->findByReference($payload['MerchantReference']);
-
+            Log::channel('financial')->info('$gatewayPayment', [
+                '$gatewayPayment' => $gatewayPayment,
+            ]);
             if (!$gatewayPayment) {
                 throw new HttpException(404, 'Gateway payment not found.');
             }
@@ -44,6 +46,9 @@ readonly class ConsultationWebhookService
 
                 return;
             }
+            Log::channel('financial')->info('$gatewayPayment', [
+                'bool' => true,
+            ]);
 //            if (!in_array($payload['PaidThrough'], ['Card'])) {
 //                Log::channel('financial')->warning('unexpected_payment_method', [
 //                    'method' => $payload['PaidThrough'],
