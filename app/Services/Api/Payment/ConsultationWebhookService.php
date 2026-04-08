@@ -41,7 +41,7 @@ readonly class ConsultationWebhookService
             Log::channel('financial')->info('$gatewayPayment', ['bool' => true]);
             if (!in_array($payload['PaidThrough'], ['Card'])) {
                 Log::channel('financial')->warning('unexpected_payment_method', [
-                    'method' => $payload['PaidThrough'],
+                    'method' => $payload['PaidThrough']
                 ]);
             }
             $this->assertHashIsValid($payload);
@@ -211,6 +211,8 @@ readonly class ConsultationWebhookService
 
     private function assertMidMerchantValid(array $payload):void
     {
+        Log::channel('Merchant')->info($payload['MerchantId'] , config('amwal.mid')  );
+
         if ((int)$payload['MerchantId'] !== config('amwal.mid')) {
             throw new HttpException(403, 'Invalid merchant');
         }
