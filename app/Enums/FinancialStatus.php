@@ -11,6 +11,8 @@ enum FinancialStatus: string
     case WITHDRAWN = 'withdrawn';
     case REFUNDED = 'refunded';
     case FROZEN = 'frozen';
+    case PAYMENT_SUSPENDED  = 'payment_suspended';
+
 
 
 

@@ -31,6 +31,12 @@ class GatewayPayment extends Model
         'response_code',
         'response_message',
         'payload',
+        'attempts',
+        'max_attempts',
+        'frozen_at',
+        'freeze_until',
+        'freeze_reason',
+
     ];
 
     protected $casts = [
