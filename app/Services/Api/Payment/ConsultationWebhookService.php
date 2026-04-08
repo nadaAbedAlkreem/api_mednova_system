@@ -39,11 +39,11 @@ readonly class ConsultationWebhookService
                 return;
             }
             Log::channel('financial')->info('$gatewayPayment', ['bool' => true]);
-//            if (!in_array($payload['PaidThrough'], ['Card'])) {
-//                Log::channel('financial')->warning('unexpected_payment_method', [
-//                    'method' => $payload['PaidThrough'],
-//                ]);
-//            }
+            if (!in_array($payload['PaidThrough'], ['Card'])) {
+                Log::channel('financial')->warning('unexpected_payment_method', [
+                    'method' => $payload['PaidThrough'],
+                ]);
+            }
             $this->assertHashIsValid($payload);
             $this->assertMidMerchantValid($payload);
             $this->assertTxnTypeIsValid($payload);
@@ -274,23 +274,18 @@ readonly class ConsultationWebhookService
     private function generateSecureHashForWebhook(array $payload): string
     {
         $allowedKeys = [
-//            'MerchantId',
-//            'TerminalId',
-//            'AuthorizationDateTime',
-//            'DateTimeLocalTrxn',
-//            'ResponseCode',
-//            'TxnType',
-//            'PaidThrough',
-//            'SystemReference',
-//            'Message',
-//            'MerchantReference',
-//            'Amount',
-//            'CurrencyId',
-            'MerchantReference' ,
-            'ResponseCode' ,
-            'SystemReference' ,
-            'Amount' ,
-            'CurrencyId' ,
+            'MerchantId',
+            'TerminalId',
+            'AuthorizationDateTime',
+            'DateTimeLocalTrxn',
+            'ResponseCode',
+            'TxnType',
+            'PaidThrough',
+            'SystemReference',
+            'Message',
+            'MerchantReference',
+            'Amount',
+            'CurrencyId',
         ];
 
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
