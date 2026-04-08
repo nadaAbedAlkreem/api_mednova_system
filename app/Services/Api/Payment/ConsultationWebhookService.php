@@ -18,37 +18,27 @@ readonly class ConsultationWebhookService
     public function __construct(
         private IGatewayPaymentRepositories $gatewayPayments,
         private ITransactionRepositories    $transactions,
-        private IWalletRepositories         $wallets,
-    )
+        private IWalletRepositories         $wallets)
     {
     }
 
     public function processWebhook(array $payload): void
     {
         $this->validatePayload($payload);
-        Log::channel('financial')->info('consultation_webhook', [
-             'payload' => $payload,
-        ]);
+        Log::channel('financial')->info('consultation_webhook',['payload' => $payload]);
         DB::transaction(function () use ($payload): void {
             $gatewayPayment = $this->gatewayPayments->findByReference($payload['MerchantReference']);
-            Log::channel('financial')->info('$gatewayPayment', [
-                '$gatewayPayment' => $gatewayPayment,
-            ]);
-            if (!$gatewayPayment) {
-                throw new HttpException(404, 'Gateway payment not found.');
-            }
+            Log::channel('financial')->info('$gatewayPayment', ['$gatewayPayment' => $gatewayPayment,]);
+            if (!$gatewayPayment) {throw new HttpException(404, 'Gateway payment not found.');}
 
             if ($this->isFinalStatus((string)$gatewayPayment->status)) {
                 Log::channel('financial')->info('consultation_webhook.ignored_final_status', [
                     'gateway_payment_id' => $gatewayPayment->id,
                     'status' => $gatewayPayment->status,
                 ]);
-
                 return;
             }
-            Log::channel('financial')->info('$gatewayPayment', [
-                'bool' => true,
-            ]);
+            Log::channel('financial')->info('$gatewayPayment', ['bool' => true]);
 //            if (!in_array($payload['PaidThrough'], ['Card'])) {
 //                Log::channel('financial')->warning('unexpected_payment_method', [
 //                    'method' => $payload['PaidThrough'],
@@ -284,18 +274,25 @@ readonly class ConsultationWebhookService
     private function generateSecureHashForWebhook(array $payload): string
     {
         $allowedKeys = [
-            'MerchantId',
-            'TerminalId',
-            'AuthorizationDateTime',
-            'DateTimeLocalTrxn',
-            'ResponseCode',
-            'TxnType',
-            'PaidThrough',
-            'SystemReference',
-            'Message',
-            'MerchantReference',
-            'Amount',
-            'CurrencyId',
+//            'MerchantId',
+//            'TerminalId',
+//            'AuthorizationDateTime',
+//            'DateTimeLocalTrxn',
+//            'ResponseCode',
+//            'TxnType',
+//            'PaidThrough',
+//            'SystemReference',
+//            'Message',
+//            'MerchantReference',
+//            'Amount',
+//            'CurrencyId',
+            'MerchantReference' ,
+            'ResponseCode' ,
+            'SystemReference' ,
+            'Amount' ,
+            'CurrencyId' ,
+            'SecureHash' ,
+
         ];
 
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
