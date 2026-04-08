@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ReleaseSuspendedConsultationsJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -14,3 +15,4 @@ Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 //Schedule::command('consultations:check-status')->hourly(); in production
 Schedule::command('consultations:check-status')->everyFifteenSeconds();
 Schedule::command('payments:expire-stale')->everyFifteenMinutes();
+Schedule::job(new ReleaseSuspendedConsultationsJob)->everyFiveMinutes();

@@ -2,9 +2,12 @@
 
 namespace App\Services\Api\Payment;
 
+use App\Enums\FinancialStatus;
+use App\Enums\StatusType;
 use App\Exceptions\ConsultationNotPayableException;
 use App\Models\Customer;
 use App\Repositories\IGatewayPaymentRepositories;
+use HttpException;
 use Illuminate\Support\Facades\Log;
 
 class ConsultationPaymentIntentService
@@ -18,8 +21,17 @@ class ConsultationPaymentIntentService
 
     public function create(object $consultation, Customer $patient ,String $purpose  )
     {
+        if (!in_array($consultation->status, [StatusType::PENDING->value]) ) {
+            throw new HttpException(422, 'Invalid consultation state');
+        }
         // ── Guard 1: الاستشارة يجب أن تكون unpaid ──────────────────────────
         if ($consultation->financial_status !== 'unpaid') {
+            if ($consultation->financial_status === FinancialStatus::PAYMENT_SUSPENDED->value) {
+                $remainingMinutes = now()->diffInMinutes($consultation->suspended_until, false);
+                throw new ConsultationNotPayableException(
+                    "تم تعليق الدفع مؤقتاً. يمكنك المحاولة بعد {$remainingMinutes} دقيقة."
+                );
+            }
             Log::channel('financial')->warning('payment_intent.not_payable', [
                 'consultation_id'   => $consultation->id,
                 'financial_status'  => $consultation->financial_status,
@@ -71,13 +83,6 @@ class ConsultationPaymentIntentService
          ]);
 
 
-
-//        $paymentLink = $this->gateway->createPaymentLink([
-//            'customer' => $owner,
-//            'amount' => $amount,
-//            'payment_method' => $paymentMethod,
-//        ]);
-
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
         $response = $this->gateway->createPaymentLink([
             'biller_ref'     => $billerRef,
@@ -95,22 +100,6 @@ class ConsultationPaymentIntentService
                 ['checkout_url' => $response->checkoutUrl],
                 $response->raw
             )] ,$gatewayPayment->id );
-
-
-//        $this->gatewayPayments->create([
-//            'reference_type' => Customer::class,
-//            'reference_id' => $owner->id,
-//            'gateway' => 'amwal',
-//            'gateway_reference' =>$paymentLink->billerRef,
-//            'amount' => $amount,
-//            'currency' => 'OMR',
-//            'status' => 'initiated',
-//            'purpose' => $purpose,
-//            'payload' => array_merge(
-//                ['checkout_url' => $paymentLink->checkoutUrl],
-//                $paymentLink->raw
-//            ),
-//            ]);
 
         Log::channel('financial')->info('payment_intent.created', [
             'gateway_payment_id' => $gatewayPayment->id,

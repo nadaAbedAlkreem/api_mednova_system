@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\GatewayPayment;
+use App\Models\Transaction;
 
 interface IGatewayPaymentRepositories
 {
@@ -11,4 +12,7 @@ interface IGatewayPaymentRepositories
         string $referenceType,
         int    $referenceId
     ): ?GatewayPayment;
+
+    public function  existsBySystemReference(string $systemReference): bool;
+
 }

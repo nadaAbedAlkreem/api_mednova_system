@@ -13,13 +13,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ConsultationWebhookService
+readonly class ConsultationWebhookService
 {
     public function __construct(
-        private readonly IGatewayPaymentRepositories $gatewayPayments,
-        private readonly ITransactionRepositories $transactions,
-        private readonly IWalletRepositories $wallets,
-    ) {}
+        private IGatewayPaymentRepositories $gatewayPayments,
+        private ITransactionRepositories    $transactions,
+        private IWalletRepositories         $wallets,
+    )
+    {
+    }
 
     public function processWebhook(array $payload): void
     {
@@ -32,7 +34,7 @@ class ConsultationWebhookService
                 throw new HttpException(404, 'Gateway payment not found.');
             }
 
-            if ($this->isFinalStatus((string) $gatewayPayment->status)) {
+            if ($this->isFinalStatus((string)$gatewayPayment->status)) {
                 Log::channel('financial')->info('consultation_webhook.ignored_final_status', [
                     'gateway_payment_id' => $gatewayPayment->id,
                     'status' => $gatewayPayment->status,
@@ -40,13 +42,19 @@ class ConsultationWebhookService
 
                 return;
             }
-
+            if (!in_array($payload['PaidThrough'], ['Card'])) {
+                Log::channel('financial')->warning('unexpected_payment_method', [
+                    'method' => $payload['PaidThrough'],
+                ]);
+            }
             $this->assertHashIsValid($payload);
+            $this->assertMidMerchantValid($payload);
+            $this->assertTxnTypeIsValid($payload);
             $this->assertCurrencyAndAmount($gatewayPayment->amount, $payload);
             $this->assertSystemReferenceIsUnique($payload['SystemReference']);
             $this->assertInitiatedLock($gatewayPayment->initiated_lock, $gatewayPayment->reference_type, $gatewayPayment->reference_id);
 
-            if ((string) $payload['ResponseCode'] === '00') {
+            if ((string)$payload['ResponseCode'] === '00') {
                 $this->processSuccess($gatewayPayment, $payload);
 
                 return;
@@ -64,24 +72,24 @@ class ConsultationWebhookService
         }
 
         $consultantWallet = $this->wallets->getByOwner($consultation->consultant_id);
-
+        $patientWallet = $this->wallets->getByOwner($consultation->patient_id);
         $this->transactions->create([
             'reference_type' => $gatewayPayment->reference_type,
             'reference_id' => $gatewayPayment->reference_id,
             'gateway_payment_id' => $gatewayPayment->id,
             'transaction_type' => TransactionType::PAYMENT_RECORD->value,
             'entry_type' => 'debit',
-            'wallet_id' => null,
+            'wallet_id' => $patientWallet->id,
             'gross_amount' => $gatewayPayment->amount,
             'platform_commission' => 0,
             'vat_amount' => 0,
             'net_amount' => $gatewayPayment->amount,
-            'currency' => (string) $gatewayPayment->currency,
+            'currency' => (string)$gatewayPayment->currency,
             'status' => 'available',
             'meta' => [
                 'role' => 'patient',
-                'system_reference' => (string) $payload['SystemReference'],
-                'response_code' => (string) $payload['ResponseCode'],
+                'system_reference' => (string)$payload['SystemReference'],
+                'response_code' => (string)$payload['ResponseCode'],
             ],
         ]);
 
@@ -96,52 +104,76 @@ class ConsultationWebhookService
             'platform_commission' => 0,
             'vat_amount' => 0,
             'net_amount' => $gatewayPayment->amount,
-            'currency' => (string) $gatewayPayment->currency,
+            'currency' => (string)$gatewayPayment->currency,
             'status' => 'pending',
             'meta' => [
                 'role' => 'consultant',
                 'consultant_id' => $consultation->consultant_id,
-                'system_reference' => (string) $payload['SystemReference'],
+                'system_reference' => (string)$payload['SystemReference'],
             ],
         ]);
 
-        $this->wallets->increasePendingBalance($consultantWallet, (float) $gatewayPayment->amount);
+        $this->wallets->increasePendingBalance($consultantWallet, (float)$gatewayPayment->amount);
 
         $consultation->update([
             'financial_status' => FinancialStatus::HELD->value,
         ]);
-
-        $this->gatewayPayments->update([
-            'status' => 'captured',
-            'gateway_transaction_id' => (string) $payload['SystemReference'],
-            'response_code' => (string) $payload['ResponseCode'],
-            'response_message' => (string) ($payload['Message'] ?? 'AUTHORIZED'),
-            'payload' => $payload,
-            'initiated_lock' => null,
-        ], $gatewayPayment->id);
+        try {
+            $this->gatewayPayments->update([
+                'status' => 'captured',
+                'gateway_transaction_id' => (string)$payload['SystemReference'],
+                'response_code' => (string)$payload['ResponseCode'],
+                'response_message' => (string)($payload['Message'] ?? 'AUTHORIZED'),
+                'payload' => $payload,
+                'initiated_lock' => null,
+            ], $gatewayPayment->id);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'gateway_transaction_id')) {
+                return;
+            }
+            throw $e;
+        }
     }
 
     public function processFailure($gatewayPayment, array $payload): void
     {
+        $attempts = isset($gatewayPayment->attempts) ? (int)$gatewayPayment->attempts + 1 : null;
+
         $updateData = [
             'status' => 'failed',
-            'response_code' => (string) ($payload['ResponseCode'] ?? ''),
-            'response_message' => (string) ($payload['Message'] ?? 'FAILED'),
+            'response_code' => (string)($payload['ResponseCode'] ?? ''),
+            'response_message' => (string)($payload['Message'] ?? 'FAILED'),
             'payload' => $payload,
             'initiated_lock' => null,
+            'attempts' => $attempts,
         ];
-
-        $attempts = isset($gatewayPayment->attempts) ? (int) $gatewayPayment->attempts + 1 : null;
-        if ($attempts !== null) {
-            $updateData['attempts'] = $attempts;
-        }
-
         $this->gatewayPayments->update($updateData, $gatewayPayment->id);
 
-        if ($attempts !== null && isset($gatewayPayment->max_attempts) && $attempts >= (int) $gatewayPayment->max_attempts) {
+        if ($attempts !== null && isset($gatewayPayment->max_attempts) && $attempts >= (int)$gatewayPayment->max_attempts) {
             $consultation = $gatewayPayment->reference;
             if ($consultation && $this->isConsultationReference($consultation::class)) {
-                $consultation->update(['financial_status' => FinancialStatus::FROZEN->value]);
+                $suspensionCount = (int) $consultation->suspension_count + 1;
+                $freezeMinutes = match (true) {
+                    $suspensionCount === 1 => 30,
+                    $suspensionCount === 2 => 120,
+                    default               => 1440, // 24 ساعة
+                };
+                $this->gatewayPayments->update([
+                    'frozen_at' => now(),
+                    'freeze_until' => now()->addMinutes($freezeMinutes),
+                    'freeze_reason' => 'max_attempts_reached',
+                ], $gatewayPayment->id);
+                $consultation->update([
+                    'financial_status' => FinancialStatus::PAYMENT_SUSPENDED->value,
+                    'suspended_until'  => now()->addMinutes($freezeMinutes),
+                    'suspension_count' => $suspensionCount,
+                ]);
+                Log::channel('financial')->warning('consultation.payment_suspended', [
+                    'consultation_id'  => $consultation->id,
+                    'suspension_count' => $suspensionCount,
+                    'suspended_until'  => now()->addMinutes($freezeMinutes),
+                    'freeze_minutes'   => $freezeMinutes,
+                ]);
             }
         }
     }
@@ -159,7 +191,7 @@ class ConsultationWebhookService
 
     private function assertHashIsValid(array $payload): void
     {
-        $received = strtoupper((string) $payload['SecureHash']);
+        $received = strtoupper((string)$payload['SecureHash']);
         $expected = $this->generateSecureHashForWebhook($payload);
 
         if (!hash_equals($expected, $received)) {
@@ -167,14 +199,34 @@ class ConsultationWebhookService
         }
     }
 
+    private function assertTxnTypeIsValid(array $payload): void
+    {
+        if ($payload['TxnType'] !== 'Purchase') {
+            throw new HttpException(422, 'Invalid transaction type');
+        }
+    }
+    private function assertPaidThrough(array $payload):void
+    {
+        if ($payload['PaidThrough'] !== 'Card') {
+            throw new HttpException(422, 'Unsupported payment method');
+        }
+    }
+
+    private function assertMidMerchantValid(array $payload):void
+    {
+        if ((int)$payload['MerchantId'] !== config('amwal.mid')) {
+            throw new HttpException(403, 'Invalid merchant');
+        }
+    }
     private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
     {
-        if ((int) $payload['CurrencyId'] !== 512) {
+        if ((int)$payload['CurrencyId'] !== 512) {
             throw new HttpException(422, 'Unsupported currency id.');
         }
 
-        $payloadAmount = round((float) $payload['Amount'], 3);
-        $databaseAmount = round((float) $expectedAmount, 3);
+//        $payloadAmount = round(((float)$payload['Amount']) / 1000, 3);
+        $payloadAmount = round((float)(float) $payload['Amount'], 3 );
+        $databaseAmount = round((float)$expectedAmount, 3);
 
         if ($payloadAmount !== $databaseAmount) {
             throw new HttpException(422, 'Amount mismatch.');
@@ -183,9 +235,8 @@ class ConsultationWebhookService
 
     private function assertSystemReferenceIsUnique(string $systemReference): void
     {
-        $existing = $this->transactions->findByMeta('system_reference', $systemReference);
-
-        if ($existing !== null) {
+        $existing = $this->gatewayPayments->existsBySystemReference($systemReference);
+        if ($existing === true){
             throw new HttpException(409, 'Duplicate system reference.');
         }
     }
@@ -221,12 +272,12 @@ class ConsultationWebhookService
         ];
 
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
-        $filtered = array_map(fn ($v) => $v === null ? '' : (string) $v, $filtered);
+        $filtered = array_map(fn($v) => $v === null ? '' : (string)$v, $filtered);
 
         ksort($filtered);
 
         $baseString = collect($filtered)
-            ->map(fn ($v, $k) => "{$k}={$v}")
+            ->map(fn($v, $k) => "{$k}={$v}")
             ->implode('&');
 
         $binaryKey = hex2bin(config('amwal.secure_key'));
