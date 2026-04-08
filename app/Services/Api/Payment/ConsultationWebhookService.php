@@ -211,8 +211,10 @@ readonly class ConsultationWebhookService
 
     private function assertMidMerchantValid(array $payload):void
     {
-        Log::channel('Merchant')->info($payload['MerchantId'] , config('amwal.mid')  );
-
+        Log::channel('financial')->info('consultation_webhook.ignored_final_status', [
+            'MerchantId' => $payload['MerchantId'],
+            'amwal' => config('amwal.mid'),
+        ]);
         if ((int)$payload['MerchantId'] !== config('amwal.mid')) {
             throw new HttpException(403, 'Invalid merchant');
         }
