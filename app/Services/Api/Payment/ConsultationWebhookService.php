@@ -44,11 +44,11 @@ readonly class ConsultationWebhookService
 
                 return;
             }
-            if (!in_array($payload['PaidThrough'], ['Card'])) {
-                Log::channel('financial')->warning('unexpected_payment_method', [
-                    'method' => $payload['PaidThrough'],
-                ]);
-            }
+//            if (!in_array($payload['PaidThrough'], ['Card'])) {
+//                Log::channel('financial')->warning('unexpected_payment_method', [
+//                    'method' => $payload['PaidThrough'],
+//                ]);
+//            }
             $this->assertHashIsValid($payload);
             $this->assertMidMerchantValid($payload);
             $this->assertTxnTypeIsValid($payload);
