@@ -91,7 +91,7 @@ class ConsultationPaymentIntentService
             'currency'       => 512, // OMR code
             'email'          => $patient->email,
             'redirect_url'   => 'https://mednovacare.com/',
-            'payment_method' => 1,
+            'payment_method' => 0,
         ]);
 
         // ── Step 4: حفظ checkout_url في gateway_payment ──────────────────────

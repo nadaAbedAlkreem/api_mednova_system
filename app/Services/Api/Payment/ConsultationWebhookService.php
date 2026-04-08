@@ -242,7 +242,6 @@ readonly class ConsultationWebhookService
             throw new HttpException(422, 'Unsupported currency id.');
         }
 
-        // ✅ تقسيم على 1000 لتحويل من mils إلى OMR
         $payloadAmount  = round((float)$payload['Amount'] / 1000, 3);
         $databaseAmount = round((float)$expectedAmount, 3);
 
