@@ -302,8 +302,14 @@ readonly class ConsultationWebhookService
             ->map(fn($v, $k) => "{$k}={$v}")
             ->implode('&');
 
-        $binaryKey = hex2bin(config('amwal.secure_key'));
+        Log::channel('financial')->debug('webhook_hash_base_string', [
+            'base_string' => $baseString,
+        ]);
 
+        $binaryKey = hex2bin(config('amwal.secure_key'));
+        Log::channel('financial')->debug('$binaryKey', [
+            '$binaryKey' => $binaryKey,
+        ]);
         return strtoupper(hash_hmac('sha256', $baseString, $binaryKey));
     }
 
