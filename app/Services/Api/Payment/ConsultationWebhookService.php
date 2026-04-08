@@ -225,21 +225,41 @@ readonly class ConsultationWebhookService
             throw new HttpException(403, 'Invalid merchant');
         }
     }
+//    private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
+//    {
+////        if ((int)$payload['CurrencyId'] !== 512) {
+////            throw new HttpException(422, 'Unsupported currency id.');
+////        }
+////
+//////        $payloadAmount = round(((float)$payload['Amount']) / 1000, 3);
+////        $payloadAmount = round((float)(float) $payload['Amount'], 3 );
+////        $databaseAmount = round((float)$expectedAmount, 3);
+////
+////        if ($payloadAmount !== $databaseAmount) {
+////            throw new HttpException(422, 'Amount mismatch.');
+////        }
+//
+//
+//    }
+
     private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
     {
         if ((int)$payload['CurrencyId'] !== 512) {
             throw new HttpException(422, 'Unsupported currency id.');
         }
 
-//        $payloadAmount = round(((float)$payload['Amount']) / 1000, 3);
-        $payloadAmount = round((float)(float) $payload['Amount'], 3 );
+        // ✅ تقسيم على 1000 لتحويل من mils إلى OMR
+        $payloadAmount  = round((float)$payload['Amount'] / 1000, 3);
         $databaseAmount = round((float)$expectedAmount, 3);
 
         if ($payloadAmount !== $databaseAmount) {
+            Log::channel('financial')->error('amount_mismatch', [
+                'payload_amount'   => $payloadAmount,
+                'database_amount'  => $databaseAmount,
+            ]);
             throw new HttpException(422, 'Amount mismatch.');
         }
     }
-
     private function assertSystemReferenceIsUnique(string $systemReference): void
     {
         $existing = $this->gatewayPayments->existsBySystemReference($systemReference);
