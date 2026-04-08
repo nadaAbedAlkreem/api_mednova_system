@@ -215,7 +215,7 @@ readonly class ConsultationWebhookService
             'MerchantId' => $payload['MerchantId'],
             'amwal' => config('amwal.mid'),
         ]);
-        if ((int)$payload['MerchantId'] !== config('amwal.mid')) {
+        if ((int)$payload['MerchantId'] !== (int)(config('amwal.mid'))) {
             throw new HttpException(403, 'Invalid merchant');
         }
     }
