@@ -291,8 +291,6 @@ readonly class ConsultationWebhookService
             'SystemReference' ,
             'Amount' ,
             'CurrencyId' ,
-            'SecureHash' ,
-
         ];
 
         $filtered = array_intersect_key($payload, array_flip($allowedKeys));
