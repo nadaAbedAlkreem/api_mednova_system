@@ -27,7 +27,7 @@ class AmwalWebhookController extends Controller
     public function handleConsultation(Request $request): JsonResponse
     {
         try {
-            $this->consultationWebhookService->processWebhook($request->all());
+            $this->consultationWebhookService->processWebhook($request->only(['MerchantId' , 'TerminalId' , 'AuthorizationDateTime' , 'DateTimeLocalTrxn' , 'ResponseCode' , 'TxnType' ,'PaidThrough', 'SystemReference', 'Message', 'MerchantReference', 'Amount', 'CurrencyId']));
             return response()->json(['message' => 'Consultation webhook processed successfully.'], 200);
         } catch (HttpException $exception) {
             Log::channel('financial')->warning('webhook_http_exception', [

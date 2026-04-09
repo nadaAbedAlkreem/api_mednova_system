@@ -3,6 +3,7 @@
 namespace App\Services\Api\Payment;
 
 use App\Enums\FinancialStatus;
+use App\Enums\GatewayPaymentStatus;
 use App\Enums\TransactionType;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
@@ -39,14 +40,10 @@ readonly class ConsultationWebhookService
                 return;
             }
             Log::channel('financial')->info('$gatewayPayment', ['bool' => true]);
-            if (!in_array($payload['PaidThrough'], ['Card'])) {
-                Log::channel('financial')->warning('unexpected_payment_method', [
-                    'method' => $payload['PaidThrough']
-                ]);
-            }
             $this->assertHashIsValid($payload);
             $this->assertMidMerchantValid($payload);
             $this->assertTxnTypeIsValid($payload);
+            $this->assertPaidThrough($payload);
             $this->assertCurrencyAndAmount($gatewayPayment->amount, $payload);
             $this->assertSystemReferenceIsUnique($payload['SystemReference']);
             $this->assertInitiatedLock($gatewayPayment->initiated_lock, $gatewayPayment->reference_type, $gatewayPayment->reference_id);
@@ -68,15 +65,25 @@ readonly class ConsultationWebhookService
             throw new HttpException(422, 'Invalid consultation reference on payment.');
         }
 
+          $updated = $this->gatewayPayments->updateWhere([
+            'status' => GatewayPaymentStatus::CAPTURED->value,
+            'gateway_transaction_id' => (string)$payload['SystemReference'],
+            'response_code' => (string)$payload['ResponseCode'],
+            'response_message' => (string)($payload['Message'] ?? 'AUTHORIZED'),
+            'payload' => $payload,
+            'initiated_lock' => null,], ['id' =>$gatewayPayment->id , 'status' => GatewayPaymentStatus::INITIATED->value]);
+        if (!$updated) {
+            return;
+        }
+
         $consultantWallet = $this->wallets->getByOwner($consultation->consultant_id);
-        $patientWallet = $this->wallets->getByOwner($consultation->patient_id);
         $this->transactions->create([
             'reference_type' => $gatewayPayment->reference_type,
             'reference_id' => $gatewayPayment->reference_id,
             'gateway_payment_id' => $gatewayPayment->id,
             'transaction_type' => TransactionType::PAYMENT_RECORD->value,
             'entry_type' => 'debit',
-            'wallet_id' => $patientWallet->id,
+            'wallet_id' =>null,
             'gross_amount' => $gatewayPayment->amount,
             'platform_commission' => 0,
             'vat_amount' => 0,
@@ -85,6 +92,8 @@ readonly class ConsultationWebhookService
             'status' => 'available',
             'meta' => [
                 'role' => 'patient',
+                'funding_source' => 'external_gateway',
+                'wallet_impact' => 'none',
                 'system_reference' => (string)$payload['SystemReference'],
                 'response_code' => (string)$payload['ResponseCode'],
             ],
@@ -115,21 +124,14 @@ readonly class ConsultationWebhookService
         $consultation->update([
             'financial_status' => FinancialStatus::HELD->value,
         ]);
-        try {
-            $this->gatewayPayments->update([
-                'status' => 'captured',
-                'gateway_transaction_id' => (string)$payload['SystemReference'],
-                'response_code' => (string)$payload['ResponseCode'],
-                'response_message' => (string)($payload['Message'] ?? 'AUTHORIZED'),
-                'payload' => $payload,
-                'initiated_lock' => null,
-            ], $gatewayPayment->id);
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'gateway_transaction_id')) {
-                return;
-            }
-            throw $e;
-        }
+//        try {
+//
+//        } catch (\Illuminate\Database\QueryException $e) {
+//            if (str_contains($e->getMessage(), 'gateway_transaction_id')) {
+//                throw new HttpException(409, 'Duplicate system reference');
+//            }
+//            throw $e;
+//        }
     }
 
     public function processFailure($gatewayPayment, array $payload): void
@@ -219,22 +221,6 @@ readonly class ConsultationWebhookService
             throw new HttpException(403, 'Invalid merchant');
         }
     }
-//    private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
-//    {
-////        if ((int)$payload['CurrencyId'] !== 512) {
-////            throw new HttpException(422, 'Unsupported currency id.');
-////        }
-////
-//////        $payloadAmount = round(((float)$payload['Amount']) / 1000, 3);
-////        $payloadAmount = round((float)(float) $payload['Amount'], 3 );
-////        $databaseAmount = round((float)$expectedAmount, 3);
-////
-////        if ($payloadAmount !== $databaseAmount) {
-////            throw new HttpException(422, 'Amount mismatch.');
-////        }
-//
-//
-//    }
 
     private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
     {
@@ -264,7 +250,7 @@ readonly class ConsultationWebhookService
     private function assertInitiatedLock(?string $initiatedLock, string $referenceType, int $referenceId): void
     {
         if ($initiatedLock === null) {
-            return;
+            throw new HttpException(423, 'Missing payment lock.');
         }
 
         $expected = $referenceType . '-' . $referenceId;

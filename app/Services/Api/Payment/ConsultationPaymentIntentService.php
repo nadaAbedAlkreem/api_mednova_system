@@ -83,7 +83,8 @@ class ConsultationPaymentIntentService
          ]);
 
 
-        // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
+    // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
+        try {
         $response = $this->gateway->createPaymentLink([
             'biller_ref'     => $billerRef,
             'payer_name'     => $patient->full_name,
@@ -115,6 +116,23 @@ class ConsultationPaymentIntentService
             'gateway_payment_id' => $gatewayPayment->id,
             'biller_ref'         => $billerRef,
         ];
+        } catch (\Exception $e) {
+            $this->gatewayPayments->update([
+                'status' => 'failed',
+                'initiated_lock' => null,
+            ], $gatewayPayment->id);
+
+            Log::channel('financial')->error('payment_intent.failed', [
+                'gateway_payment_id' => $gatewayPayment->id,
+                'consultation_id'    => $consultation->id,
+                'consultation_type'  => get_class($consultation),
+                'patient_id'         => $patient->id,
+                'error'              => $e->getMessage(),
+            ]);
+
+            // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
+            throw $e;
+        }
     }
     private function generateBillerRef(object $consultation): string
     {
