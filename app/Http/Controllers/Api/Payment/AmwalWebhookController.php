@@ -27,6 +27,9 @@ class AmwalWebhookController extends Controller
     public function handleConsultation(Request $request): JsonResponse
     {
         try {
+            Log::channel('financial')->warning('cached', [
+                'message' => $request->all(),
+            ]);
             $this->consultationWebhookService->processWebhook($request->only(
                 [
                 'MerchantId' ,
