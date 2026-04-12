@@ -219,7 +219,7 @@ readonly class ConsultationWebhookService
         ]);
         if ((int)$payload['MerchantId'] !== (int)(config('amwal.mid'))) {
             throw new HttpException(403, 'Invalid merchant');
-        }
+         }
     }
 
     private function assertCurrencyAndAmount(string $expectedAmount, array $payload): void
