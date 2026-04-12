@@ -25,8 +25,8 @@ readonly class ConsultationWebhookService
 
     public function processWebhook(array $payload): void
     {
-        $this->validatePayload($payload);
         Log::channel('financial')->info('consultation_webhook',['payload' => $payload]);
+        $this->validatePayload($payload);
         DB::transaction(function () use ($payload): void {
             $gatewayPayment = $this->gatewayPayments->findByReference($payload['MerchantReference']);
             Log::channel('financial')->info('$gatewayPayment', ['$gatewayPayment' => $gatewayPayment,]);
@@ -183,7 +183,7 @@ readonly class ConsultationWebhookService
 
         foreach ($required as $key) {
             if (!array_key_exists($key, $payload)) {
-                throw new HttpException(422, "Missing required field: {$key}");
+                throw new HttpException(422, message: "Missing required field: {$key}");
             }
         }
     }
@@ -213,10 +213,6 @@ readonly class ConsultationWebhookService
 
     private function assertMidMerchantValid(array $payload):void
     {
-        Log::channel('financial')->info('consultation_webhook.ignored_final_status', [
-            'MerchantId' => $payload['MerchantId'],
-            'amwal' => config('amwal.mid'),
-        ]);
         if ((int)$payload['MerchantId'] !== (int)(config('amwal.mid'))) {
             throw new HttpException(403, 'Invalid merchant');
          }
