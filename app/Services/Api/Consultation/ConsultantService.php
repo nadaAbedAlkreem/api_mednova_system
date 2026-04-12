@@ -2,6 +2,10 @@
 
 namespace App\Services\Api\Consultation;
 
+use App\Enums\ConsultantType;
+use App\Enums\ConsultationStatus;
+use App\Enums\ConsultationType;
+use App\Enums\FinancialStatus;
 use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
@@ -97,7 +101,15 @@ class ConsultantService
             $chatQuery->where('consultant_id', $userId);
             $videoQuery->where('consultant_id', $userId);
         }
+        $excludedStatuses = [ConsultationStatus::CANCELLED->value, ConsultationStatus::CANCELLED->value];
 
+        $chatQuery->whereNotIn('status', $excludedStatuses);
+        $videoQuery->whereNotIn('status', $excludedStatuses);
+
+        if ($userType !== ConsultantType::PATIENT->value) {
+            $chatQuery->where('financial_status', '!=', FinancialStatus::UNPAID->value);
+            $videoQuery->where('financial_status', '!=', FinancialStatus::UNPAID->value);
+        }
         // فلترة حسب الحالة إذا وجدت
         if (!empty($status)) {
             $chatQuery->where('status', $status);
