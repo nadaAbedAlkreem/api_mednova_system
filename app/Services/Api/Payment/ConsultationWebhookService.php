@@ -8,8 +8,8 @@ use App\Enums\TransactionType;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
 use App\Repositories\IGatewayPaymentRepositories;
-use App\Repositories\ITransactionRepositories;
 use App\Repositories\IWalletRepositories;
+use App\Services\Financial\FinancialTransactionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -18,8 +18,8 @@ readonly class ConsultationWebhookService
 {
     public function __construct(
         private IGatewayPaymentRepositories $gatewayPayments,
-        private ITransactionRepositories    $transactions,
-        private IWalletRepositories         $wallets)
+        private IWalletRepositories         $wallets,
+        private FinancialTransactionService $financialTransactions)
     {
     }
 
@@ -77,47 +77,47 @@ readonly class ConsultationWebhookService
         }
 
         $consultantWallet = $this->wallets->getByOwner($consultation->consultant_id);
-        $this->transactions->create([
-            'reference_type' => $gatewayPayment->reference_type,
-            'reference_id' => $gatewayPayment->reference_id,
-            'gateway_payment_id' => $gatewayPayment->id,
-            'transaction_type' => TransactionType::PAYMENT_RECORD->value,
-            'entry_type' => 'debit',
-            'wallet_id' =>null,
-            'gross_amount' => $gatewayPayment->amount,
-            'platform_commission' => 0,
-            'vat_amount' => 0,
-            'net_amount' => $gatewayPayment->amount,
-            'currency' => (string)$gatewayPayment->currency,
-            'status' => 'available',
-            'meta' => [
+        $this->financialTransactions->createWalletEntry(
+            referenceType: $gatewayPayment->reference_type,
+            referenceId: $gatewayPayment->reference_id,
+            gatewayPaymentId: $gatewayPayment->id,
+            transactionType: TransactionType::PAYMENT_RECORD->value,
+            entryType: 'debit',
+            walletId: null,
+            grossAmount: (float)$gatewayPayment->amount,
+            netAmount: (float)$gatewayPayment->amount,
+            currency: (string)$gatewayPayment->currency,
+            status: 'available',
+            meta: [
                 'role' => 'patient',
                 'funding_source' => 'external_gateway',
                 'wallet_impact' => 'none',
                 'system_reference' => (string)$payload['SystemReference'],
                 'response_code' => (string)$payload['ResponseCode'],
             ],
-        ]);
+            platformCommission: 0,
+            vatAmount: 0,
+        );
 
-        $this->transactions->create([
-            'reference_type' => $gatewayPayment->reference_type,
-            'reference_id' => $gatewayPayment->reference_id,
-            'gateway_payment_id' => $gatewayPayment->id,
-            'transaction_type' => TransactionType::CONSULTATION_CREDIT->value,
-            'entry_type' => 'credit',
-            'wallet_id' => $consultantWallet->id,
-            'gross_amount' => $gatewayPayment->amount,
-            'platform_commission' => 0,
-            'vat_amount' => 0,
-            'net_amount' => $gatewayPayment->amount,
-            'currency' => (string)$gatewayPayment->currency,
-            'status' => 'pending',
-            'meta' => [
+        $this->financialTransactions->createWalletEntry(
+            referenceType: $gatewayPayment->reference_type,
+            referenceId: $gatewayPayment->reference_id,
+            gatewayPaymentId: $gatewayPayment->id,
+            transactionType: TransactionType::CONSULTATION_CREDIT->value,
+            entryType: 'credit',
+            walletId: $consultantWallet->id,
+            grossAmount: (float)$gatewayPayment->amount,
+            netAmount: (float)$gatewayPayment->amount,
+            currency: (string)$gatewayPayment->currency,
+            status: 'pending',
+            meta: [
                 'role' => 'consultant',
                 'consultant_id' => $consultation->consultant_id,
                 'system_reference' => (string)$payload['SystemReference'],
             ],
-        ]);
+            platformCommission: 0,
+            vatAmount: 0,
+        );
 
         $this->wallets->increasePendingBalance($consultantWallet, (float)$gatewayPayment->amount);
 
