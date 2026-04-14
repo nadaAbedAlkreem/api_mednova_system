@@ -5,6 +5,7 @@ namespace App\Services\Api\Payment;
 use App\Enums\FinancialStatus;
 use App\Enums\GatewayPaymentStatus;
 use App\Enums\TransactionType;
+use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
 use App\Repositories\IGatewayPaymentRepositories;
@@ -124,6 +125,11 @@ readonly class ConsultationWebhookService
         $consultation->update([
             'financial_status' => FinancialStatus::HELD->value,
         ]);
+        $message = __('messages.ACCEPTED_REQUEST', [
+            'name' => $consultation->consultant->full_name,
+        ]);
+        event(new ConsultationRequested($consultation, $message, 'accepted'));
+
 //        try {
 //
 //        } catch (\Illuminate\Database\QueryException $e) {

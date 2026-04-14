@@ -14,6 +14,7 @@ use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
 use App\Services\Api\Customer\TimezoneService;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,35 @@ class ConsultantService
         $this->chatRepo = $chatRepo;
         $this->videoRepo = $videoRepo;
         $this->appointmentRepo = $appointmentRepo;
+    }
+
+    public function findConsultation(int $id, ConsultationType $type): Model
+    {
+        return match ($type) {
+            ConsultationType::CHAT  => $this->findChatConsultation($id),
+            ConsultationType::VIDEO => $this->findVideoConsultation($id),
+        };
+    }
+
+    private function findChatConsultation(int $id): ConsultationChatRequest
+    {
+        return ConsultationChatRequest::with([
+            'patient:id,full_name,email,phone,image',
+            'consultant:id,full_name,email,phone,image',
+            'messages' => fn ($q) => $q->latest()->limit(50),
+        ])
+            ->findOrFail($id);
+    }
+
+    private function findVideoConsultation(int $id): ConsultationVideoRequest
+    {
+        return ConsultationVideoRequest::with([
+            'patient:id,full_name,email,phone,image',
+            'consultant:id,full_name,email,phone,image',
+            'activities' => fn ($q) => $q->latest()->limit(20),
+            'reports',
+        ])
+            ->findOrFail($id);
     }
 
     public function createConsultationByType(array $data, string $type ,array $breakdown)

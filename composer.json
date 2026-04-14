@@ -22,7 +22,8 @@
         "symfony/http-client": "^7.4",
         "symfony/mailgun-mailer": "^7.4",
         "symfony/postmark-mailer": "^7.4",
-        "yajra/laravel-datatables-oracle": "^12.4"
+        "yajra/laravel-datatables-oracle": "^12.4",
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",

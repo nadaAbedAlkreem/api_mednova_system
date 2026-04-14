@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'account_type' => \App\Http\Middleware\EnsureAccountType::class,
         ]);
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
 

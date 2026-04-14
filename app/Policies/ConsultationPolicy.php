@@ -6,11 +6,14 @@ use App\Enums\AccountStatus;
 use App\Enums\ConsultantType;
 use App\Enums\FinancialStatus;
 use App\Enums\StatusType;
+use App\Models\ConsultationChatRequest;
+use App\Models\ConsultationVideoRequest;
 use App\Models\Customer;
 use Illuminate\Auth\Access\Response;
 
 class ConsultationPolicy
 {
+    //Payment is prohibited except for the person eligible for the specific consultation, i.e., the patient requesting the consultation.
     public function pay(Customer $customer, $consultation): Response
     {
          if ($customer->type_account !== ConsultantType::PATIENT->value) {
@@ -43,7 +46,7 @@ class ConsultationPolicy
     /**
      * عرض الاستشارة
      */
-    public function view(Customer $customer, $consultation): bool
+    public function view(Customer $customer, ConsultationChatRequest|ConsultationVideoRequest $consultation): bool
     {
         return $customer->id === $consultation->patient_id
             || $customer->id === $consultation->consultant_id;

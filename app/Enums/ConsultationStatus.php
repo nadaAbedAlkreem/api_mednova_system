@@ -9,4 +9,6 @@ enum ConsultationStatus : string
     case ACTIVE = 'active';
     case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
+    case APPROVED = 'approved';
+
 }

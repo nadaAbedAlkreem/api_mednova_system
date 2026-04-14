@@ -16,9 +16,6 @@ class ConsultationStatusService
         $consultation->load(['patient', 'consultant']);
         switch ($status) {
             case 'accepted':
-                $message = __('messages.ACCEPTED_REQUEST', [
-                    'name' => $consultation->consultant->full_name,
-                ]);
                 if($type == 'video'){
                     $consultation->load('appointmentRequest');
                     if($consultation->appointmentRequest != null){
@@ -26,7 +23,6 @@ class ConsultationStatusService
                         $consultation->appointmentRequest->update(['status' => 'approved']);
                     }
                 }
-                event(new ConsultationRequested($consultation, $message, 'accepted'));
                 break;
 
             case 'cancelled':

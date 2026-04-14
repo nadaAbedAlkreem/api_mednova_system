@@ -16,4 +16,14 @@ enum TransactionType : string
     case SUBSCRIPTION_CHARGE = 'subscription_charge';
     case PLATFORM_FEE = 'platform_fee';
     case REFUND = 'refund';
+
+    public static function visibleForConsultant(): array
+    {
+        return [
+            self::CONSULTATION_CREDIT,
+            self::WITHDRAWAL,
+            self::REFUND,
+            self::CONSULTATION_RELEASE
+         ];
+    }
 }

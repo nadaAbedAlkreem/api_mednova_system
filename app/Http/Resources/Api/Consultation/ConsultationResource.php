@@ -34,6 +34,8 @@ class ConsultationResource extends JsonResource
             'review_deadline' => $this->review_deadline,
             'released_at' => $this->released_at,
             'data' => $data,
+            'suspended_until' => $this->suspended_until ,
+            'suspension_count' => $this->suspension_count ,
             'financial' => [
                 'consultation_price' => $this->consultation_price
                     ? (float)$this->consultation_price
@@ -48,6 +50,7 @@ class ConsultationResource extends JsonResource
                     ? (float)$this->net_amount
                     : null,
             ],
+
             'created_at' => $this->created_at->format('Y-m-d H:i'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i'),
         ];

@@ -93,7 +93,7 @@ class StoreConsultationRequest extends FormRequest
                         ->where('consultant_id', $this->consultant_id)
                         ->whereIn('status', array_keys($statuses))
                         ->first();
-                  if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
+                   if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
             }
             if ($this->filled('requested_time') && $this->filled('timezone') && $this->filled('requested_day')) {
                $requestedTimeUtc = TimezoneService::toUTC($this->requested_time, $patientTimezone);
