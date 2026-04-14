@@ -10,6 +10,7 @@ enum FinancialStatus: string
     case REVIEW_WINDOW = 'review_window';
     case WITHDRAWN = 'withdrawn';
     case REFUNDED = 'refunded';
+    case REFUNDED_INTERNAL = 'refunded_internal';
     case FROZEN = 'frozen';
     case PAYMENT_SUSPENDED  = 'payment_suspended';
 
