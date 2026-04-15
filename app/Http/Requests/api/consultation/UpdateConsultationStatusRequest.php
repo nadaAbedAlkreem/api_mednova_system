@@ -147,6 +147,17 @@ class UpdateConsultationStatusRequest extends FormRequest
     // Error Formatting
     // -------------------------------------------------------------------------
 
+    protected function failedAuthorization(): never
+    {
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => __('messages.UNAUTHORIZED_CONSULTATION_ACTION'),
+                'data'    => [],
+                'status'  => 'Forbidden',
+            ], 403)
+        );
+    }
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator): never
     {
