@@ -117,4 +117,8 @@ class ConsultantFinancialService
             throw new \DomainException('Access restricted to consultant accounts.');
         }
     }
+
+
+
+
 }

@@ -164,24 +164,6 @@ class ConsultationController extends Controller
 
 
 
-//    public function start($token): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
-//    {
-//        try{
-//            // Find the activity by internal_token
-//            $activity = ConsultationVideoActivity::with('consultationVideoRequest')->where('token', $token)->first();
-//            if (!$activity) {throw new \Exception('Invalid Token');}
-//            $consultation = $activity->consultationVideoRequest; // ensure relation exists
-//            if (!$consultation || !$consultation->zoom_meeting_id) {
-//                return response()->json(['message' => 'Meeting not available'], 400);
-//            }
-//            $videoLink = $activity->consultationVideoRequest->video_room_link ;
-//            if (!$videoLink)
-//            {throw new \Exception('Invalid Link');}
-//            return redirect()->away($videoLink);
-//
-//        } catch (\Exception $e) {
-//            Log::error('Registrant creation failed: ' . $e->getMessage(), ['activity_id' => $activity->id ?? null] );
-//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);        }
-//    }
+
 
 }

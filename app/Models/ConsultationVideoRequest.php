@@ -44,6 +44,8 @@ class ConsultationVideoRequest extends Model
         ];
 
     protected $dates = ['deleted_at'];
+    public const REFERENCE_TYPE = 'consultation';
+
     protected $casts = [
         'created_at'                 => 'datetime',
         'updated_at'                 => 'datetime',
@@ -60,10 +62,6 @@ class ConsultationVideoRequest extends Model
         'net_amount'                 => 'decimal:3',
     ];
 
-//    protected $casts = [
-//        'created_at' => 'datetime',
-//        'updated_at' => 'datetime',
-//    ];
     protected static function boot()
     {
         parent::boot();

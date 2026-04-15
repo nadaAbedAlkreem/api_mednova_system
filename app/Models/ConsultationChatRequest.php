@@ -41,6 +41,8 @@ class ConsultationChatRequest extends Model
         'net_amount',
 
     ];
+    public const REFERENCE_TYPE = 'consultation';
+
     protected $casts = [
         'started_at'                 => 'datetime',
         'ended_at'                   => 'datetime',
