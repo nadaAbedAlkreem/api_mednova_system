@@ -147,12 +147,6 @@ class UpdateConsultationStatusRequest extends FormRequest
     // Error Formatting
     // -------------------------------------------------------------------------
 
-    protected function failedAuthorization(): never
-    {
-        throw new \Illuminate\Auth\Access\AuthorizationException(
-            __('messages.UNAUTHORIZED_CONSULTATION_ACTION')
-        );
-    }
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator): never
     {
