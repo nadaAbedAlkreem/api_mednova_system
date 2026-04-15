@@ -102,12 +102,12 @@ class ConsultationController extends Controller
     {
         try {
             $consultantNature = $request->input('consultant_nature');
+
             $consultation = match ($consultantNature) {
                 'chat' => $this->consultationChatRequestRepositories->updateAndReturn($request->getData(), $request['id']),
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']),
                 default => throw new \Exception('Invalid consultation nature')
             };
-            $this->authorize('updateStatus', $consultation);
             if (($consultantNature === ConsultationType::VIDEO->value) && ($request->status === 'accepted')) {
                 $consultation->load('appointmentRequest');
                 $appointmentDateTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
