@@ -102,7 +102,7 @@ class ConsultationRefundService
                 'trace_id' => request()->header('X-Trace-ID'),
             ]);
 
-            $patientWallet = $this->walletRepositories->getOrCreateByOwnerForUpdate($secondOwnerId);
+            $patientWallet = $this->walletRepositories->getOrCreateByOwnerForUpdate($consultation->patient_id);
         }
 
         // ---------------------------------------------------------------
