@@ -4,6 +4,7 @@ namespace App\Http\Requests\api\consultation;
 
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
+use App\Policies\ConsultationPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,9 +17,135 @@ class UpdateConsultationStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $id     = $this->input('id');
+        $nature = $this->input('consultant_nature');
+
+        if (!$id || !$nature) {
+            return false;
+        }
+
+        $consultation = $this->fetchConsultation($nature, $id);
+
+        if (!$consultation) {
+            return true;
+        }
+
+        $user   = $this->user();
+        $policy = new ConsultationPolicy();
+
+        // 1. تحقق من الملكية
+        if (!$policy->updateStatus($user, $consultation)) {
+            return false;
+        }
+
+        // 2. إذا كانت العملية إلغاء، تحقق من أن action_by يطابق دور المستخدم
+        if ($this->input('status') === 'cancelled') {
+            $actionBy = $this->input('action_by');
+            if ($actionBy && !$policy->cancelAs($user, $consultation, $actionBy)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $nature = $this->input('consultant_nature');
+        $table  = match ($nature) {
+            'video' => 'consultation_video_requests',
+            'chat'  => 'consultation_chat_requests',
+            default => null,
+        };
+
+        $idRules = ['required'];
+        if ($table) {
+            $idRules[] = "exists:{$table},id,deleted_at,NULL";
+        }
+
+        return [
+            'id'                 => $idRules,
+            'status'             => 'required|in:accepted,cancelled,active,completed',
+            'consultant_nature'  => 'required|in:video,chat',
+            'action_by'          => 'required_if:status,cancelled|nullable|in:patient,consultable',
+            'action_reason'      => 'required_if:status,cancelled|nullable|string|max:500',
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $nature = $this->input('consultant_nature');
+            $record = $this->fetchConsultation($nature, $this->input('id'));
+
+            if (!$record) {
+                return;
+            }
+
+            // لا يمكن إلغاء جلسة شات بدأت فعلاً
+            if ($nature === 'chat' && $this->input('status') === 'cancelled') {
+                if ($record->patient_message_count > 0 && $record->consultant_message_count > 0) {
+                    $validator->errors()->add('status', __('لا يمكنك إلغاء جلسة بدأت فعلاً.'));
+                }
+            }
+
+            // الحالة نفسها مرة ثانية
+            if ($record->status === $this->input('status')) {
+                $validator->errors()->add('status', match ($this->input('status')) {
+                    'accepted'  => __('تم قبول الطلب مسبقًا.'),
+                    'cancelled' => __('تم إلغاء الطلب مسبقًا.'),
+                    default     => __('الحالة نفسها موجودة مسبقًا.'),
+                });
+            }
+
+            // لا يمكن قبول طلب ملغى
+            if ($record->status === 'cancelled' && $this->input('status') === 'accepted') {
+                $validator->errors()->add('status', __('لا يمكنك قبول طلب تم إلغاؤه.'));
+            }
+        });
+    }
+
+    public function getData(): array
+    {
+        $data = $this->validated();
+
+        if ($data['status'] === 'cancelled') {
+            $data['action_by']     = $data['action_by']     ?? null;
+            $data['action_reason'] = $data['action_reason'] ?? null;
+        }
+
+        if ($data['status'] === 'accepted') {
+            $data['response_at'] = now();
+        }
+
+        return $data;
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private function fetchConsultation(
+        string $nature,
+        mixed $id
+    ): ConsultationChatRequest|ConsultationVideoRequest|null {
+        if (!$id || !$nature) {
+            return null;
+        }
+
+        return match ($nature) {
+            'video' => ConsultationVideoRequest::find($id),
+            'chat'  => ConsultationChatRequest::find($id),
+            default => null,
+        };
+    }
+
+    // -------------------------------------------------------------------------
+    // Error Formatting
+    // -------------------------------------------------------------------------
 
     protected function failedAuthorization(): never
     {
@@ -27,116 +154,37 @@ class UpdateConsultationStatusRequest extends FormRequest
         );
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator): never
     {
-        $nature = $this->input('consultant_nature');
-        $table = match ($nature) {
-            'video' => 'consultation_video_requests',
-            'chat' => 'consultation_chat_requests',
-            default => null,
-        };
+        $errors = collect($validator->errors()->messages())
+            ->map(fn($messages) => $messages[0])
+            ->toArray();
 
-         $idRules = ['required'];
-        if ($table) {
-             $idRules[] = "exists:{$table},id,deleted_at,NULL";
-        }
-
-        return [
-            'id' => $idRules,
-            'status' => 'required|in:accepted,cancelled,active,completed',
-            'consultant_nature' => 'required|in:video,chat',
-            'action_by' => 'required_if:status,cancelled|in:patient,consultable|nullable',
-            'action_reason' => 'required_if:status,cancelled|string|max:500',
-        ];
+        throw new \Illuminate\Validation\ValidationException(
+            $validator,
+            response()->json([
+                'success' => false,
+                'message' => __('messages.ERROR_OCCURRED'),
+                'data'    => $errors,
+                'status'  => 'Unprocessable Entity',
+            ], 422)
+        );
     }
 
-    public function withValidator($validator): void
-    {
-
-        $validator->after(function ($validator) {
-
-            $record = ($this->consultant_nature == 'video')?  ConsultationVideoRequest::find($this->id) :  ConsultationChatRequest::find($this->id);
-
-            if ($record) {
-               if($this->consultant_nature == 'chat')
-               {
-                   if ($record->patient_message_count > 0 && $record->consultant_message_count > 0) {
-                       if ($this->status == 'cancelled') {
-                           $validator->errors()->add('status', __('لا يمكنك لغي جلسة ألأن .'));
-                       }
-                   }
-               }
-
-                if ($record->status === $this->status) {
-                    if($this->status == 'accepted')
-                    {
-                        $validator->errors()->add('status', __('تم قبول الطلب مسبقًا.'));
-                    }
-
-                    if($this->status == 'cancelled')
-                    {
-                        $validator->errors()->add('status', __('تم إلغاء الطلب مسبقًا.'));
-                    }
-
-                }
-                if(($record->status == 'cancelled') && $this->status == 'accepted' )
-                {
-                    $validator->errors()->add('status', __('نعتذر منك لا يمكنك ألأن اعتماد طلب تم لغيه .'));
-                }
-            }
-        });
-    }
-
-    public function getData()
-    {
-        $data = $this->validated();
-
-        if ($data['status'] === 'cancelled') {
-            $data['action_by'] = $data['action_by'] ?? null;
-            $data['action_reason'] = $data['action_reason'] ?? null;
-        }
-        if ($data['status']  === 'accepted') {
-            $data['response_at'] = now();
-        }
-        return $data;
-    }
-
-
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
-    {
-        $errors = $validator->errors()->messages();
-        $formattedErrors = [];
-        foreach ($errors as $field => $messages) {
-            $formattedErrors[$field] = $messages[0];
-        }
-        throw new \Illuminate\Validation\ValidationException($validator, response()->json([
-            'success' => false,
-            'message' => __('messages.ERROR_OCCURRED'),
-            'data' => $formattedErrors,
-            'status' => 'Internal Server Error'
-        ], 422));
-    }
     public function messages(): array
     {
-
         return [
-            'id.required' => __('validation.required', ['attribute' => __('validation.attributes.id_con')]),
-            'id.exists' => __('validation.exists', ['attribute' => __('validation.attributes.id_con')]),
-            'status.required' => __('validation.required', ['attribute' => __('validation.attributes.status')]),
-            'status.in' => __('validation.in', ['attribute' => __('validation.attributes.status')]),
-            'action_by.required' => __('validation.required', ['attribute' => __('validation.attributes.action_by')]),
-            'action_by.in' => __('validation.exists', ['attribute' => __('validation.attributes.action_by')]),
-            'action_reason.string' => __('validation.string', ['attribute' => __('validation.attributes.action_by')]),
+            'id.required'                => __('validation.required', ['attribute' => __('validation.attributes.id_con')]),
+            'id.exists'                  => __('validation.exists',   ['attribute' => __('validation.attributes.id_con')]),
+            'status.required'            => __('validation.required', ['attribute' => __('validation.attributes.status')]),
+            'status.in'                  => __('validation.in',       ['attribute' => __('validation.attributes.status')]),
+            'action_by.required_if'      => __('validation.required', ['attribute' => __('validation.attributes.action_by')]),
+            'action_by.in'               => __('validation.in',       ['attribute' => __('validation.attributes.action_by')]),
+            'action_reason.required_if'  => __('validation.required', ['attribute' => __('validation.attributes.action_reason')]),
+            'action_reason.string'       => __('validation.string',   ['attribute' => __('validation.attributes.action_reason')]),
             'consultant_nature.required' => __('validation.required', ['attribute' => __('validation.attributes.consultant_nature')]),
-            'consultant_nature.in' => __('validation.in', ['attribute' => __('validation.attributes.consultant_nature')]),
-
-
-
+            'consultant_nature.in'       => __('validation.in',       ['attribute' => __('validation.attributes.consultant_nature')]),
         ];
     }
+
 }

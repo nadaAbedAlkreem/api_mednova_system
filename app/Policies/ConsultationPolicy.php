@@ -58,4 +58,13 @@ class ConsultationPolicy
             || (int) $user->id === (int) $consultation->consultant_id;
     }
 
+    public function cancelAs(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation, string $actionBy): bool
+    {
+        return match ($actionBy) {
+            'patient'     => (int) $user->id === (int) $consultation->patient_id,
+            'consultable' => (int) $user->id === (int) $consultation->consultant_id,
+            default       => false,
+        };
+    }
+
 }

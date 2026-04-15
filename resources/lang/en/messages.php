@@ -18,6 +18,7 @@ return [
         'required' =>'The type game field is required.' ,
         'in' => 'The nature of the challenge must be determined, whether individual enter (I) or enter (T) team.',
     ],
+    'UNAUTHORIZED_CONSULTATION_ACTION' => 'You do not have permission to modify this consultation.',
     'unique' => 'unique ',
     'PROGRAM_ALREADY_APPROVED' => 'This program has already been approved.',
 
