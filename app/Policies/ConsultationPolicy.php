@@ -51,4 +51,11 @@ class ConsultationPolicy
         return $customer->id === $consultation->patient_id
             || $customer->id === $consultation->consultant_id;
     }
+
+    public function updateStatus(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation): bool
+    {
+        return (int) $user->id === (int) $consultation->patient_id
+            || (int) $user->id === (int) $consultation->consultant_id;
+    }
+
 }

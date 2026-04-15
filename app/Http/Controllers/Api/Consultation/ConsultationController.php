@@ -107,6 +107,7 @@ class ConsultationController extends Controller
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']),
                 default => throw new \Exception('Invalid consultation nature')
             };
+            $this->authorize('updateStatus', $consultation);
             if (($consultantNature === ConsultationType::VIDEO->value) && ($request->status === 'accepted')) {
                 $consultation->load('appointmentRequest');
                 $appointmentDateTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);

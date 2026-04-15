@@ -19,16 +19,14 @@ class UpdateConsultationStatusRequest extends FormRequest
         return true;
     }
 
-    protected function prepareForValidation()
+
+    protected function failedAuthorization(): never
     {
-//         $nature = $this->input('consultant_nature');
-//
-//         $this->table = match ($nature) {
-//            'video' => 'consultation_video_requests',
-//            'chat' => 'consultation_chat_requests',
-//            default => null,
-//        };
-     }
+        throw new \Illuminate\Auth\Access\AuthorizationException(
+            __('messages.UNAUTHORIZED_CONSULTATION_ACTION')
+        );
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
