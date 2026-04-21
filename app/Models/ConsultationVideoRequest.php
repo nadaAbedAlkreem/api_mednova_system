@@ -62,10 +62,10 @@ class ConsultationVideoRequest extends Model
         'expires_at'                 => 'datetime',
         'consultant_approved'        => 'boolean',
         'patient_approved'           => 'boolean',
-        'consultation_price'         => 'decimal:3',
-        'gateway_commission_rate'    => 'decimal:3',
-        'gateway_commission_amount'  => 'decimal:3',
-        'net_amount'                 => 'decimal:3',
+//        'consultation_price'         => 'decimal:3',
+//        'gateway_commission_rate'    => 'decimal:3',
+//        'gateway_commission_amount'  => 'decimal:3',
+//        'net_amount'                 => 'decimal:3',
     ];
 
     protected static function boot()

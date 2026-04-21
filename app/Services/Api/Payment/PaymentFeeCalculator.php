@@ -47,15 +47,15 @@ class PaymentFeeCalculator
         $consultantEarningAmount = round($consultationPrice - $platformCommissionAmount, 3);
 
         return [
-            'consultation_price' => round($consultationPrice, 3),
+            'consultation_price' => number_format($consultationPrice, 3, '.', ''),
             'gateway_commission_rate' => round($gateFees * 100, 2),
-            'gateway_commission_amount' => $gatewayFeeAmount,
-            'gross_amount' => $grossAmount,
-            'net_received_amount' => round($consultationPrice, 3),
+            'gateway_commission_amount' => number_format($gatewayFeeAmount, 3, '.', ''),
+            'gross_amount' => number_format($grossAmount, 3, '.', ''),
+            'net_received_amount' => number_format($consultationPrice, 3, '.', ''),
             'currency' => config('amwal.currency_en'),
             'platform_commission_rate' => round($platformRate * 100, 2),
-            'platform_commission_amount' => $platformCommissionAmount,
-            'consultant_earning_amount' => $consultantEarningAmount,
+            'platform_commission_amount' => number_format($platformCommissionAmount, 3, '.', ''),
+            'consultant_earning_amount' => number_format($consultantEarningAmount, 3, '.', ''),
         ];
    }
 

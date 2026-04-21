@@ -59,10 +59,10 @@ class ConsultationChatRequest extends Model
         'first_consultant_message_at'=> 'datetime',
         'last_reminder_sent_at'      => 'datetime',
         'suspended_until'            => 'datetime',
-        'consultation_price'         => 'decimal:3',
-        'gateway_commission_rate'    => 'decimal:3',
-        'gateway_commission_amount'  => 'decimal:3',
-        'net_amount'                 => 'decimal:3',
+//        'consultation_price'         => 'decimal:3',
+//        'gateway_commission_rate'    => 'decimal:3',
+//        'gateway_commission_amount'  => 'decimal:3',
+//        'net_amount'                 => 'decimal:3',
     ];
     protected $dates = ['deleted_at'];
 

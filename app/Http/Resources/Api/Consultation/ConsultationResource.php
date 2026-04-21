@@ -37,34 +37,13 @@ class ConsultationResource extends JsonResource
             'suspended_until' => $this->suspended_until ,
             'suspension_count' => $this->suspension_count ,
             'financial' => [
-                'consultation_price' => $this->consultation_price
-                    ? (float)$this->consultation_price
-                    : null,
-                'gateway_commission_rate' => $this->gateway_commission_rate . '%'
-                    ? (float)$this->gateway_commission_rate . '%'
-                    : null,
-                'gateway_commission_amount' => $this->gateway_commission_amount
-                    ? (float)$this->gateway_commission_amount
-                    : null,
-
-                'gross_amount' => $this->gross_amount
-                    ? (float)$this->gross_amount
-                    : null,
-
-                'platform_commission_rate' => $this->platform_commission_rate . '%'
-                    ? (float)$this->platform_commission_rate . '%'
-                    : null,
-
-                'platform_commission_amount' => $this->platform_commission_amount
-                    ? (float)$this->platform_commission_amount
-                    : null,
-
+                'consultation_price' => $this->consultation_price ,
+                'gateway_commission_rate' => $this->gateway_commission_rate,
+                'gateway_commission_amount' => $this->gateway_commission_amount,
+                'gross_amount' => $this->gross_amount,
+                'platform_commission_rate' => $this->platform_commission_rate,
+                'platform_commission_amount' => $this->platform_commission_amount,
                 'consultant_earning_amount' => $this->consultant_earning_amount
-                    ? (float)$this->consultant_earning_amount
-                    : null,
-//                'net_amount' => $this->net_amount
-//                    ? (float)$this->net_amount
-//                    : null,
             ],
             'created_at' => $this->created_at->format('Y-m-d H:i'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i'),
