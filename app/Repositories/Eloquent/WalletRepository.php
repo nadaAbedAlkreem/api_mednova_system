@@ -27,6 +27,21 @@ class WalletRepository extends BaseRepository implements IWalletRepositories
             ->lockForUpdate()
             ->first();
     }
+    public function getPlatformWallet(): Wallet
+    {
+        return Wallet::firstOrCreate(
+            [
+                'owner_type' => 'platform',
+                'owner_id' => 1,
+                'currency' => 'OMR',
+            ],
+            [
+                'available_balance' => 0,
+                'pending_balance' => 0,
+                'frozen_balance' => 0,
+            ]
+        )->lockForUpdate();
+    }
 
     public function getOrCreateByOwnerForUpdate($ownerId, ?string $currency = null): Wallet
     {

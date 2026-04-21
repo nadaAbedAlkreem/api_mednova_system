@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Enums\AccountStatus;
+use App\Enums\CardType;
 use App\Enums\ConsultantType;
 use App\Enums\ConsultationStatus;
 use App\Enums\ConsultationType;
@@ -53,7 +54,7 @@ class ConsultationController extends Controller
             $price    = ($request['consultant_nature'] == ConsultationType::CHAT->value ) ? 'chat_consultation_price'  : 'video_consultation_price' ;
             $consultant = \App\Models\Customer::with($relation)->find($request['consultant_id']);
             $breakdown = PaymentFeeCalculator::calculateTotal(
-                consultationPrice: $consultant->$relation->$price, cardType: 'domestic');
+                consultationPrice: $consultant->$relation->$price, cardType: CardType::DOMESTIC->value,);
             $this->authorize('createRequest', $consultant);
             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
             DB::commit();

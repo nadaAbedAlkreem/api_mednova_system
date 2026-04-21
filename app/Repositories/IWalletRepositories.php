@@ -13,4 +13,6 @@ interface IWalletRepositories
     public function increaseAvailableBalance(Wallet $wallet, float $amount): Wallet;
 
     public function increasePendingBalance(Wallet $wallet, float $amount): Wallet;
+
+    public function getPlatformWallet(): Wallet;
 }

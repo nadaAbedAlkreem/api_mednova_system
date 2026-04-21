@@ -68,7 +68,13 @@ class ConsultantService
             $data['consultation_price'] = $breakdown['consultation_price'];
             $data['gateway_commission_rate'] = $breakdown['gateway_commission_rate'];
             $data['gateway_commission_amount'] = $breakdown['gateway_commission_amount'];
-            $data['net_amount'] = $breakdown['net_amount'];
+            $data['platform_commission_rate'] = $breakdown['platform_commission_rate'];
+            $data['platform_commission_amount'] = $breakdown['platform_commission_amount'];
+            $data['consultant_earning_amount'] = $breakdown['consultant_earning_amount'];
+            $data['currency'] = $breakdown['currency'];
+            $data['gross_amount'] = $breakdown['gross_amount'];
+
+
             if ($type === 'chat') {
                 $consultation = $this->chatRepo->create($data);
                 $consultation->load(['patient', 'consultant']);

@@ -27,7 +27,8 @@ class GatewayPayment extends Model
         'payment_method',
         'card_id',
         'bank_account_id',
-        'amount',
+        'amount', // المبلغ  المدفوع من خلال البوابة يشمل الرسوم المنصة
+        'net_received_amount' , //  المبلغ الذي وصل محفظة التاجر بدون رسوم المنصة
         'currency',
         'country',
         'status',

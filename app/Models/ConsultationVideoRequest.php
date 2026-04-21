@@ -41,6 +41,12 @@ class ConsultationVideoRequest extends Model
             'gateway_commission_amount',
             'net_amount',
             'expires_at',
+
+            'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
+            'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
+            'platform_commission_amount', // المبلغ المأثر على الاستشارة
+            'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
+
         ];
 
     protected $dates = ['deleted_at'];

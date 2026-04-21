@@ -46,11 +46,26 @@ class ConsultationResource extends JsonResource
                 'gateway_commission_amount' => $this->gateway_commission_amount
                     ? (float)$this->gateway_commission_amount
                     : null,
-                'net_amount' => $this->net_amount
-                    ? (float)$this->net_amount
-                    : null,
-            ],
 
+                'gross_amount' => $this->gross_amount
+                    ? (float)$this->gross_amount
+                    : null,
+
+                'platform_commission_rate' => $this->platform_commission_rate . '%'
+                    ? (float)$this->platform_commission_rate . '%'
+                    : null,
+
+                'platform_commission_amount' => $this->platform_commission_amount
+                    ? (float)$this->platform_commission_amount
+                    : null,
+
+                'consultant_earning_amount' => $this->consultant_earning_amount
+                    ? (float)$this->consultant_earning_amount
+                    : null,
+//                'net_amount' => $this->net_amount
+//                    ? (float)$this->net_amount
+//                    : null,
+            ],
             'created_at' => $this->created_at->format('Y-m-d H:i'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i'),
         ];

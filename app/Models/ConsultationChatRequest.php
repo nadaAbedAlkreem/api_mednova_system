@@ -36,9 +36,16 @@ class ConsultationChatRequest extends Model
         'suspension_count',
         // Financial columns
         'consultation_price',
-        'gateway_commission_rate',
-        'gateway_commission_amount',
-        'net_amount',
+        'gateway_commission_rate', //  رسوم البوابة
+        'gateway_commission_amount', // رسوم البوابة قيمة الرسوم
+        //'net_amount', delete this column
+
+        'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
+        'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
+        'platform_commission_amount', // المبلغ المأثر على الاستشارة
+        'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
+
+
 
     ];
     public const REFERENCE_TYPE = 'consultation';
