@@ -29,18 +29,21 @@ class WalletRepository extends BaseRepository implements IWalletRepositories
     }
     public function getPlatformWallet(): Wallet
     {
-        return Wallet::firstOrCreate(
+        Wallet::firstOrCreate(
             [
                 'owner_type' => 'platform',
                 'owner_id' => 1,
                 'currency' => 'OMR',
             ],
-            [
-                'available_balance' => 0,
+            [   'available_balance' => 0,
                 'pending_balance' => 0,
-                'frozen_balance' => 0,
-            ]
-        )->lockForUpdate();
+                'frozen_balance' => 0]);
+        return Wallet::query()
+            ->where('owner_type', 'platform')
+            ->where('owner_id', 1)
+            ->where('currency', 'OMR')
+            ->lockForUpdate()
+            ->firstOrFail();
     }
 
     public function getOrCreateByOwnerForUpdate($ownerId, ?string $currency = null): Wallet
