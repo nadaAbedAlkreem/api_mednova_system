@@ -11,6 +11,7 @@ use App\Http\Resources\Api\Financial\ConsultantTransactionResource;
 use App\Http\Resources\Api\Financial\WalletResource;
 use App\Models\Wallet;
 use App\Services\Api\Financial\ConsultantFinancialService;
+use App\Services\Api\Financial\PatientFinancialService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,8 @@ class WalletController extends Controller
 {
     use ResponseTrait;
     public function __construct(
-        private readonly ConsultantFinancialService $financialService
+        private readonly ConsultantFinancialService $consultantFinancialService ,
+        private readonly PatientFinancialService $patientFinancialService
     ) {}
     /**
      * Display a listing of the resource.
@@ -30,7 +32,7 @@ class WalletController extends Controller
     {
         try {
             $consultant = $request->user('api');
-            $wallet = $this->financialService->getWallet($consultant);
+            $wallet = $this->consultantFinancialService->getWallet($consultant);
             return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),new  WalletResource($wallet), 202);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
@@ -41,7 +43,7 @@ class WalletController extends Controller
     public function walletPatient(Request $request): JsonResponse
     {
         $patient = $request->user();
-        $wallet  = $this->financialService->getWallet($patient);
+        $wallet  = $this->patientFinancialService->getWallet($patient);
 
         if (! $wallet) {
             $wallet = new Wallet([
