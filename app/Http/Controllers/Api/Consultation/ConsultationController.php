@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Enums\AccountStatus;
+use App\Enums\CardType;
 use App\Enums\ConsultantType;
+use App\Enums\ConsultationStatus;
 use App\Enums\ConsultationType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\consultation\CheckDependenciesDataRequest;
+use App\Http\Requests\api\consultation\ShowConsultationRequest;
 use App\Http\Requests\api\consultation\StoreConsultationRequest;
 use App\Http\Requests\api\consultation\UpdateConsultationStatusRequest;
 use App\Http\Resources\Api\Consultation\ConsultationResource;
@@ -19,6 +22,7 @@ use App\Services\Api\Payment\PaymentFeeCalculator;
 use App\Traits\ResponseTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +37,7 @@ class ConsultationController extends Controller
     protected IConsultationChatRequestRepositories $consultationChatRequestRepositories;
     protected IConsultationVideoRequestRepositories $consultationVideoRequestRepositories;
 
-    public function __construct(ConsultantService $consultantService, IConsultationVideoRequestRepositories $consultationVideoRequestRepositories, IConsultationChatRequestRepositories $consultationChatRequestRepositories, ConsultationStatusService $statusService)
+    public function __construct( ConsultantService $consultantService, IConsultationVideoRequestRepositories $consultationVideoRequestRepositories, IConsultationChatRequestRepositories $consultationChatRequestRepositories, ConsultationStatusService $statusService)
     {
         $this->consultationChatRequestRepositories = $consultationChatRequestRepositories;
         $this->statusService = $statusService;
@@ -50,9 +54,9 @@ class ConsultationController extends Controller
             $price    = ($request['consultant_nature'] == ConsultationType::CHAT->value ) ? 'chat_consultation_price'  : 'video_consultation_price' ;
             $consultant = \App\Models\Customer::with($relation)->find($request['consultant_id']);
             $breakdown = PaymentFeeCalculator::calculateTotal(
-                consultationPrice: $consultant->$relation->$price, cardType: 'domestic');
-            $this->authorize('createRequest', $consultant);
-            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
+                consultationPrice: $consultant->$relation->$price, cardType: CardType::DOMESTIC->value);
+             $this->authorize('createRequest', $consultant);
+             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
             DB::commit();
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201);
         } catch (AuthorizationException $e) {
@@ -66,7 +70,18 @@ class ConsultationController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
         }
     }
+    public function show(ShowConsultationRequest $request, int $id): JsonResponse
+    {
+        try {
+            $type = ConsultationType::from($request->validated('type'));
+            $consultation = $this->consultantService->findConsultation($id, $type);
+            $this->authorize('view', $consultation);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), new ConsultationResource($consultation), 201);
+        }catch (\Exception $exception) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
+        }
 
+    }
     public function getStatusRequest(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -88,6 +103,7 @@ class ConsultationController extends Controller
     {
         try {
             $consultantNature = $request->input('consultant_nature');
+
             $consultation = match ($consultantNature) {
                 'chat' => $this->consultationChatRequestRepositories->updateAndReturn($request->getData(), $request['id']),
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']),
@@ -103,7 +119,7 @@ class ConsultationController extends Controller
 
             if ($consultantNature === ConsultationType::VIDEO->value) {
                 $consultation->load('appointmentRequest');
-                if ($request['status'] == 'cancelled' || $consultation->status == 'completed' || $consultation->status == 'approved') {
+                if ($request['status'] ==  ConsultationStatus::CANCELLED->value || $consultation->status == ConsultationStatus::COMPLETED->value || $consultation->status == ConsultationStatus::APPROVED->value) {
                     $consultation->appointmentRequest->update(['status' => $request->status]);
                 }
             }
@@ -150,24 +166,6 @@ class ConsultationController extends Controller
 
 
 
-//    public function start($token): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
-//    {
-//        try{
-//            // Find the activity by internal_token
-//            $activity = ConsultationVideoActivity::with('consultationVideoRequest')->where('token', $token)->first();
-//            if (!$activity) {throw new \Exception('Invalid Token');}
-//            $consultation = $activity->consultationVideoRequest; // ensure relation exists
-//            if (!$consultation || !$consultation->zoom_meeting_id) {
-//                return response()->json(['message' => 'Meeting not available'], 400);
-//            }
-//            $videoLink = $activity->consultationVideoRequest->video_room_link ;
-//            if (!$videoLink)
-//            {throw new \Exception('Invalid Link');}
-//            return redirect()->away($videoLink);
-//
-//        } catch (\Exception $e) {
-//            Log::error('Registrant creation failed: ' . $e->getMessage(), ['activity_id' => $activity->id ?? null] );
-//            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);        }
-//    }
+
 
 }

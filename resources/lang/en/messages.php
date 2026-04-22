@@ -7,6 +7,9 @@ return [
         'mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg.',
         'max' => 'The image may not be greater than 2048 kilobytes.',
     ],
+    'UNAUTHORISED_ACCOUNT_TYPE' => 'Account type not authorized to access',
+    'ACCOUNT_NOT_ACTIVE' => 'Account not activated',
+    'ACCOUNT_PENDING_APPROVAL' => 'Account under review and not yet approved',
     'name_game' => [
         'required' => 'The game name field is required.',
         'max' => 'The name must be less than 255 characters'
@@ -15,6 +18,7 @@ return [
         'required' =>'The type game field is required.' ,
         'in' => 'The nature of the challenge must be determined, whether individual enter (I) or enter (T) team.',
     ],
+    'UNAUTHORIZED_CONSULTATION_ACTION' => 'You do not have permission to modify this consultation.',
     'unique' => 'unique ',
     'PROGRAM_ALREADY_APPROVED' => 'This program has already been approved.',
 

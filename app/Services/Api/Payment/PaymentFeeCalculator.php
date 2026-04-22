@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Services\Api\Payment;
 
 use App\Enums\AccountStatus;
+use App\Enums\CardType;
 use App\Enums\StatusType;
 use App\Events\CustomerApprovalStatusChanged;
 use App\Mail\AccountApprovedMail;
@@ -16,27 +18,45 @@ use Illuminate\Validation\ValidationException;
 
 class PaymentFeeCalculator
 {
-    private const FEES = [
-        'domestic'      => 0.009, // 0.9%  - داخل البلد
-        'international' => 0.018, // 1.8%  - خارج البلد
-    ];
-    public static function calculateTotal(float $consultationPrice, string $cardType = 'domestic'): array
+//    private const FEES = [
+//        'domestic'      => 0.009, // 0.9%  - داخل البلد
+//        'international' => 0.018, // 1.8%  - خارج البلد
+//    ];
+    public static function calculateTotal(
+        float  $consultationPrice,
+        string $cardType = CardType::DOMESTIC->value
+    ): array
     {
-        $feeRate   = self::FEES[$cardType] ?? self::FEES['domestic'];
-        $feeAmount = round($consultationPrice * $feeRate, 3);
-        $total     = round($consultationPrice + $feeAmount, 3);
+        $platformRate = config('amwal.platform_commission.default_rate');
+        $gateFees = $cardType === CardType::DOMESTIC->value
+            ? config('amwal.gateway_fees.domestic')
+            : config('amwal.gateway_fees.international');
 
+        Log::info('fee Rate gateway: ' . $gateFees);
+
+        // رسوم بوابة الدفع التي يدفعها المريض
+        $gatewayFeeAmount = round($consultationPrice * $gateFees, 3);
+
+        // إجمالي ما يدفعه المريض = سعر الاستشارة + رسوم البوابة
+        $grossAmount = round($consultationPrice + $gatewayFeeAmount, 3);
+
+        // عمولة المنصة تُحسب من سعر الاستشارة نفسه
+        $platformCommissionAmount = round($consultationPrice * $platformRate, 3);
+
+        // ربح المستشار = سعر الاستشارة - عمولة المنصة
+        $consultantEarningAmount = round($consultationPrice - $platformCommissionAmount, 3);
 
         return [
-            'consultation_price'      => $consultationPrice,
-            'gateway_commission_rate'   => $feeRate * 100,   // 0.9 (للعرض كنسبة مئوية)
-            'gateway_commission_amount' => $feeAmount,        // المبلغ الفعلي
-            'net_amount'              => $total,
-            'currency'                => 'OMR',
+            'consultation_price' => number_format($consultationPrice, 3, '.', ''),
+            'gateway_commission_rate' => round($gateFees * 100, 2),
+            'gateway_commission_amount' => number_format($gatewayFeeAmount, 3, '.', ''),
+            'gross_amount' => number_format($grossAmount, 3, '.', ''),
+            'net_received_amount' => number_format($consultationPrice, 3, '.', ''),
+            'currency' => config('amwal.currency_en'),
+            'platform_commission_rate' => round($platformRate * 100, 2),
+            'platform_commission_amount' => number_format($platformCommissionAmount, 3, '.', ''),
+            'consultant_earning_amount' => number_format($consultantEarningAmount, 3, '.', ''),
         ];
-    }
-
-
-
+   }
 
 }

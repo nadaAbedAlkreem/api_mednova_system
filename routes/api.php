@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Package\UserPackageController;
 use App\Http\Controllers\Api\Payment\GatewayPaymentController;
 use App\Http\Controllers\Api\Payment\AmwalWebhookController;
+use App\Http\Controllers\Api\Payment\TransactionController;
+use App\Http\Controllers\Api\Payment\WalletController;
 use App\Http\Controllers\Api\Payment\WalletTopUpController;
 use App\Http\Controllers\Api\Program\ProgramController;
 use App\Http\Controllers\Api\Program\ProgramEnrollmentController;
@@ -94,6 +96,20 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/update', [PatientController::class, 'update']);
 
             });
+           Route::prefix('financial')->group(function ()
+                  {
+                      Route::prefix('consultant')->middleware(['account_type:therapist,rehabilitation_center', 'throttle:api'])->group(function () {
+                              Route::get('wallet', [WalletController::class, 'walletConsultant'])->name('wallet');
+                              Route::get('transactions', [TransactionController::class, 'transactions']);
+                          });
+                      Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api',])->group(function () {
+                          Route::get('wallet', [WalletController::class, 'walletPatient']);
+                      });
+                      Route::get('payments', [GatewayPaymentController::class, 'payments']);
+
+                 });
+
+
             Route::prefix('therapist')->group(function ()
             {
                 Route::get('/', [TherapistController::class, 'get']);
@@ -115,27 +131,18 @@ use Illuminate\Support\Facades\Route;
             {
                 Route::prefix('payment-gateway')->group(function () {
                     Route::post('create-link-payment/{type}/{id}', [GatewayPaymentController::class, '__invoke']);
-
                 });
+                Route::get('/consultant/{id}/{type}', [ConsultationController::class, 'show'])->whereNumber('id');
                 Route::post('/store', [ConsultationController::class, 'store']);
-                Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']); // test time for consultant and patient
+                Route::get('/get-status-request', [ConsultationController::class, 'getStatusRequest']);
                 Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
-        //        Route::prefix('video')->group(function ()
-        //        {
-        //            Route::post('/consultation-approval', [ConsultationController::class, 'approvedConsultationBetweenCustomer']);
-        //            Route::get('/unaccredited-consultations', [ConsultationController::class, 'hasPendingApprovedConsultations']);
-        //        });
-
                 Route::prefix('chat')->group(function ()
                 {
                     Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
                 });
-        //        Route::get('/vc/start/{token}', [ConsultationController::class, 'start']);
 
             });
-        //    Route::post('/zoom/webhooks', [ZoomWebhookController::class, 'handle']);
             Route::prefix('programs')->group(function () {
-         //        Route::get('/current-service-provider', [ProgramController::class, 'getAllProgramsForCurrentProvider']);  //done get all programs for every one service provider
                 Route::post('/', [ProgramController::class, 'store']);
                 Route::post('program/update', [ProgramController::class, 'update']);
                 Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program

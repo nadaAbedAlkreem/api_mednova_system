@@ -7,6 +7,7 @@ use App\Services\Api\Payment\AmwalWebhookService;
 use App\Services\Api\Payment\ConsultationWebhookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AmwalWebhookController extends Controller
@@ -26,22 +27,40 @@ class AmwalWebhookController extends Controller
     public function handleConsultation(Request $request): JsonResponse
     {
         try {
-            $this->consultationWebhookService->processWebhook($request->only([
-                'MerchantReference',
-                'ResponseCode',
+            Log::channel('financial')->warning('cached', [
+                'message' => $request->all(),
+            ]);
+            $this->consultationWebhookService->processWebhook($request->only(
+                [
+                'MerchantId' ,
+                'TerminalId' ,
+                'AuthorizationDateTime' ,
+                'DateTimeLocalTrxn' ,
+                'SecureHash' ,
+                'ResponseCode' ,
+                'TxnType' ,
+                'PaidThrough',
                 'SystemReference',
+                'Message',
+                'MerchantReference',
                 'Amount',
-                'CurrencyId',
-                'SecureHash',
-            ]));
+                'AmountOMR' ,
+                'ApplePayShippingAndBillingInfo' ,
+                'CurrencyId' ]));
             return response()->json(['message' => 'Consultation webhook processed successfully.'], 200);
         } catch (HttpException $exception) {
+            Log::channel('financial')->warning('webhook_http_exception', [
+                'message' => $exception->getMessage(),
+                'status'  => $exception->getStatusCode(),
+            ]);
             return response()->json([
                 'message' => $exception->getMessage(),
             ], $exception->getStatusCode());
         } catch (\Throwable $exception) {
             report($exception);
-
+            Log::channel('financial')->warning('webhook_http_exception', [
+                'message' => $exception->getMessage(),
+            ]);
             return response()->json([
                 'message' => 'Unexpected error while processing webhook.',
             ], 500);

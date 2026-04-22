@@ -3,6 +3,8 @@
 namespace App\Services\Api\Payment;
 
 use App\Enums\FinancialStatus;
+use App\Enums\GatewayPaymentStatus;
+use App\Enums\PaymentMethodType;
 use App\Enums\StatusType;
 use App\Exceptions\ConsultationNotPayableException;
 use App\Models\Customer;
@@ -15,13 +17,15 @@ class ConsultationPaymentIntentService
 
 
     public function __construct(
-        private AmwalPayService $gateway,
+        private AmwalPayService             $gateway,
         private IGatewayPaymentRepositories $gatewayPayments
-    ) {}
-
-    public function create(object $consultation, Customer $patient ,String $purpose  )
+    )
     {
-        if (!in_array($consultation->status, [StatusType::PENDING->value]) ) {
+    }
+
+    public function create(object $consultation, Customer $patient, string $purpose)
+    {
+        if (!in_array($consultation->status, [StatusType::PENDING->value])) {
             throw new HttpException(422, 'Invalid consultation state');
         }
         // ── Guard 1: الاستشارة يجب أن تكون unpaid ──────────────────────────
@@ -33,9 +37,9 @@ class ConsultationPaymentIntentService
                 );
             }
             Log::channel('financial')->warning('payment_intent.not_payable', [
-                'consultation_id'   => $consultation->id,
-                'financial_status'  => $consultation->financial_status,
-                'patient_id'        => $patient->id,
+                'consultation_id' => $consultation->id,
+                'financial_status' => $consultation->financial_status,
+                'patient_id' => $patient->id,
             ]);
             throw new ConsultationNotPayableException(
                 "Consultation {$consultation->id} status is '{$consultation->financial_status}', expected 'unpaid'"
@@ -51,13 +55,13 @@ class ConsultationPaymentIntentService
         if ($existing) {
             if ($existing->created_at->diffInMinutes(now()) < 30) {
                 return [
-                    'checkout_url'       => $existing->payload['checkout_url'],
+                    'checkout_url' => $existing->payload['checkout_url'],
                     'gateway_payment_id' => $existing->id,
-                    'biller_ref'         => $existing->gateway_reference,
+                    'biller_ref' => $existing->gateway_reference,
                 ];
             }
             $this->gatewayPayments->update([
-                'status'         => 'expired',
+                'status' => 'expired',
                 'initiated_lock' => null,
             ], $existing->id);
         }
@@ -70,52 +74,72 @@ class ConsultationPaymentIntentService
         // ── Step 2: إنشاء gateway_payment بـ status = initiated ─────────────
         // مهم: يُنشأ قبل استدعاء البوابة — إذا فشلت البوابة يبقى سجل للـ audit
         $gatewayPayment = $this->gatewayPayments->create([
-            'reference_type'    => get_class($consultation),
-            'reference_id'      => $consultation->id,
-            'gateway'           => 'amwal',
+            'reference_type' => get_class($consultation),
+            'reference_id' => $consultation->id,
+            'gateway' => 'amwal',
             'gateway_reference' => $billerRef,
-            'payment_method'    => 'card',
-            'purpose'           => $purpose,
-            'amount'            => $consultation['net_amount'],
-            'currency'          => 'OMR',
-            'status'            => 'initiated',
-            'initiated_lock'    => get_class($consultation) .'-'. $consultation->id,
-         ]);
+            'payment_method' => PaymentMethodType::METHOD_CARD->value ?? 'card',
+            'purpose' => $purpose,
+            'amount' => $consultation->gross_amount,
+            'net_received_amount' => $consultation->consultation_price,
+            'currency' => config('amwal.currency_en') ?? 'OMR',
+            'status' => GatewayPaymentStatus::INITIATED->value ?? 'initiated',
+            'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
+        ]);
 
 
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
-        $response = $this->gateway->createPaymentLink([
-            'biller_ref'     => $billerRef,
-            'payer_name'     => $patient->full_name,
-            'amount'         => $consultation['net_amount'],
-            'currency'       => 512, // OMR code
-            'email'          => $patient->email,
-            'redirect_url'   => 'https://mednovacare.com/',
-            'payment_method' => 1,
-        ]);
+        try {
+            $response = $this->gateway->createPaymentLink([
+                'biller_ref' => $billerRef,
+                'payer_name' => $patient->full_name,
+                'amount' => $consultation->gross_amount,
+                'currency' => 512, // OMR code
+                'email' => $patient->email,
+                'redirect_url' => config('amwal.redirect_url') ?? 'https://mednovacare.com/',
+                'payment_method' => 0,
+            ]);
 
-        // ── Step 4: حفظ checkout_url في gateway_payment ──────────────────────
-        $this->gatewayPayments->update( [
-            'payload' => array_merge(
-                ['checkout_url' => $response->checkoutUrl],
-                $response->raw
-            )] ,$gatewayPayment->id );
+            // ── Step 4: حفظ checkout_url في gateway_payment ──────────────────────
+            $this->gatewayPayments->update([
+                'payload' => array_merge(
+                    ['checkout_url' => $response->checkoutUrl],
+                    $response->raw
+                )], $gatewayPayment->id);
 
-        Log::channel('financial')->info('payment_intent.created', [
-            'gateway_payment_id' => $gatewayPayment->id,
-            'consultation_id'    => $consultation->id,
-            'consultation_type'  => get_class($consultation),
-            'patient_id'         => $patient->id,
-            'biller_ref'         => $billerRef,
-            'amount'             => $consultation->net_amount,
-        ]);
+            Log::channel('financial')->info('payment_intent.created', [
+                'gateway_payment_id' => $gatewayPayment->id,
+                'consultation_id' => $consultation->id,
+                'consultation_type' => get_class($consultation),
+                'patient_id' => $patient->id,
+                'biller_ref' => $billerRef,
+                'amount' => $consultation->gross_amount,
+            ]);
 
-        return [
-            'checkout_url'       => $response->checkoutUrl,
-            'gateway_payment_id' => $gatewayPayment->id,
-            'biller_ref'         => $billerRef,
-        ];
+            return [
+                'checkout_url' => $response->checkoutUrl,
+                'gateway_payment_id' => $gatewayPayment->id,
+                'biller_ref' => $billerRef,
+            ];
+        } catch (\Exception $e) {
+            $this->gatewayPayments->update([
+                'status' => 'failed',
+                'initiated_lock' => null,
+            ], $gatewayPayment->id);
+
+            Log::channel('financial')->error('payment_intent.failed', [
+                'gateway_payment_id' => $gatewayPayment->id,
+                'consultation_id' => $consultation->id,
+                'consultation_type' => get_class($consultation),
+                'patient_id' => $patient->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
+            throw $e;
+        }
     }
+
     private function generateBillerRef(object $consultation): string
     {
         $type = str_contains(get_class($consultation), 'Chat') ? 'CHAT' : 'VIDEO';

@@ -2,6 +2,10 @@
 
 namespace App\Services\Api\Consultation;
 
+use App\Enums\ConsultantType;
+use App\Enums\ConsultationStatus;
+use App\Enums\ConsultationType;
+use App\Enums\FinancialStatus;
 use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;
@@ -10,6 +14,7 @@ use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
 use App\Services\Api\Customer\TimezoneService;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -28,13 +33,48 @@ class ConsultantService
         $this->appointmentRepo = $appointmentRepo;
     }
 
+    public function findConsultation(int $id, ConsultationType $type): Model
+    {
+        return match ($type) {
+            ConsultationType::CHAT  => $this->findChatConsultation($id),
+            ConsultationType::VIDEO => $this->findVideoConsultation($id),
+        };
+    }
+
+    private function findChatConsultation(int $id): ConsultationChatRequest
+    {
+        return ConsultationChatRequest::with([
+            'patient:id,full_name,email,phone,image',
+            'consultant:id,full_name,email,phone,image',
+            'messages' => fn ($q) => $q->latest()->limit(50),
+        ])
+            ->findOrFail($id);
+    }
+
+    private function findVideoConsultation(int $id): ConsultationVideoRequest
+    {
+        return ConsultationVideoRequest::with([
+            'patient:id,full_name,email,phone,image',
+            'consultant:id,full_name,email,phone,image',
+            'activities' => fn ($q) => $q->latest()->limit(20),
+            'reports',
+        ])
+            ->findOrFail($id);
+    }
+
     public function createConsultationByType(array $data, string $type ,array $breakdown)
     {
         return DB::transaction(function () use ($data, $type , $breakdown) {
             $data['consultation_price'] = $breakdown['consultation_price'];
             $data['gateway_commission_rate'] = $breakdown['gateway_commission_rate'];
             $data['gateway_commission_amount'] = $breakdown['gateway_commission_amount'];
-            $data['net_amount'] = $breakdown['net_amount'];
+            $data['platform_commission_rate'] = $breakdown['platform_commission_rate'];
+            $data['platform_commission_amount'] = $breakdown['platform_commission_amount'];
+            $data['consultant_earning_amount'] = $breakdown['consultant_earning_amount'];
+            $data['currency'] = $breakdown['currency'];
+            $data['gross_amount'] = $breakdown['gross_amount'];
+
+
             if ($type === 'chat') {
                 $consultation = $this->chatRepo->create($data);
                 $consultation->load(['patient', 'consultant']);
@@ -97,7 +137,15 @@ class ConsultantService
             $chatQuery->where('consultant_id', $userId);
             $videoQuery->where('consultant_id', $userId);
         }
+        $excludedStatuses = [ConsultationStatus::CANCELLED->value, ConsultationStatus::CANCELLED->value];
 
+        $chatQuery->whereNotIn('status', $excludedStatuses);
+        $videoQuery->whereNotIn('status', $excludedStatuses);
+
+        if ($userType !== ConsultantType::PATIENT->value) {
+            $chatQuery->where('financial_status', '!=', FinancialStatus::UNPAID->value);
+            $videoQuery->where('financial_status', '!=', FinancialStatus::UNPAID->value);
+        }
         // فلترة حسب الحالة إذا وجدت
         if (!empty($status)) {
             $chatQuery->where('status', $status);

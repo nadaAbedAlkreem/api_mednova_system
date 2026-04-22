@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ConsultantType;
+use App\Enums\ConsultationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,24 +41,33 @@ class ConsultationVideoRequest extends Model
             'gateway_commission_amount',
             'net_amount',
             'expires_at',
-            'created_at',
-            'updated_at',
+
+            'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
+            'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
+            'platform_commission_amount', // المبلغ المأثر على الاستشارة
+            'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
+
         ];
 
     protected $dates = ['deleted_at'];
+    public const REFERENCE_TYPE = 'consultation';
+
     protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'consultation_price' => 'decimal:2',
-        'gateway_commission_rate' => 'decimal:2',
-        'gateway_commission_amount' => 'decimal:2',
-        'net_amount' => 'decimal:2',
+        'created_at'                 => 'datetime',
+        'updated_at'                 => 'datetime',
+        'review_deadline'            => 'datetime',
+        'released_at'                => 'datetime',
+        'last_reminder_sent_at'      => 'datetime',
+        'suspended_until'            => 'datetime',
+        'expires_at'                 => 'datetime',
+        'consultant_approved'        => 'boolean',
+        'patient_approved'           => 'boolean',
+//        'consultation_price'         => 'decimal:3',
+//        'gateway_commission_rate'    => 'decimal:3',
+//        'gateway_commission_amount'  => 'decimal:3',
+//        'net_amount'                 => 'decimal:3',
     ];
 
-//    protected $casts = [
-//        'created_at' => 'datetime',
-//        'updated_at' => 'datetime',
-//    ];
     protected static function boot()
     {
         parent::boot();
@@ -92,6 +103,10 @@ class ConsultationVideoRequest extends Model
     public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ConsultationVideoReport::class, 'consultation_video_request_id');
+    }
+    public function isOwnedBy(int $userId): bool
+    {
+        return $this->patient_id === $userId || $this->consultant_id === $userId;
     }
 
 }

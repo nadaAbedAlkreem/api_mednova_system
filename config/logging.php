@@ -36,6 +36,8 @@ return [
         'trace' => env('LOG_DEPRECATIONS_TRACE', false),
     ],
 
+
+
     /*
     |--------------------------------------------------------------------------
     | Log Channels
@@ -63,6 +65,11 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+        ],
+        'financial' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/financial.log'),
+            'level' => 'info',
         ],
 
         'daily' => [

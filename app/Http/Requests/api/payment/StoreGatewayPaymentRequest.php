@@ -23,8 +23,8 @@ class StoreGatewayPaymentRequest extends FormRequest
     {
         return [
 //            'amount' => ['required', 'numeric', 'min:1'],
-            'payment_method' => ['sometimes', 'in:card,apple_pay,bank'],
-            'card_type'      => ['sometimes', 'in:domestic,international'],
+//            'payment_method' => ['sometimes', 'in:card,apple_pay,bank'],
+//            'card_type'      => ['sometimes', 'in:domestic,international'],
 
 //            'card_token' => ['required_if:payment_method,card'],
 //            'bank_account_id' => ['required_if:payment_method,bank'],

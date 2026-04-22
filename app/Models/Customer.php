@@ -6,6 +6,7 @@ use App\Enums\AccountStatus;
 use App\Enums\ConsultantType;
 use App\Enums\StatusType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -41,7 +42,10 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(AccountReview::class, 'customer_id');
     }
-
+    public function wallet(): MorphOne
+    {
+        return $this->morphOne(Wallet::class, 'owner');
+    }
 
 
     public function complainantReport(): \Illuminate\Database\Eloquent\Relations\HasMany

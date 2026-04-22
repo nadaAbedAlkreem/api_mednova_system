@@ -14,10 +14,15 @@ class Wallet extends Model
         'owner_type',
         'owner_id',
         'currency',
-//        'balance',
         'available_balance',
         'pending_balance',
         'frozen_balance',
+    ];
+
+    protected $casts = [
+        'available_balance' => 'decimal:3',
+        'pending_balance'   => 'decimal:3',
+        'frozen_balance'    => 'decimal:3',
     ];
 
     /**
@@ -42,5 +47,14 @@ class Wallet extends Model
     public function disputes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Dispute::class);
+    }
+
+    public function getTotalBalanceAttribute(): string
+    {
+        return bcadd(
+            bcadd((string) $this->available_balance, (string) $this->pending_balance, 3),
+            (string) $this->frozen_balance,
+            3
+        );
     }
 }

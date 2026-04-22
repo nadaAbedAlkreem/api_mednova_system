@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ConsultantType;
+use App\Enums\ConsultationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,26 +36,34 @@ class ConsultationChatRequest extends Model
         'suspension_count',
         // Financial columns
         'consultation_price',
-        'gateway_commission_rate',
-        'gateway_commission_amount',
-        'net_amount',
+        'gateway_commission_rate', //  رسوم البوابة
+        'gateway_commission_amount', // رسوم البوابة قيمة الرسوم
+        //'net_amount', delete this column
 
-        'created_at',
-        'updated_at',
-        'deleted_at',
+        'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
+        'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
+        'platform_commission_amount', // المبلغ المأثر على الاستشارة
+        'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
+
+
 
     ];
+    public const REFERENCE_TYPE = 'consultation';
+
     protected $casts = [
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'consultation_price' => 'decimal:2',
-        'gateway_commission_rate' => 'decimal:2',
-        'gateway_commission_amount' => 'decimal:2',
-        'net_amount' => 'decimal:2',
+        'started_at'                 => 'datetime',
+        'ended_at'                   => 'datetime',
+        'review_deadline'            => 'datetime',
+        'released_at'                => 'datetime',
+        'first_patient_message_at'   => 'datetime',
+        'first_consultant_message_at'=> 'datetime',
+        'last_reminder_sent_at'      => 'datetime',
+        'suspended_until'            => 'datetime',
+//        'consultation_price'         => 'decimal:3',
+//        'gateway_commission_rate'    => 'decimal:3',
+//        'gateway_commission_amount'  => 'decimal:3',
+//        'net_amount'                 => 'decimal:3',
     ];
-
     protected $dates = ['deleted_at'];
 
 
@@ -68,15 +78,20 @@ class ConsultationChatRequest extends Model
         return $this->belongsTo(Customer::class, 'consultant_id');
     }
 
-    public function messages()
+    public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Message::class, 'chat_request_id');
     }
 
-    public function unreadMessages()
+    public function unreadMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Message::class, 'chat_request_id')
             ->where('is_read', false);
+    }
+
+    public function isOwnedBy(int $userId): bool
+    {
+        return $this->patient_id === $userId || $this->consultant_id === $userId;
     }
 
 

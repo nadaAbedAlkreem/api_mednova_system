@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\GatewayPaymentStatus;
+use App\Enums\PaymentMethodType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GatewayPayment extends Model
@@ -24,7 +27,8 @@ class GatewayPayment extends Model
         'payment_method',
         'card_id',
         'bank_account_id',
-        'amount',
+        'amount', // المبلغ  المدفوع من خلال البوابة يشمل الرسوم المنصة
+        'net_received_amount' , //  المبلغ الذي وصل محفظة التاجر بدون رسوم المنصة
         'currency',
         'country',
         'status',
@@ -40,22 +44,22 @@ class GatewayPayment extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:3',
-        'payload' => 'array',
-        'processed_at' => 'datetime',
+        'amount'      => 'decimal:3',
+        'payload'     => 'array',
+        'frozen_at'   => 'datetime',
+        'freeze_until'=> 'datetime',
     ];
 
-    /**
-     * العلاقة مع جدول Transaction
-     */
-//    public function transaction()
+
+//    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasOne
 //    {
-//        return $this->belongsTo(Transaction::class);
+//        return $this->hasOne(Transaction::class, 'gateway_payment_id');
 //    }
-    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function transactions(): HasMany
     {
-        return $this->hasOne(Transaction::class, 'gateway_payment_id');
+        return $this->hasMany(Transaction::class);
     }
+
     public function reference(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
@@ -83,4 +87,32 @@ class GatewayPayment extends Model
     {
         return $this->payment_method === 'bank' && !is_null($this->bank_account_id);
     }
+
+    public function scopeSuccessful($query)
+    {
+        return $query->where('status', GatewayPaymentStatus::CAPTURED->value);
+    }
+    public function scopeForUser($query, int $userId, string $morphType = 'App\\Models\\Customer')
+    {
+        // Gateway payments are linked to a reference (e.g. Consultation).
+        // This scope is intentionally left as a hook for the service layer,
+        // which knows how to join through Consultation → patient_id.
+        return $query;
+    }
+    public function isFrozen(): bool
+    {
+        return $this->frozen_at !== null
+            && ($this->freeze_until === null || $this->freeze_until->isFuture());
+    }
+
+    public function getPaymentMethodLabelAttribute(): string
+    {
+        return match ($this->payment_method) {
+            PaymentMethodType::METHOD_CARD->value => 'Credit / Debit Card',
+            PaymentMethodType::METHOD_APPLE_PAY->value => 'Apple Pay',
+            PaymentMethodType::METHOD_BANK->value       => 'Bank Transfer',
+            default                => ucfirst($this->payment_method),
+        };
+    }
+
 }

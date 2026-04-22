@@ -17,4 +17,15 @@ return [
         'OMR' => 512,
     ],
     'redirectUrl' => 'https://mednovacare.com/',
+
+    'currency_en' => 'OMR',
+
+    'gateway_fees' => [
+        'domestic'      => 0.009, // 0.9%
+        'international' => 0.018, // 1.8%
+    ],
+
+    'platform_commission' => [
+        'default_rate' => 0.10, // 10%
+    ],
  ];
