@@ -20,10 +20,8 @@ enum TransactionType : string
     public static function visibleForConsultant(): array
     {
         return [
-            self::CONSULTATION_CREDIT,
-            self::WITHDRAWAL,
-            self::REFUND,
-            self::CONSULTATION_RELEASE
+            self::CONSULTATION_CREDIT, // اضافة على محفظة المستشار عند نجاخ العملية
+            self::WITHDRAWAL,// سحب المستشار لمبلغ معين
          ];
     }
 }

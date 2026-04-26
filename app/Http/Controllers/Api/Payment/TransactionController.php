@@ -23,20 +23,16 @@ class TransactionController extends Controller
     }
 
 
-    public function transactions(Request $request): JsonResponse
+    public function consultantTransactions(Request $request): JsonResponse
     {
         try {
-            $request->validate([
-                'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
-            ]);
+            $request->validate(['per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],]);
             $consultant = $request->user('api');
-            $perPage = (int)$request->input('per_page', 15);
+            $perPage    = (int) $request->query('per_page', 15);
             $transactions = $this->financialService->getTransactions($consultant, $perPage);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ConsultantTransactionResource::collection($transactions), 202);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), ConsultantTransactionResource::collection($transactions), 200);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
-
         }
-
     }
 }

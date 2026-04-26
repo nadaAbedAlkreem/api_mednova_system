@@ -3,6 +3,7 @@
 namespace App\Services\Api\Financial;
 
 use App\Enums\ConsultantType;
+use App\Enums\TransactionType;
 use App\Models\Customer;
 use App\Models\Transaction;
 use App\Models\User;
@@ -16,11 +17,12 @@ use Illuminate\Support\Facades\Log;
  * Encapsulates all financial read logic for consultant-type users.
  *
  * Responsibilities:
- *   - Retrieve wallet balance with guard against missing wallet
- *   - Retrieve paginated transaction history filtered to consultant-relevant types
+ *   - Retrieve wallet balance (null-safe, no auto-creation)
+ *   - Retrieve paginated transaction history filtered to consultant-visible types
  *   - Apply correct scope: only the consultant's own wallet transactions
  *
  * Does NOT:
+ *   - Create wallets (responsibility of payment webhook / payout services)
  *   - Perform any write operations
  *   - Format data for HTTP responses (that is the Resource's job)
  *   - Know about HTTP request/response cycle
@@ -38,53 +40,58 @@ class ConsultantFinancialService
     private const DEFAULT_PER_PAGE = 15;
     private const MAX_PER_PAGE     = 50;
 
+    /**
+     * Transaction types visible to consultants in their history feed.
+     * Internal ledger types (consultation_hold, platform_fee, payment_record,
+     * consultation_release) are filtered out per CLAUDE.md rules.
+     */
+
     // ── Public API ─────────────────────────────────────────────────────────────
 
     /**
      * Retrieve the consultant's wallet.
      *
-     * Returns null if no wallet exists yet (e.g. newly approved consultant
-     * who has never received a payment).  Controllers should handle this
-     * gracefully by returning a zero-balance placeholder.
+     * Returns null if no wallet exists yet. The caller (Resource layer) must
+     * handle null gracefully by returning zero balances.
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException if user is not a consultant
+     * Note: wallet creation is intentionally NOT performed here. A consultant
+     * wallet is created by the payout/webhook service on first earning event.
+     *
+     * @throws \DomainException if user is not a consultant
      */
     public function getWallet(Customer $consultant): ?Wallet
     {
         $this->assertConsultant($consultant);
 
-        return $consultant->wallet()->firstOrCreate([
-            // keys to search (empty لأن العلاقة polymorphic)
-        ], [
-            'currency'          => 'OMR',
-            'available_balance' => '0.000',
-            'pending_balance'   => '0.000',
-            'frozen_balance'    => '0.000',
-        ]);
+        return $consultant->wallet()->first();
     }
 
     /**
-     * Retrieve a paginated list of ledger transactions for the consultant.
+     * Retrieve paginated ledger transactions for the consultant.
      *
-     * Filters:
-     *   - Only transaction types relevant to consultants
-     *   - Scoped via wallet relationship (no direct wallet_id parameter)
-     *   - Ordered by most recent first
+     * Filters applied:
+     *   - Scoped to the consultant's own wallet
+     *   - Only VISIBLE_TYPES are returned (internal ledger types hidden)
+     *   - Soft-deleted records excluded
+     *   - Most recent first
      *
-     * @param  User   $consultant  The authenticated consultant
-     * @param  int    $perPage     Items per page (capped at MAX_PER_PAGE)
      * @return LengthAwarePaginator<Transaction>
      */
     public function getTransactions(Customer $consultant, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         $this->assertConsultant($consultant);
+
         $perPage = min($perPage, self::MAX_PER_PAGE);
+
         $wallet = $consultant->wallet()->first();
+
         if (! $wallet) {
             return Transaction::query()->whereNull('id')->paginate($perPage);
         }
-        return Transaction::VisibleToUser()
+
+        return Transaction::query()
             ->where('wallet_id', $wallet->id)
+            ->whereIn('transaction_type', array_map(fn ($type) => $type->value, TransactionType::visibleForConsultant()))
             ->whereNull('deleted_at')
             ->orderByDesc('created_at')
             ->paginate($perPage);
@@ -93,32 +100,31 @@ class ConsultantFinancialService
     // ── Private helpers ────────────────────────────────────────────────────────
 
     /**
-     * Ensures the provided User is a consultant-type account.
+     * Ensures the provided Customer is a consultant-type account.
      * Throws a domain exception on mismatch.
      *
      * IMPORTANT: This is a defence-in-depth check.
      * The route middleware (role:therapist,rehabilitation_center) is the
      * primary guard; this service-level check prevents logic errors if the
-     * service is ever called from a non-route context (e.g. console commands,
+     * service is ever called from a non-route context (console commands,
      * jobs, tests).
      *
      * @throws \DomainException
      */
     private function assertConsultant(Customer $customer): void
     {
-        $consultantTypes = [ConsultantType::THERAPIST->value, ConsultantType::REHABILITATION_CENTER->value];
+        $consultantTypes = [
+            ConsultantType::THERAPIST->value,
+            ConsultantType::REHABILITATION_CENTER->value,
+        ];
 
-        if (!in_array($customer->type_account, $consultantTypes, true)) {
+        if (! in_array($customer->type_account, $consultantTypes, true)) {
             Log::warning('ConsultantFinancialService: non-consultant access attempt', [
-                'customer_id'      => $customer->id,
+                'customer_id'  => $customer->id,
                 'type_account' => $customer->type_account,
             ]);
 
             throw new \DomainException('Access restricted to consultant accounts.');
         }
     }
-
-
-
-
 }

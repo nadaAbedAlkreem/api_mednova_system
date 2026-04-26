@@ -100,7 +100,7 @@ use Illuminate\Support\Facades\Route;
                   {
                       Route::prefix('consultant')->middleware(['account_type:therapist,rehabilitation_center', 'throttle:api'])->group(function () {
                               Route::get('wallet', [WalletController::class, 'walletConsultant'])->name('wallet');
-                              Route::get('transactions', [TransactionController::class, 'transactions']);
+                              Route::get('transactions', [TransactionController::class, 'consultantTransactions']);
                           });
                       Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api',])->group(function () {
                           Route::get('wallet', [WalletController::class, 'walletPatient']);

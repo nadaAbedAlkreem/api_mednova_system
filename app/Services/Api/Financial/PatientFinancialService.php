@@ -6,6 +6,8 @@ use App\Enums\ConsultantType;
 use App\Enums\EntryType;
 use App\Enums\GatewayPaymentStatus;
 use App\Enums\TransactionType;
+use App\Models\ConsultationChatRequest;
+use App\Models\ConsultationVideoRequest;
 use App\Models\Customer;
 use App\Models\GatewayPayment;
 use App\Models\Transaction;
@@ -37,20 +39,51 @@ use Illuminate\Support\Facades\Log;
  *   All queries are scoped through the $consultant model relationship,
  *   never through user-supplied IDs.
  */
+/**
+ * PatientFinancialService
+ *
+ * Encapsulates all financial read logic for patient-type users.
+ *
+ * Responsibilities:
+ *   - Retrieve wallet balance (null-safe)
+ *   - Retrieve paginated gateway payment history with refund flag decoration
+ *   - Retrieve paginated ledger transactions (refunds, withdrawals, dispute releases)
+ *
+ * Does NOT:
+ *   - Create wallets (created on first refund event)
+ *   - Perform any write operations
+ *   - Format data for HTTP responses (Resource's job)
+ *
+ * ── Audit Notes ──────────────────────────────────────────────────────────────
+ * Sensitive fields (payload, gateway_transaction_id, response_code) are never
+ * selected here — they are filtered at the Resource layer per CLAUDE.md rules.
+ */
 class PatientFinancialService
 {
     private const DEFAULT_PER_PAGE = 15;
     private const MAX_PER_PAGE     = 50;
 
+    /**
+     * Transaction types visible to patients in their history feed.
+     * Internal ledger types are filtered out per CLAUDE.md rules.
+     */
+    private const VISIBLE_TYPES = [
+        'refund',
+        'withdrawal',
+        'dispute_release',
+    ];
+
     // ── Public API ─────────────────────────────────────────────────────────────
 
     /**
-     * Retrieve the patient's wallet (for available balance display).
+     * Retrieve the patient's wallet.
      *
-     * Returns null if no wallet exists — callers should handle this
-     * by returning a zero-balance placeholder.
+     * Returns null if no wallet exists — callers should handle this via the
+     * PatientWalletResource which returns zero balances for a null wallet.
+     *
+     * @throws \DomainException if user is not a patient
      */
-    public function getWallet(User $patient): ?Wallet
+    public function getWallet(Customer $patient): ?Wallet
     {
         $this->assertPatient($patient);
 
@@ -63,30 +96,24 @@ class PatientFinancialService
      *
      * Process:
      *   1. Fetch paginated gateway payments for this patient's consultations
-     *   2. Fetch the set of consultation IDs that have received an internal refund
-     *   3. Decorate the collection with refund flags
+     *      (both chat and video types via polymorphic reference)
+     *   2. Determine which payments have been refunded via transactions table
+     *   3. Decorate the collection with is_refunded + refunded_amount flags
      *
-     * @param  User  $patient
-     * @param  int   $perPage
-     * @return LengthAwarePaginator<GatewayPayment>  with ->refundedPaymentIds appended
+     * @return LengthAwarePaginator<GatewayPayment>
      */
-    public function getPaymentHistory(User $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getPaymentHistory(Customer $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         $this->assertPatient($patient);
 
         $perPage = min($perPage, self::MAX_PER_PAGE);
 
-        // Step 1: Paginate gateway payments linked to this patient via Consultation
-        // We use whereHasMorph to traverse the polymorphic reference to Consultation,
-        // then filter by the consultation's patient_id.
-        //
-        // ASSUMPTION: reference_type = 'App\Models\Consultation' (or equivalent)
-        // and consultations table has a patient_id column.
-        // Adjust the morph type string to match your actual model namespace.
+        // Step 1: Paginate gateway payments linked to this patient via either
+        // ConsultationChatRequest or ConsultationVideoRequest (polymorphic).
         $payments = GatewayPayment::query()
             ->whereHasMorph(
                 'reference',
-                ['App\Models\Consultation'],
+                [ConsultationChatRequest::class, ConsultationVideoRequest::class],
                 fn ($q) => $q->where('patient_id', $patient->id)
             )
             ->whereIn('status', [
@@ -95,21 +122,65 @@ class PatientFinancialService
                 GatewayPaymentStatus::AUTHORIZED->value,
             ])
             ->whereNull('deleted_at')
+            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
             ->orderByDesc('created_at')
             ->paginate($perPage);
+
+        // Step 2: Identify which of these payments were refunded internally
+        $paymentIds  = $payments->getCollection()->pluck('id')->all();
+        $refundedIds = $this->getRefundedPaymentIds($patient, $paymentIds);
+
+        // Step 3: Decorate each payment with refund metadata
+        $payments->getCollection()->transform(function (GatewayPayment $payment) use ($refundedIds) {
+            $payment->is_refunded     = $refundedIds->contains($payment->id);
+            $payment->refunded_amount = $payment->is_refunded
+                ? ($payment->reference->consultation_price ?? null)
+                : null;
+
+            return $payment;
+        });
 
         return $payments;
     }
 
     /**
-     * Given a collection of GatewayPayment IDs, return the subset that
-     * have an associated internal refund transaction in the ledger.
+     * Retrieve paginated ledger transactions for the patient.
      *
-     * Logic:
-     *   A refund is detected when the patient's wallet has a 'refund' credit
-     *   transaction whose gateway_payment_id matches the gateway payment.
+     * Only refund, withdrawal, and dispute_release types are returned —
+     * internal ledger entries are hidden per CLAUDE.md rules.
      *
-     * Returns a Collection of gateway_payment_id values that were refunded.
+     * @return LengthAwarePaginator<Transaction>
+     */
+    public function getTransactions(Customer $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    {
+        $this->assertPatient($patient);
+
+        $perPage = min($perPage, self::MAX_PER_PAGE);
+
+        $wallet = $patient->wallet()->first();
+
+        if (! $wallet) {
+            return Transaction::query()->whereNull('id')->paginate($perPage);
+        }
+
+        return Transaction::query()
+            ->where('wallet_id', $wallet->id)
+            ->whereIn('transaction_type', self::VISIBLE_TYPES)
+            ->whereNull('deleted_at')
+            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Given a list of gateway payment IDs, return the subset that
+     * have an associated internal refund credit transaction in the ledger.
+     *
+     * A refund is detected when the patient's wallet has a 'refund' credit
+     * transaction whose gateway_payment_id matches the gateway payment.
+     *
+     * @param  array<int>  $gatewayPaymentIds
+     * @return \Illuminate\Support\Collection
      */
     public function getRefundedPaymentIds(Customer $patient, array $gatewayPaymentIds): \Illuminate\Support\Collection
     {
@@ -135,17 +206,16 @@ class PatientFinancialService
     // ── Private helpers ────────────────────────────────────────────────────────
 
     /**
-     * Ensures the provided User is a patient-type account.
+     * Ensures the provided Customer is a patient-type account.
      *
      * @throws \DomainException
      */
-    private function assertPatient(User $user): void
+    private function assertPatient(Customer $patient): void
     {
-        // Adjust the string if your enum uses a different label, e.g. 'user'
-        if ($user->type_account !== 'patient') {
+        if ($patient->type_account !== 'patient') {
             Log::warning('PatientFinancialService: non-patient access attempt', [
-                'user_id'      => $user->id,
-                'type_account' => $user->type_account,
+                'customer_id'  => $patient->id,
+                'type_account' => $patient->type_account,
             ]);
 
             throw new \DomainException('Access restricted to patient accounts.');

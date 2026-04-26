@@ -8,6 +8,8 @@ use App\Http\Requests\StoreWalletRequest;
 use App\Http\Requests\UpdateWalletRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Http\Resources\Api\Financial\ConsultantTransactionResource;
+use App\Http\Resources\Api\Financial\Wallet\ConsultantWalletResource;
+use App\Http\Resources\Api\Financial\Wallet\PatientWalletResource;
 use App\Http\Resources\Api\Financial\WalletResource;
 use App\Models\Wallet;
 use App\Services\Api\Financial\ConsultantFinancialService;
@@ -33,7 +35,7 @@ class WalletController extends Controller
         try {
             $consultant = $request->user('api');
             $wallet = $this->consultantFinancialService->getWallet($consultant);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),new  WalletResource($wallet), 202);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),new  ConsultantWalletResource($wallet), 202);
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
@@ -42,19 +44,16 @@ class WalletController extends Controller
     }
     public function walletPatient(Request $request): JsonResponse
     {
-        $patient = $request->user();
-        $wallet  = $this->patientFinancialService->getWallet($patient);
+        try {
+            $patient = $request->user('api');
+            $wallet  = $this->patientFinancialService->getWallet($patient);
+            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'),new  PatientWalletResource($wallet), 202);
+        }catch (\Exception $exception){
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);
 
-        if (! $wallet) {
-            $wallet = new Wallet([
-                'available_balance' => '0.000',
-                'currency'          => 'OMR',
-            ]);
         }
 
-        return response()->json([
-            'data' => WalletResource::make($wallet)->forPatient(),
-        ]);
+
     }
 
     /**

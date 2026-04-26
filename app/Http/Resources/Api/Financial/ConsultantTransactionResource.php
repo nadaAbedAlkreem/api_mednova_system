@@ -4,71 +4,112 @@ namespace App\Http\Resources\Api\Financial;
 
 use App\Enums\AccountStatus;
 use App\Enums\AmountStatus;
+use App\Enums\ConsultationType;
+use App\Enums\EntryType;
 use App\Enums\TransactionType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConsultantTransactionResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    private const TYPE_LABELS = [
-        TransactionType::CONSULTATION_CREDIT->value => 'Consultation Earnings',
-        TransactionType::REFUND->value => 'Refund Issued',
-        TransactionType::DISPUTE_FREEZE->value => 'Dispute Freeze',
-        TransactionType::WITHDRAWAL->value => 'Withdrawal',
-        TransactionType::PAYMENT_RECORD->value => 'Payment Record',
+    private const LABELS = [
+        'consultation_credit' => ['ar' => 'أرباح استشارة', 'en' => 'Consultation Earnings'],
+        'dispute_freeze' => ['ar' => 'تجميد بسبب نزاع', 'en' => 'Dispute Hold'],
+        'dispute_release' => ['ar' => 'فك تجميد', 'en' => 'Dispute Resolved'],
+        'withdrawal' => ['ar' => 'سحب أرباح', 'en' => 'Withdrawal'],
     ];
 
-    // Map internal status values to display labels
+    private const STATUS_LABELS = [
+        'pending' => ['ar' => 'معلّق', 'en' => 'Pending'],
+        'available' => ['ar' => 'متاح', 'en' => 'Available'],
+        'frozen' => ['ar' => 'مجمّد', 'en' => 'Frozen'],
+    ];
 
 
     public function toArray(Request $request): array
     {
+        $locale = $this->resolveLocale($request);
         return [
             'id' => $this->id,
-            'type' => $this->resource->transaction_type,        // machine key for frontend logic
-            'type_label' => $this->resolveTypeLabel(),                // human readable
-            'amount' => $this->resolveSignedAmount(),             // signed float
-            'amount_formatted' => $this->formatAmountDisplay(),            // "− 5.000 OMR"
+            'type' => $this->transaction_type,
+            'label' => $this->resolveLabel($locale),
+            'amount' => $this->formatSignedAmount(),
             'currency' => $this->currency,
-            'status' => $this->resource->status,
-            'consultation_id' => $this->consultation_id,                   // nullable — from meta
+            'status' => $this->status,
+            'status_label' => $this->resolveStatusLabel($locale),
+            'consultation' => $this->buildConsultationPayload(),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
-    private function resolveTypeLabel(): string
+    private function resolveLocale(Request $request): string
     {
-        return self::TYPE_LABELS[$this->resource->transaction_type]
-            ?? ucwords(str_replace('_', ' ', $this->resource->transaction_type));
+        return str_starts_with($request->header('Accept-Language', ''), 'en') ? 'en' : 'ar';
     }
 
-
-    /**
-     * Returns a signed float for the net_amount:
-     *   Credits  → positive  (e.g.  25.500)
-     *   Debits   → negative  (e.g. -10.000)
-     */
-    private function resolveSignedAmount(): float
+    private function resolveLabel(string $locale): string
     {
-        return (float)$this->signed_amount; // computed attribute on Transaction model
+        return self::LABELS[$this->transaction_type][$locale]
+            ?? ucwords(str_replace('_', ' ', $this->transaction_type));
     }
 
-    /**
-     * Formats for display: "25.500 OMR" or "− 10.000 OMR"
-     */
-    private function formatAmountDisplay(): string
+    private function resolveStatusLabel(string $locale): string
     {
-        $amount = (float)$this->signed_amount;
-        $sign = $amount >= 0 ? '' : '− ';
-        $abs = number_format(abs($amount), 3);
+        return self::STATUS_LABELS[$this->status][$locale]
+            ?? ucwords(str_replace('_', ' ', $this->status));
+    }
 
-        return "{$sign}{$abs} {$this->currency}";
+    private function formatSignedAmount(): string
+    {
+        $formatted = number_format((float)$this->net_amount, 3, '.', '');
+
+        return $this->entry_type === EntryType::ENTRY_CREDIT->value
+            ? '+' . $formatted
+            : '-' . $formatted;
+    }
+
+    private function buildConsultationPayload(): ?array
+    {
+        if ($this->transaction_type === TransactionType::WITHDRAWAL->value) {
+            return null;
+        }
+
+        $reference = $this->reference;
+
+        if (!$reference) {
+            return null;
+        }
+
+        return [
+            'id' => $reference->id,
+            'type' => $this->resolveConsultationType(),
+            'patient_name' => isset($reference->patient)
+                ? $this->shortenName($reference->patient->full_name)
+                : null,
+        ];
+    }
+
+    private function resolveConsultationType(): string
+    {
+        if (str_contains($this->reference_type ?? '', 'Chat')) {
+            return ConsultationType::CHAT->value;
+        }
+
+        if (str_contains($this->reference_type ?? '', 'Video')) {
+            return ConsultationType::VIDEO->value;
+        }
+
+        return 'unknown';
+    }
+
+    private function shortenName(string $fullName): string
+    {
+        $parts = preg_split('/\s+/', trim($fullName), 3);
+
+        if (count($parts) < 2) {
+            return $parts[0] ?? $fullName;
+        }
+
+        return $parts[0] . ' ' . mb_substr($parts[1], 0, 1) . '.';
     }
 }
