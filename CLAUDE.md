@@ -98,3 +98,197 @@ All controllers use `ResponseTrait` for uniform `{ data, message, status }` API 
 - **Maatwebsite Excel** — data export
 - **Dedoc Scramble** — auto API documentation
 - **Omnix** — external service (`config/omnix.php`)
+
+---
+
+## 🔴 Custom Project Financial Context (VERY IMPORTANT)
+
+### Platform Services
+
+The platform provides 3 core services:
+
+1. Chat Consultation (Pusher realtime)
+2. Video Consultation (Zoom scheduling)
+3. Rehab Glove Device (IoT via Python → Laravel)
+4. Rehab Courses
+
+⚠️ Current scope focuses ONLY on consultation financial system.
+
+---
+
+### Financial Flow (Source of Truth)
+
+- Patient pays:
+  consultation_price + gateway_fee = gross_amount
+
+- Only consultation_price is considered platform-held amount
+
+- After payment:
+  → amount goes to platform_wallet.pending_balance (ESCROW)
+
+- Consultant receives NOTHING at this stage
+
+---
+
+### On Success
+
+- consultant_earning_amount → consultant_wallet.available_balance
+- platform_commission_amount → platform_wallet.available_balance
+
+---
+
+### On Failure / Cancel / Dispute (Patient Wins)
+
+- consultation_price → refunded internally
+- moved from:
+  platform_wallet.pending_balance → patient_wallet.available_balance
+
+- gateway_fee is NEVER refunded
+
+---
+
+### Wallet Semantics
+
+- available_balance = usable money
+- pending_balance = escrow (NOT owned yet)
+- frozen_balance = dispute locked
+
+---
+
+### Patient Wallet Response (FINAL)
+
+Patient sees ONLY:
+
+{
+"wallet": {
+"total_balance": "...",
+"available_balance": "...",
+"pending_withdrawal": "...",
+"currency": "OMR"
+}
+}
+
+❌ Patient MUST NOT see:
+- platform_commission
+- consultant_earning
+- gateway breakdown
+
+---
+
+### Consultant Visibility
+
+Consultant sees ONLY:
+
+- consultation_credit
+- dispute_freeze
+- dispute_release
+- withdrawal
+
+❌ Consultant MUST NOT see:
+- consultation_release
+- platform_fee
+- payment_record
+- refund
+
+---
+
+### Financial Tables Meaning
+
+- consultation = source of truth
+- gateway_payments = external payment
+- transactions = ledger (history)
+- wallets = balances only
+
+---
+
+### Transaction Types Meaning
+
+- payment_record = external payment
+- consultation_hold = escrow (platform pending)
+- consultation_credit = consultant earning
+- platform_fee = platform earning
+- refund = internal refund to patient
+- dispute_freeze = freeze funds
+- dispute_release = resolve dispute
+- withdrawal = user withdrawal
+
+---
+
+### Critical Rules
+
+- NEVER modify financial values after payment success
+- ALWAYS use DB::transaction
+- ALWAYS use lockForUpdate for wallet updates
+- NEVER duplicate webhook processing
+- consultation financial values are IMMUTABLE snapshot
+
+
+---
+
+## API Response Filtering by Role (CRITICAL)
+
+Financial data MUST be filtered at Resource layer based on user role.
+NEVER send sensitive data to frontend expecting it to hide them.
+
+### Patient Role
+Patient sees in wallet:
+- total_balance (computed)
+- available_balance
+- pending_withdrawal (alias for pending_balance)
+- currency
+
+Patient sees in payments:
+- amount_paid (gross)
+- gateway_fee
+- consultation_price
+- is_refunded + refunded_amount
+
+Patient NEVER sees:
+- platform_commission_rate / amount
+- consultant_earning_amount
+- frozen_balance
+- payload / gateway_transaction_id
+- response_code / response_message
+
+### Consultant Role
+Consultant sees in wallet:
+- total_balance (computed)
+- available_balance
+- pending_balance (future earnings from active consultations)
+- frozen_balance
+- withdrawable_balance (= available_balance)
+
+Consultant sees in consultation financials:
+- consultation_price
+- platform_commission_rate / amount
+- your_earning (= consultant_earning_amount)
+
+Consultant NEVER sees:
+- gross_amount
+- gateway_fee / gateway_commission_*
+- refund details
+
+### Allowed Transaction Types Per Role
+
+Patient: refund, withdrawal, dispute_release
+Consultant: consultation_credit, dispute_freeze, dispute_release, withdrawal
+
+Never visible to Patient: consultation_hold, consultation_release, platform_fee, payment_record
+Never visible to Consultant: consultation_release, platform_fee, payment_record, refund, consultation_hold
+
+---
+
+## Localization
+
+All Resources must support Arabic (default) and English via Accept-Language header.
+Labels live as const arrays inside each Resource (not in lang files for now).
+If header starts with 'en' → English, otherwise → Arabic.
+
+---
+
+## Pagination Defaults
+
+- Default per_page: 15
+- Max per_page: 50
+- Always orderByDesc('created_at')
+- Always whereNull('deleted_at') on soft-deleted tables
