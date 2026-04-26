@@ -138,6 +138,26 @@ class PatientFinancialService
         return $payments;
     }
 
+
+    public function getTransactions(Customer $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    {
+        $this->assertPatient($patient);
+        $perPage = min($perPage, self::MAX_PER_PAGE);
+        $wallet = $patient->wallet()->first();
+        if (! $wallet) {
+            return Transaction::query()->whereNull('id')->paginate($perPage);
+        }
+        return Transaction::query()
+            ->where('wallet_id', $wallet->id)
+            ->whereIn('transaction_type', array_map(fn ($type) => $type->value, TransactionType::visibleForPatient()))
+            ->whereNull('deleted_at')
+            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+    }
+
+
+
     /**
      * Retrieve paginated ledger transactions for the patient.
      *
@@ -158,6 +178,10 @@ class PatientFinancialService
      * @param  array<int>  $gatewayPaymentIds
      * @return \Illuminate\Support\Collection
      */
+
+
+
+
     public function getRefundedPaymentIds(Customer $patient, array $gatewayPaymentIds): \Illuminate\Support\Collection
     {
         if (empty($gatewayPaymentIds)) {

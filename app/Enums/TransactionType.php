@@ -24,4 +24,15 @@ enum TransactionType : string
             self::WITHDRAWAL,// سحب المستشار لمبلغ معين
          ];
     }
+    public static function visibleForPatient(): array
+    {
+
+        return [
+            self::REFUND,
+            self::DISPUTE_FREEZE,
+            self::DISPUTE_RELEASE,
+            self::WITHDRAWAL
+        ];
+    }
 }
+
