@@ -48,6 +48,7 @@ class GatewayPaymentController extends Controller
         $this->consultationPaymentIntentService = $consultationPaymentIntentService;
         $this->gatewayPaymentRepositories = $gatewayPaymentRepositories;
         $this->financialTransactionService = $financialTransactionService;
+
     }
 
     /**
@@ -110,28 +111,27 @@ class GatewayPaymentController extends Controller
     }
 
 
-    public function payments(Request $request): JsonResponse
+    public function patientPayments(Request $request): JsonResponse
     {
         try {
             $request->validate([
                 'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
             ]);
-
-            $patient = $request->user();
-            $perPage = (int) $request->input('per_page', 15);
+            $patient = $request->user('api');
+            $perPage = (int) $request->query('per_page', 15);
             $payments = $this->financialService->getPaymentHistory($patient, $perPage);
-            $paymentIds    = $payments->getCollection()->pluck('id')->all();
-            $refundedIds   = $this->financialService->getRefundedPaymentIds($patient, $paymentIds);
-            $resources = $payments->getCollection()->map(
-                fn ($payment) => PatientPaymentResource::make($payment)
-                    ->withRefund($refundedIds->contains($payment->id))
+            return $this->successResponse(
+                __('messages.DATA_RETRIEVED_SUCCESSFULLY'),
+                PatientPaymentResource::collection($payments),
+                200
             );
-            $payments->setCollection($resources);
-            return $this->successResponse(__('messages.DATA_RETRIEVED_SUCCESSFULLY'), PatientPaymentResource::collection($payments), 202);
-        }catch (Exception $e) {
-            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(
+                __('messages.ERROR_OCCURRED'),
+                ['error' => $exception->getMessage()],
+                500
+            );
         }
-
     }
 
 

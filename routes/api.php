@@ -104,8 +104,9 @@ use Illuminate\Support\Facades\Route;
                           });
                       Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api',])->group(function () {
                           Route::get('wallet', [WalletController::class, 'walletPatient']);
+                          Route::get('payments', [GatewayPaymentController::class, 'patientPayments']);
+
                       });
-                      Route::get('payments', [GatewayPaymentController::class, 'payments']);
 
                  });
 

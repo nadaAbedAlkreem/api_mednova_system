@@ -105,11 +105,7 @@ class PatientFinancialService
     public function getPaymentHistory(Customer $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         $this->assertPatient($patient);
-
         $perPage = min($perPage, self::MAX_PER_PAGE);
-
-        // Step 1: Paginate gateway payments linked to this patient via either
-        // ConsultationChatRequest or ConsultationVideoRequest (polymorphic).
         $payments = GatewayPayment::query()
             ->whereHasMorph(
                 'reference',
@@ -126,11 +122,10 @@ class PatientFinancialService
             ->orderByDesc('created_at')
             ->paginate($perPage);
 
-        // Step 2: Identify which of these payments were refunded internally
+        // Decoration: refund flags
         $paymentIds  = $payments->getCollection()->pluck('id')->all();
         $refundedIds = $this->getRefundedPaymentIds($patient, $paymentIds);
 
-        // Step 3: Decorate each payment with refund metadata
         $payments->getCollection()->transform(function (GatewayPayment $payment) use ($refundedIds) {
             $payment->is_refunded     = $refundedIds->contains($payment->id);
             $payment->refunded_amount = $payment->is_refunded
