@@ -1,9 +1,7 @@
 <?php
 
-namespace App\Http\Resources\Api\Financial;
+namespace App\Http\Resources\Api\Financial\Transaction;
 
-use App\Enums\AccountStatus;
-use App\Enums\AmountStatus;
 use App\Enums\ConsultationType;
 use App\Enums\EntryType;
 use App\Enums\TransactionType;

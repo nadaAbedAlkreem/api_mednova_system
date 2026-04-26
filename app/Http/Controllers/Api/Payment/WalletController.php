@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers\Api\Payment;
 
-use App\Enums\ConsultantType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWalletRequest;
 use App\Http\Requests\UpdateWalletRequest;
-use App\Http\Resources\Api\Customer\CustomerResource;
-use App\Http\Resources\Api\Financial\ConsultantTransactionResource;
 use App\Http\Resources\Api\Financial\Wallet\ConsultantWalletResource;
 use App\Http\Resources\Api\Financial\Wallet\PatientWalletResource;
-use App\Http\Resources\Api\Financial\WalletResource;
 use App\Models\Wallet;
 use App\Services\Api\Financial\ConsultantFinancialService;
 use App\Services\Api\Financial\PatientFinancialService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Auth;
+
 
 class WalletController extends Controller
 {
