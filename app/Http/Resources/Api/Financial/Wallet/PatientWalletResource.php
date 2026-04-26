@@ -14,7 +14,8 @@ class PatientWalletResource extends JsonResource
         return [
             'total_balance'      => $this->amount('available_balance', 'pending_balance'),
             'available_balance'  => $this->amount('available_balance'),
-            'pending_withdrawal' => $this->amount('pending_balance'),
+            'pending_withdrawal' => $this->amount('pending_balance'),// هو مبالغ التي تم طلب السحب وبانتظار تحويل خارج المنصة
+            'withdrawable_balance' => $this->amount('available_balance'), // حاليا يساوي متاح ولكن في حال مستقبل كان في قيد على حد ادنى او اعلي
             'currency'           => $this->resource?->currency ?? 'OMR',
         ];
     }

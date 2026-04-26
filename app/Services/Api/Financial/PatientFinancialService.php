@@ -151,26 +151,7 @@ class PatientFinancialService
      *
      * @return LengthAwarePaginator<Transaction>
      */
-    public function getTransactions(Customer $patient, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        $this->assertPatient($patient);
 
-        $perPage = min($perPage, self::MAX_PER_PAGE);
-
-        $wallet = $patient->wallet()->first();
-
-        if (! $wallet) {
-            return Transaction::query()->whereNull('id')->paginate($perPage);
-        }
-
-        return Transaction::query()
-            ->where('wallet_id', $wallet->id)
-            ->whereIn('transaction_type', self::VISIBLE_TYPES)
-            ->whereNull('deleted_at')
-            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
-            ->orderByDesc('created_at')
-            ->paginate($perPage);
-    }
 
     /**
      * Given a list of gateway payment IDs, return the subset that
