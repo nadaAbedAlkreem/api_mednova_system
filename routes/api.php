@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Package\UserPackageController;
+use App\Http\Controllers\Api\ControlPanel\FinancialDepartment\DisputeController as AdminDisputeController;
+use App\Http\Controllers\Api\Payment\DisputeController;
 use App\Http\Controllers\Api\Payment\GatewayPaymentController;
 use App\Http\Controllers\Api\Payment\AmwalWebhookController;
 use App\Http\Controllers\Api\Payment\TransactionController;
@@ -102,7 +104,7 @@ use Illuminate\Support\Facades\Route;
                               Route::get('wallet', [WalletController::class, 'walletConsultant'])->name('wallet');
                               Route::get('transactions', [TransactionController::class, 'consultantTransactions']);
                           });
-                      Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api',])->group(function () {
+                      Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api'])->group(function () {
                           Route::get('wallet', [WalletController::class, 'walletPatient']);
                           Route::get('payments', [GatewayPaymentController::class, 'patientPayments']);
                           Route::get('transactions', [TransactionController::class, 'patientTransactions']);
@@ -142,6 +144,9 @@ use Illuminate\Support\Facades\Route;
                 Route::prefix('chat')->group(function ()
                 {
                     Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+                });
+                Route::middleware(['account_type:patient', 'throttle:api'])->prefix('financial/patient')->group(function () {
+                    Route::post('{id}/dispute', [DisputeController::class, 'openDispute']);
                 });
 
             });
@@ -235,7 +240,12 @@ use Illuminate\Support\Facades\Route;
                         Route::patch('/subscribing-users/{subscriberId}', [UserPackageController::class, 'accountDeactivation']); // حذف فيديوdone
 
                     });
-
+                    Route::prefix('financial')->group(function () {
+                            Route::prefix('disputes')->group(function () {
+                            Route::get('{id}', [AdminDisputeController::class, 'show']);
+                            Route::post('{id}/resolve', [AdminDisputeController::class, 'resolve']);
+                        });
+                    });
                 });
             });
 

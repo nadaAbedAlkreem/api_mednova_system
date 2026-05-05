@@ -95,3 +95,4 @@ class ConsultationResource extends JsonResource
         ];
     }
 }
+

@@ -36,8 +36,8 @@ class ConsultationVideoActivity extends Model
         'last_reminder_sent_at' => 'datetime',
     ];
 
-     public function consultationVideoRequest()
-    {
+     public function consultationVideoRequest(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+     {
         return $this->belongsTo(ConsultationVideoRequest::class, 'consultation_video_request_id');
     }
 

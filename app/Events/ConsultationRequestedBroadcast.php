@@ -34,19 +34,22 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
         try {
             $this->notification->update(['status' => 'sent']);
             $this->notification->save();
-            if ($this->eventType === 'active_by_patient' || $this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient') {
+            if ($this->eventType === 'dispute_opened_consultant' || $this->eventType === 'dispute_resolved_consultant' || $this->eventType === 'active_by_patient' || $this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient' || $this->eventType === 'settlement_completed_consultant') {
                 Log::info(' for nada', [
                     'requested' => $this->consultation->consultant_id,
                 ]);
                 return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
             }
-            if ($this->eventType === 'active_by_consultant' ||$this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant') {
+            if ($this->eventType === 'dispute_opened_patient' || $this->eventType === 'dispute_resolved_patient' || $this->eventType === 'active_by_consultant' || $this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant' || $this->eventType === 'review_window_opened' || $this->eventType === 'settlement_completed_patient' || $this->eventType === 'review_window_expiring_patient') {
                 Log::info(' for cancelled', [
                     'consultant' => $this->consultation->consultant_id,
                 ]);
                 return new PrivateChannel('patient.' . $this->consultation->patient_id);
             }
-
+            if($this->eventType === 'dispute_opened_admin')
+            {
+                return new PrivateChannel('admin.notifications');
+            }
             if ($this->eventType === 'cancelled_by_system'  || $this->eventType === 'active' || $this->eventType === 'completed' || $this->eventType === 'reminder_for_all') {
                 return [
                     new PrivateChannel('consultant.' . $this->consultation->consultant_id),

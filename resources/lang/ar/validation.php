@@ -200,6 +200,7 @@ return [
         'district' => 'الحي',
         'postal_code' => 'الرمز البريدي',
         'location_type' => 'نوع الموقع',
+        'consultation_type' => 'نوع الاستشارة ',
         'medical_specialties_id' => 'تخصص الطبي ',
         'experience_years' => 'عدد سنوات الخبرة',
         'university_name' => 'اسم الجامعة',
@@ -210,6 +211,8 @@ return [
         'license_authority' => 'الجهة المانحة لترخيص',
         'license_file' => 'نسخة من  الترخيص',
         'bio' => 'نبذة التعريفية',
+        'reason_dispute' => 'سبب النزاع',
+
         'year_establishment' => 'سنة التأسيس',
         'has_commercial_registration' => 'هل يوجد سجل تجاري',
         'commercial_registration_number' => 'رقم السجل التجاري',

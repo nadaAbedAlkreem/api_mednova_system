@@ -16,5 +16,12 @@ return [
         ],
         'policy_not_found' =>  'This policy does not exist.',
 
+        'dispute' =>
+            [
+                'not_owner' => 'This consultation does not belong to you, so you cannot open a dispute over it.' ,
+                'not_review_window' => 'Disputes can only be opened during the review period.',
+                'expired' => 'The review period for this consultation has expired.'
+            ] ,
+
     ],
 ];

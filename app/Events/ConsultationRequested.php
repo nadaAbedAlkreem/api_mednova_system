@@ -10,12 +10,12 @@ class ConsultationRequested
 {
     use Dispatchable, SerializesModels;
 
-    public $consultation , $message  , $eventType;
+    public $consultation , $message  , $eventType ;
 
     /**
      * Create a new event instance.
      */
-    public function __construct( $consultation , $message , $eventType )
+    public function __construct( $consultation , $message , $eventType  )
     {
         $this->consultation = $consultation->load(['patient', 'consultant']);
         $this->message = $message;

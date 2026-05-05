@@ -16,3 +16,8 @@ Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 Schedule::command('consultations:check-status')->everyFifteenSeconds();
 Schedule::command('payments:expire-stale')->everyFifteenMinutes();
 Schedule::job(new ReleaseSuspendedConsultationsJob)->everyFiveMinutes();
+Schedule::command('consultations:process-review-expiry')
+         ->everyTenMinutes()
+         ->withoutOverlapping()
+         ->runInBackground();
+

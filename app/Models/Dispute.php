@@ -11,8 +11,8 @@ class Dispute extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'reference_dispute_type',
-        'reference_dispute_id',
+        'reference_type',
+        'reference_id',
         'wallet_id',
         'amount',
         'currency',
@@ -28,24 +28,29 @@ class Dispute extends Model
     ];
 
     protected $casts = [
-        'meta' => 'array',
+        'amount' => 'decimal:3',
         'opened_at' => 'datetime',
         'resolved_at' => 'datetime',
+        'meta' => 'array',
     ];
 
-    /**
-     * Polymorphic reference for the dispute
-     */
-    public function referenceDispute(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function reference()
     {
         return $this->morphTo();
     }
 
-    /**
-     * Wallet related to this dispute
-     */
-    public function wallet(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function wallet()
     {
         return $this->belongsTo(Wallet::class);
+    }
+
+    public function openedBy()
+    {
+        return $this->morphTo();
+    }
+
+    public function resolvedBy()
+    {
+        return $this->morphTo();
     }
 }

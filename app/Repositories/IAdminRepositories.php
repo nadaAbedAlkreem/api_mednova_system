@@ -7,5 +7,7 @@ interface IAdminRepositories
 
     public function login(array $credentials): ?string;
 
+    public function getSuperAdmin();
+
 
 }

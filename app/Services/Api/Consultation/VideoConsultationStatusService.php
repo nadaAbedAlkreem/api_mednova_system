@@ -2,8 +2,12 @@
 
 namespace App\Services\Api\Consultation;
 
+use App\Enums\ConsultationStatus;
+use App\Enums\FinancialStatus;
+use App\Events\ConsultationRequested;
 use App\Models\ConsultationVideoRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class VideoConsultationStatusService
@@ -20,20 +24,17 @@ class VideoConsultationStatusService
 
     public function processPending(Carbon $now): void
     {
-        $consultations = ConsultationVideoRequest::with(['patient', 'consultant'])
-            ->where('status', 'pending')
-            ->get();
-
-        if ($consultations->isEmpty()) {
-            return;
-        }
-
-        foreach ($consultations as $consultation)
-        {
-            $hours = Carbon::parse($consultation->created_at)->diffInHours($now);
-            $this->handlePendingReminders($consultation, $hours );
-            if ($hours >= 24) {$this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');}
-        }
+        ConsultationVideoRequest::with(['patient', 'consultant'])
+            ->where('status', ConsultationStatus::PENDING->value)
+            ->chunkById(100, function ($consultations) use ($now) {
+                foreach ($consultations as $consultation) {
+                    $hours = Carbon::parse($consultation->created_at)->diffInHours($now);
+                    $this->handlePendingReminders($consultation, $hours);
+                    if ($hours >= 24) {
+                        $this->cancel($consultation, 'لم يتم اعتماد الاستشارة خلال 24 ساعة');
+                    }
+                }
+            });
     }
 
     private function handlePendingReminders($consultation, int $hours ): void
@@ -53,41 +54,45 @@ class VideoConsultationStatusService
 
     public function processAccepted(Carbon $now): void
     {
-        $consultations = ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant'])
-            ->where('status', 'accepted')
-            ->get();
+        ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant'])
+            ->where('status', ConsultationStatus::ACCEPTED->value)
+            ->chunkById(100, function ($consultations) use ($now) {
+                foreach ($consultations as $consultation) {
+                    $appointment = $consultation->appointmentRequest;
 
-        foreach ($consultations as $consultation) {
-            $appointment = $consultation->appointmentRequest;
+                    if (!$appointment) {
+                        continue;
+                    }
 
-            if (!$appointment) {
-                continue;
-            }
+                    $startTime = Carbon::parse($appointment->requested_time);
 
-            $startTime = Carbon::parse($appointment->requested_time);
-
-            if ($now->gte($startTime)) {
-                $consultation->update(['status' => 'active']);
-                $this->sendReminder($consultation, "جلسة الفيديو بدأت الآن");
-            }
-        }
+                    if ($now->gte($startTime)) {
+                        $consultation->update(['status' => ConsultationStatus::ACTIVE->value]);
+                        $this->sendReminder($consultation, "جلسة الفيديو بدأت الآن");
+                    }
+                }
+            });
     }
 
 
     public function processActive(Carbon $now): void
     {
-        $consultations = ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant', 'activities'])->where('status', 'active')->get();
-        foreach ($consultations as $consultation) {
-            if (!$consultation->appointmentRequest)
-            {continue;}
-            $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
-            if ($now->gte($endTime)) {
-                $this->endApiZoomPlatform($consultation);
-                $this->endMeeting($consultation);
-                continue;
-            }
-            $this->processActivityReminders($consultation, $now);
-        }
+        ConsultationVideoRequest::with(['appointmentRequest', 'patient', 'consultant', 'activities'])
+            ->where('status', 'active')
+            ->chunkById(100, function ($consultations) use ($now) {
+                foreach ($consultations as $consultation) {
+                    if (!$consultation->appointmentRequest) {
+                        continue;
+                    }
+                    $endTime = Carbon::parse($consultation->appointmentRequest->confirmed_end_time);
+                    if ($now->gte($endTime)) {
+                        $this->endApiZoomPlatform($consultation);
+                        $this->endMeeting($consultation);
+                        continue;
+                    }
+                    $this->processActivityReminders($consultation, $now);
+                }
+            });
     }
 
     private function endApiZoomPlatform(ConsultationVideoRequest $consultation): void
@@ -154,23 +159,60 @@ class VideoConsultationStatusService
 
     public function endMeeting($consultation): void
     {
-        $consultation->appointmentRequest->update([
-            'status' => 'completed',
-            'is_finished' =>true,
-            'finished_at' => now(),
-        ]);
+        if ($consultation->status === 'completed') {
+            return;
+        }
 
-        $consultation->update([
-            'status' =>'completed',
-        ]);
+        $endedAt = now();
 
-        $patient  = $consultation->patient->full_name  ?? 'patient';
-        $consultant  =  $consultation->consultant->full_name ?? 'consultant'; ;
-        event(new \App\Events\ConsultationRequested(
+        DB::transaction(function () use ($consultation, $endedAt) {
+            $consultation->appointmentRequest->update([
+                'status' => 'completed',
+                'is_finished' => true,
+                'finished_at' => $endedAt,
+            ]);
+
+            $consultation->update([
+                'status' => 'completed',
+                'ended_at' => $endedAt,
+                'financial_status' => FinancialStatus::REVIEW_WINDOW->value,
+                'review_deadline' => $endedAt->copy()->addHours(48),
+                'action_by' => 'system',
+                'action_reason' => 'Video consultation completed and review window opened.',
+            ]);
+        });
+
+        $consultation->refresh();
+
+        event(new ConsultationRequested(
             $consultation,
-            "تم انهاء جلسة الفيديو بين: {$patient}  ,$consultant}",
-            'cancelled_by_system'
+            __('messages.SESSION_COMPLETED_BOTH', [
+                'patient' => $consultation->patient->full_name,
+                'consultant' => $consultation->consultant->full_name,
+            ]),
+            'completed'
         ));
+
+        event(new ConsultationRequested(
+            $consultation,
+            __('messages.ending_consultation_session_dispute', [
+                'patient' => $consultation->patient->full_name,
+                'consultant' => $consultation->consultant->full_name,
+            ]),
+            'review_window_opened'
+        ));
+
+//        $consultation->update([
+//            'status' =>'completed',
+//        ]);
+//
+//        $patient  = $consultation->patient->full_name  ?? 'patient';
+//        $consultant  =  $consultation->consultant->full_name ?? 'consultant'; ;
+//        event(new \App\Events\ConsultationRequested(
+//            $consultation,
+//            "تم انهاء جلسة الفيديو بين: {$patient}  ,$consultant}",
+//            'cancelled_by_system'
+//        ));
 
 //        optional($consultation->appointmentRequest)->delete();
 //        $consultation->delete();

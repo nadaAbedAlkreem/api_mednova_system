@@ -3,65 +3,44 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDisputeRequest;
-use App\Http\Requests\UpdateDisputeRequest;
-use App\Models\Dispute;
+use App\Http\Requests\api\consultation\StoreDisputeRequest;
+use App\Repositories\IConsultationChatRequestRepositories;
+use App\Repositories\IConsultationVideoRequestRepositories;
+use App\Services\Api\Financial\Dispute\DisputeService;
+use App\Traits\ResponseTrait;
+use DomainException;
+use Exception;
 
 class DisputeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    use ResponseTrait;
+    public function __construct(
+        protected DisputeService $disputeService,
+        protected IConsultationVideoRequestRepositories $consultationVideoRequestRepositories,
+        protected IConsultationChatRequestRepositories $consultationChatRequestRepositories,
+    ) {}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function openDispute(StoreDisputeRequest $request, int $id): \Illuminate\Http\JsonResponse
     {
-        //
-    }
+        try {
+            $data = $request->validated();
+            $consultation = match ($data['type']) {
+                'chat' =>  $this->consultationChatRequestRepositories->findOrFail($id),
+                'video' => $this->consultationVideoRequestRepositories->findOrFail($id),
+            };
+            $this->disputeService->execute(
+                consultation: $consultation,
+                patient: $request->user('api'),
+                reason: $data['reason_dispute']
+            );
+            return $this->successResponse(__('messages.DISPUTE_OPENED_SUCCESSFULLY'), [], 200);
+        } catch (DomainException $exception) {
+            return $this->errorResponse($exception->getMessage(), [], 422);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreDisputeRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Dispute $dispute)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Dispute $dispute)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateDisputeRequest $request, Dispute $dispute)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Dispute $dispute)
-    {
-        //
+        } catch (Exception $exception) {
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
+                'error' => $exception->getMessage(),
+            ], 500);
+        }
     }
 }

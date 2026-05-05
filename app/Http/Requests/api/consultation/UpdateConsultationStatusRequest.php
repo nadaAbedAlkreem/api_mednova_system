@@ -38,6 +38,10 @@ class UpdateConsultationStatusRequest extends FormRequest
             return false;
         }
 
+        if ($this->input('status') === 'accepted') {
+            return $policy->accept($user, $consultation)->allowed();
+        }
+
         // 2. إذا كانت العملية إلغاء، تحقق من أن action_by يطابق دور المستخدم
         if ($this->input('status') === 'cancelled') {
             $actionBy = $this->input('action_by');

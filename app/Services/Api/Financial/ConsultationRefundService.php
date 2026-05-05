@@ -23,7 +23,7 @@ class ConsultationRefundService
     protected IWalletRepositories $walletRepositories;
     protected FinancialTransactionService $financialTransactionService;
 
-    public function __construct(IWalletRepositories $wallets, FinancialTransactionService $financialTransactionService)
+    public function __construct(IWalletRepositories $wallets, FinancialTransactionService $financialTransactionService , )
     {
         $this->walletRepositories = $wallets;
         $this->financialTransactionService = $financialTransactionService;
@@ -88,9 +88,9 @@ class ConsultationRefundService
         // 5. التحقق من وجود المحافظ
         // ---------------------------------------------------------------
         $platformWallet = $this->walletRepositories->getPlatformWallet();
-        if ($platformWallet === null) {
-            throw new HttpException(500, 'Platform wallet not found.');
-        }
+//        if ($platformWallet === null) {
+//            throw new HttpException(500, 'Platform wallet not found.');
+//        }
 
         $patientWallet = $this->walletRepositories->getOrCreateByOwnerForUpdate($consultation->patient_id);
         if ($patientWallet === null) {
