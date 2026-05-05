@@ -34,19 +34,15 @@ class ConsultationChatRequest extends Model
         'last_reminder_level',
         'suspended_until',
         'suspension_count',
-        // Financial columns
         'consultation_price',
-        'gateway_commission_rate', //  رسوم البوابة
-        'gateway_commission_amount', // رسوم البوابة قيمة الرسوم
-        //'net_amount', delete this column
-
-        'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
-        'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
-        'platform_commission_amount', // المبلغ المأثر على الاستشارة
-        'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
-
-
-
+        'gateway_commission_rate',
+        'gateway_commission_amount',
+        'gross_amount',
+        'platform_commission_rate',
+        'platform_commission_amount',
+        'consultant_earning_amount',
+        'settled_at',
+        'review_window_reminder_sent',
     ];
     public const REFERENCE_TYPE = 'consultation';
 
@@ -59,10 +55,14 @@ class ConsultationChatRequest extends Model
         'first_consultant_message_at'=> 'datetime',
         'last_reminder_sent_at'      => 'datetime',
         'suspended_until'            => 'datetime',
-//        'consultation_price'         => 'decimal:3',
-//        'gateway_commission_rate'    => 'decimal:3',
-//        'gateway_commission_amount'  => 'decimal:3',
-//        'net_amount'                 => 'decimal:3',
+        'consultation_price'          => 'decimal:3',
+        'gateway_commission_rate'     => 'decimal:3',
+        'gateway_commission_amount'   => 'decimal:3',
+        'platform_commission_rate'    => 'decimal:3',
+        'platform_commission_amount'  => 'decimal:3',
+        'consultant_earning_amount'   => 'decimal:3',
+        'settled_at'                  => 'datetime',
+        'review_window_reminder_sent' => 'boolean',
     ];
     protected $dates = ['deleted_at'];
 

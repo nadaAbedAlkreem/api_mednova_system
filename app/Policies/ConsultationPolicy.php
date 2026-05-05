@@ -43,6 +43,23 @@ class ConsultationPolicy
 
         return Response::allow();
     }
+
+    public function openDispute(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation): Response {
+
+        if ((int) $consultation->patient_id !== (int) $user->id) {
+            return Response::deny(__('policies.consultation.dispute.not_owner'));
+        }
+        // 2. يجب أن تكون الحالة المالية في review_window
+        if ($consultation->financial_status !== FinancialStatus::REVIEW_WINDOW->value) {
+            return Response::deny(__('policies.consultation.dispute.not_review_window'));
+        }
+        // 3. يجب أن تكون المهلة لم تنتهِ
+        if (!$consultation->review_deadline || now()->greaterThan($consultation->review_deadline)) {
+            return Response::deny(__('policies.consultation.dispute.expired'));
+        }
+
+        return Response::allow();
+    }
     /**
      * عرض الاستشارة
      */
@@ -66,5 +83,20 @@ class ConsultationPolicy
             default       => false,
         };
     }
+    public function accept(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation): Response
+    {
+        if ((int) $user->id !== (int) $consultation->consultant_id) {
+            return Response::deny(__('policies.consultation.accept.not_consultant'));
+        }
+
+        if ($consultation->financial_status === FinancialStatus::UNPAID->value) {
+            return Response::deny(__('policies.consultation.accept.not_paid'));
+        }
+
+        return Response::allow();
+    }
+
+
+
 
 }

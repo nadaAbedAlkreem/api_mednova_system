@@ -39,14 +39,14 @@ class ConsultationVideoRequest extends Model
             'consultation_price',
             'gateway_commission_rate',
             'gateway_commission_amount',
-            'net_amount',
             'expires_at',
 
-            'gross_amount' , // ما يدفعه المريض فعليً المبلغ الاحمالي اي يشمل الرسوم ولا تعني كامل المبلغ دخل على محفظة
-            'platform_commission_rate' , //  قيمة نسبة المنصة من الاستشارة
-            'platform_commission_amount', // المبلغ المأثر على الاستشارة
-            'consultant_earning_amount' , // ارباج المستشار صافي الرسوم البوابة و نسبة المنصة
-
+            'gross_amount',
+            'platform_commission_rate',
+            'platform_commission_amount',
+            'consultant_earning_amount',
+            'settled_at',
+            'review_window_reminder_sent',
         ];
 
     protected $dates = ['deleted_at'];
@@ -62,10 +62,14 @@ class ConsultationVideoRequest extends Model
         'expires_at'                 => 'datetime',
         'consultant_approved'        => 'boolean',
         'patient_approved'           => 'boolean',
-//        'consultation_price'         => 'decimal:3',
-//        'gateway_commission_rate'    => 'decimal:3',
-//        'gateway_commission_amount'  => 'decimal:3',
-//        'net_amount'                 => 'decimal:3',
+        'consultation_price'          => 'decimal:3',
+        'gateway_commission_rate'     => 'decimal:3',
+        'gateway_commission_amount'   => 'decimal:3',
+        'platform_commission_rate'    => 'decimal:3',
+        'platform_commission_amount'  => 'decimal:3',
+        'consultant_earning_amount'   => 'decimal:3',
+        'settled_at'                  => 'datetime',
+        'review_window_reminder_sent' => 'boolean',
     ];
 
     protected static function boot()

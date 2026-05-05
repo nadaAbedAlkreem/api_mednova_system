@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\FinancialStatus;
+use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -31,7 +33,6 @@ class UpdateChatConsultationStatus extends Command
         });
 
 
-
         $this->info('Consultation statuses and notifications processed successfully.');
     }
 
@@ -42,13 +43,14 @@ class UpdateChatConsultationStatus extends Command
     {
 
         ConsultationChatRequest::with(['patient:id,full_name', 'consultant:id,full_name'])
+            ->whereNotIn('status', ['completed', 'cancelled'])
             ->where('status', $status)
             ->whereNotNull($timeField)
             ->whereNull('ended_at')
-            ->where($timeField, '<',  now()->subHours(6))
+            ->where($timeField, '<', now()->subHours(6))
             ->chunkById(100, function ($consultations) use ($now, $shouldRemind, $status, $timeField) {
                 foreach ($consultations as $consultation) {
-                     $timeValue = $consultation->$timeField;
+                    $timeValue = $consultation->$timeField;
                     if (!($timeValue instanceof Carbon)) {
                         $timeValue = Carbon::parse($timeValue);
                     }
@@ -91,12 +93,12 @@ class UpdateChatConsultationStatus extends Command
 
         foreach ($levels as $level => $limit) {
 //            if ($secondsSince >= $limit && $consultation->last_reminder_level < $level) {
-            if ($hoursSince >= $limit && $consultation->last_reminder_level === $level - 1){
+            if ($hoursSince >= $limit && $consultation->last_reminder_level === $level - 1) {
                 if ($level === 3) {
                     $this->cancelConsultation($consultation, 'No activity within 24 hours after acceptance');
                 } else {
                     $typeEvent = ($status == 'pending') ? 'requested' : 'reminder_for_all';
-                    $this->sendReminder($consultation, $limit , $typeEvent);
+                    $this->sendReminder($consultation, $limit, $typeEvent);
                 }
 
                 $consultation->last_reminder_level = $level;
@@ -129,26 +131,41 @@ class UpdateChatConsultationStatus extends Command
 
     private function completeConsultation($consultation)
     {
+        if ($consultation->status === 'completed') {
+            return;
+        }
+        $endedAt = now();
         $consultation->update([
             'status' => 'completed',
-            'ended_at' => now(),
+            'ended_at' => $endedAt,
+            'financial_status' => FinancialStatus::REVIEW_WINDOW->value,
+            'review_deadline' => $endedAt->copy()->addHours(48),
+            'action_by' => 'system',
+            'action_reason' => 'Chat consultation completed and review window opened.',
         ]);
 
-        $message = __('messages.SESSION_COMPLETED_BOTH', [
-            'patient' => $consultation->patient->full_name,
-            'consultant' => $consultation->consultant->full_name,
-        ]);
+        $consultation->refresh();
 
-        event(new \App\Events\ConsultationRequested(
+        event(new ConsultationRequested(
             $consultation,
-            $message,
+            __('messages.SESSION_COMPLETED_BOTH', [
+                'patient' => $consultation->patient->full_name,
+                'consultant' => $consultation->consultant->full_name,
+            ]),
             'completed'
         ));
-//        $consultation->delete();
 
+        event(new ConsultationRequested(
+            $consultation,
+            __('messages.ending_consultation_session_dispute', [
+                'patient' => $consultation->patient->full_name,
+                'consultant' => $consultation->consultant->full_name,
+            ]),
+            'review_window_opened'
+        ));
     }
 
-    private function sendReminder($consultation, int $hours , $eventType = 'reminder_for_all' )
+    private function sendReminder($consultation, int $hours, $eventType = 'reminder_for_all')
     {
         $patientName = $consultation->patient->full_name ?? 'المريض';
         $consultantName = $consultation->consultant->full_name ?? 'المختص';

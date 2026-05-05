@@ -36,36 +36,51 @@ class ZoomWebhookController extends Controller
 //    }
     public function handle(Request $request)
     {
+        // Handle Zoom URL validation challenge
+        if ($request->input('event') === 'endpoint.url_validation') {
+            $plainToken = $request->input('payload.plainToken');
+            $encryptedToken = hash_hmac('sha256', $plainToken, config('services.zoom.secret_token_webhook'));
+
+            Log::info('Zoom webhook URL validation', ['plainToken' => $plainToken]);
+
+            return response()->json([
+                'plainToken'     => $plainToken,
+                'encryptedToken' => $encryptedToken,
+            ]);
+        }
+
+        // Verify Zoom signature for all other events
+        $signature = $request->header('x-zm-signature');
+        $timestamp  = $request->header('x-zm-request-timestamp');
+
+        if (!$signature || !$timestamp) {
+            Log::warning('Zoom webhook: missing signature headers');
+            return response('Unauthorized', 401);
+        }
+
+        if (abs(time() - (int) $timestamp) > 300) {
+            Log::warning('Zoom webhook: stale request timestamp');
+            return response('Unauthorized', 401);
+        }
+
+        $expected = 'v0=' . hash_hmac(
+            'sha256',
+            "v0:{$timestamp}:{$request->getContent()}",
+            config('services.zoom.secret_token_webhook')
+        );
+
+        if (!hash_equals($expected, $signature)) {
+            Log::warning('Zoom webhook: invalid signature');
+            return response('Unauthorized', 401);
+        }
+
         Log::info('ZoomWebhook Request:', $request->all());
 
-//        // URL Validation Step
-//        if ($request->event === 'endpoint.url_validation') {
-//
-//            $plainToken = $request->input('payload.plainToken');
-//
-//            $encryptedToken = hash_hmac(
-//                'sha256',
-//                $plainToken,
-//                config('services.zoom.secret_token_webhook')
-//            );
-//
-//            Log::info('Returning Zoom Validation Response', [
-//                'plainToken' => $plainToken,
-//                'encryptedToken' => $encryptedToken
-//            ]);
-//
-//            return response()->json([
-//                "plainToken" => $plainToken,
-//                "encryptedToken" => $encryptedToken
-//            ], 200);
-//        }
+        $this->zoomWebhookService->handleEvent($request->all());
 
-//         After validation: handle real events
-       $this->zoomWebhookService->handleEvent($request->all());
+        Log::info('ZoomWebhook Event processed:', ['event' => $request->input('event')]);
 
-        Log::info('ZoomWebhook Event:', $request->all());
-
-        return response("OK", 200);
+        return response('OK', 200);
     }
 
 

@@ -22,4 +22,8 @@ class AdminRepository extends AuthRepository implements IAdminRepositories
     }
 
 
+    public function getSuperAdmin()
+    {
+        return Admin::where('email', 'super_admin@gmail.com' )->first();
+    }
 }

@@ -18,6 +18,30 @@ return [
         'required' =>'The type game field is required.' ,
         'in' => 'The nature of the challenge must be determined, whether individual enter (I) or enter (T) team.',
     ],
+    'DISPUTE_OPENED_SUCCESSFULLY' => 'The dispute has been successfully opened and will be reviewed by management.',
+    'DISPUTE_RESOLVED_SUCCESSFULLY' => 'The dispute has been resolved successfully.',
+    'DISPUTE_ALREADY_RESOLVED' => 'This dispute has already been resolved and cannot be processed again.',
+    'INSUFFICIENT_PLATFORM_FROZEN_BALANCE' => 'The frozen platform balance is insufficient to complete the operation.',
+    'dispute_resolved_refund_patient' => 'The dispute was resolved in your favour. :amount :currency has been returned to your wallet.',
+    'dispute_resolved_refund_consultant' => 'The dispute on consultation #:consultation_id was resolved in the patient\'s favour.',
+    'dispute_resolved_release_patient' => 'The dispute on consultation #:consultation_id was resolved in the consultant\'s favour.',
+    'dispute_resolved_release_consultant' => 'The dispute was resolved in your favour. Your earnings of :amount :currency are now available for withdrawal.',
+    'INVALID_CONSULTATION_AMOUNT' => 'The consultation fee is invalid.',
+    'INSUFFICIENT_PLATFORM_PENDING_BALANCE' => 'The pending platform balance is insufficient to complete the transaction.',
+    'UPDATE_STATUS'=>'Operation updated successfully',
+    'STATUS_UPDATED' => 'Operation updated successfully',
+    'dispute_opened_patient' => 'تم تسجيل النزاع بنجاح على الاستشارة رقم :consultation_id مع :consultant. سيتم مراجعة النزاع من قبل إدارة المنصة. للمتابعة تواصل مع الإدارة على الرقم '.config('app.support_phone'),
+    'dispute_opened_consultant' => 'تم فتح نزاع على الاستشارة رقم :consultation_id من قبل المريض :patient. يرجى التواصل مع إدارة المنصة على الرقم '.config('app.support_phone').'لمتابعة الإجراءات.',
+    'dispute_opened_admin' => 'نزاع جديد يحتاج مراجعة: الاستشارة رقم :consultation_id بين المريض :patient والمستشار :consultant.',
+
+
+
+    'ending_consultation_session_dispute' => 'The session has ended. You have 48 hours to open a dispute if the service was not provided as required.',
+    'SESSION_COMPLETED_BOTH' => 'The consultation session between :patient and :consultant has been completed successfully. Thank you for your engagement.',
+    'ACCEPTED_REQUEST' => 'Welcome! Your consultation request has been accepted by consultant :name. Please join the session now — it is available for 24 hours from the start time.',
+    'CANCEL_REQUEST' => 'The consultation request has been cancelled.',
+    'CANCEL_REQUEST_PATIENT' => 'The consultation request has been cancelled by the patient :name.',
+    'CANCEL_REQUEST_CONSULTANT' => 'The consultation request has been cancelled by Dr. :name.',
     'UNAUTHORIZED_CONSULTATION_ACTION' => 'You do not have permission to modify this consultation.',
     'unique' => 'unique ',
     'PROGRAM_ALREADY_APPROVED' => 'This program has already been approved.',
@@ -398,5 +422,11 @@ return [
         'boolean' => 'Property must be a boolean (true/false).',
     ],
 
-
+    // Phase 4 — Settlement
+    'settlement_completed_patient'         => 'Consultation #:consultation_id with :consultant has been settled. Thank you for using the platform.',
+    'settlement_completed_consultant'      => 'Congratulations! Your earnings of :amount :currency from consultation #:consultation_id are now available for withdrawal.',
+    'review_window_expiring_patient'       => 'Reminder: 1 hour remaining to dispute consultation #:consultation_id. If no dispute is filed, the amount will be settled automatically.',
+    'SETTLEMENT_REQUIRES_REVIEW_WINDOW'    => 'Settlement requires the consultation to be in review window status.',
+    'SETTLEMENT_REVIEW_WINDOW_NOT_EXPIRED' => 'The review window has not expired yet.',
+    'SETTLEMENT_ACCOUNTING_MISMATCH'       => 'Accounting validation failed. Settlement aborted.',
 ];
