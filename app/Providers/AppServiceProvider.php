@@ -3,8 +3,14 @@
 namespace App\Providers;
 
 
+use App\Models\Customer;
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +29,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
+
+            $openApi->secure(
+                SecurityScheme::http('bearer', 'JWT')
+            );
+        });
+
+        Scramble::configure()
+            ->routes(function (Route $route) {
+                return Str::startsWith($route->uri, 'api/');
+            });
+        Gate::define('viewApiDocs', function (?Customer $user) {
+            return $user && in_array($user->email, ['elkahloutnada@gmail.com']);
+        });
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
                 \App\Models\ConsultationChatRequest::class,

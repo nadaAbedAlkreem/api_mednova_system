@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\UpdateTimeZoneRequest;
+use App\Http\Requests\Api\User\UpdateTimeZoneRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Repositories\ICustomerRepositories;

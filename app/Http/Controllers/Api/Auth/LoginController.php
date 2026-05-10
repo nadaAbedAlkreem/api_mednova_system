@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\auth\LoginUserRequest;
+use App\Http\Requests\Api\Auth\LoginUserRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Services\Auth\CustomerAuthService;
 use App\Traits\ResponseTrait;

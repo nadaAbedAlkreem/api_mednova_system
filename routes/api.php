@@ -18,6 +18,9 @@ use App\Http\Controllers\Api\Device\GloveCommandController;
 use App\Http\Controllers\Api\Device\GloveDataController;
 use App\Http\Controllers\Api\Device\GloveErrorController;
 use App\Http\Controllers\Api\Package\UserPackageController;
+use App\Http\Controllers\Api\Financial\BankAccountController;
+use App\Http\Controllers\Api\Financial\WithdrawalController;
+use App\Http\Controllers\Api\ControlPanel\FinancialDepartment\AdminFinancialController;
 use App\Http\Controllers\Api\ControlPanel\FinancialDepartment\DisputeController as AdminDisputeController;
 use App\Http\Controllers\Api\Payment\DisputeController;
 use App\Http\Controllers\Api\Payment\GatewayPaymentController;
@@ -103,6 +106,19 @@ use Illuminate\Support\Facades\Route;
                       Route::prefix('consultant')->middleware(['account_type:therapist,rehabilitation_center', 'throttle:api'])->group(function () {
                               Route::get('wallet', [WalletController::class, 'walletConsultant'])->name('wallet');
                               Route::get('transactions', [TransactionController::class, 'consultantTransactions']);
+
+                              Route::prefix('bank-account')->group(function () {
+                                  Route::post('', [BankAccountController::class, 'store']);
+                                  Route::get('', [BankAccountController::class, 'show']);
+                                  Route::put('', [BankAccountController::class, 'update']);
+                                  Route::post('verify-otp', [BankAccountController::class, 'verifyOtp']);
+                              });
+
+                              Route::prefix('withdrawals')->group(function () {
+                                  Route::get('', [WithdrawalController::class, 'index']);
+                                  Route::post('', [WithdrawalController::class, 'store']);
+                                  Route::post('{id}/cancel', [WithdrawalController::class, 'cancel']);
+                              });
                           });
                       Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api'])->group(function () {
                           Route::get('wallet', [WalletController::class, 'walletPatient']);
@@ -241,8 +257,13 @@ use Illuminate\Support\Facades\Route;
 
                     });
                     Route::prefix('financial')->group(function () {
-                            Route::prefix('disputes')->group(function () {
-                            Route::get('{id}', [AdminDisputeController::class, 'show']);
+                        Route::get('dashboard',    [AdminFinancialController::class, 'dashboard']);
+                        Route::get('revenue',      [AdminFinancialController::class, 'revenue']);
+                        Route::get('escrow',       [AdminFinancialController::class, 'escrow']);
+                        Route::get('transactions', [AdminFinancialController::class, 'transactions']);
+                        Route::prefix('disputes')->group(function () {
+                            Route::get('',              [AdminDisputeController::class, 'index']);
+                            Route::get('{id}',          [AdminDisputeController::class, 'show']);
                             Route::post('{id}/resolve', [AdminDisputeController::class, 'resolve']);
                         });
                     });

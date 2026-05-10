@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Enums\ConsultantType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\StoreRehabilitationCenterRequest;
-use App\Http\Requests\api\user\UpdateRehabilitationCenterRequest;
+use App\Http\Requests\Api\User\StoreRehabilitationCenterRequest;
+use App\Http\Requests\Api\User\UpdateRehabilitationCenterRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Models\Location;

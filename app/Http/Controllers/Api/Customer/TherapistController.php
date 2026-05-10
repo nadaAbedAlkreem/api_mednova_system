@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Enums\ConsultantType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\StoreTherapistRequest;
-use App\Http\Requests\api\user\UpdateTherapistRequest;
+use App\Http\Requests\Api\User\StoreTherapistRequest;
+use App\Http\Requests\Api\User\UpdateTherapistRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Models\Customer;
 use App\Models\Therapist;

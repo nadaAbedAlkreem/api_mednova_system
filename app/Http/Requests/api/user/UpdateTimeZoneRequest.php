@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\user;
+namespace App\Http\Requests\Api\User;
 
 use DateTimeZone;
 use Illuminate\Foundation\Http\FormRequest;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\device\StoreGloveSessionRequest;
+use App\Http\Requests\Api\Device\StoreGloveSessionRequest;
 use App\Http\Requests\UpdateGloveSessionRequest;
 use App\Models\GloveSession;
 

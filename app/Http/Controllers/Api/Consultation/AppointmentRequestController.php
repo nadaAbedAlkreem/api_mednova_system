@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\ChackAvailableSlotsRequest;
+use App\Http\Requests\Api\Consultation\ChackAvailableSlotsRequest;
 use App\Http\Requests\StoreAppointmentRequestRequest;
 use App\Http\Requests\UpdateAppointmentRequestRequest;
 use App\Models\AppointmentRequest;

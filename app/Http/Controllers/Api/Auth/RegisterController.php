@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\auth\RegisterUserRequest;
+use App\Http\Requests\Api\Auth\RegisterUserRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Repositories\Eloquent\CustomerRepository;
 use App\Services\Api\Customer\CustomerService;

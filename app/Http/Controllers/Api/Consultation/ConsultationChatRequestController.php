@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Consultation;
 
 use App\Events\ConsultationRequested;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\UpdateChattingRequest;
+use App\Http\Requests\Api\Consultation\UpdateChattingRequest;
 use App\Http\Requests\UpdateConsultationChatRequestRequest;
 use App\Models\ConsultationChatRequest;
 use App\Repositories\IConsultationChatRequestRepositories;

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\payment\StorebankAccountRequest;
-use App\Http\Requests\api\payment\UpdatebankAccountRequest;
+use App\Http\Requests\Api\Payment\StorebankAccountRequest;
+use App\Http\Requests\Api\Payment\UpdatebankAccountRequest;
 use App\Models\bankAccount;
 
 class BankAccountController extends Controller

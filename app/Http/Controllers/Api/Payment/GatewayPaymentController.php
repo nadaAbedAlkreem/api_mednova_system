@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Payment;
 use App\Exceptions\ConsultationNotPayableException;
 use App\Exceptions\GatewayException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\payment\StoreGatewayPaymentRequest;
+use App\Http\Requests\Api\Payment\StoreGatewayPaymentRequest;
 use App\Http\Resources\Api\Financial\PatientPaymentResource;
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;

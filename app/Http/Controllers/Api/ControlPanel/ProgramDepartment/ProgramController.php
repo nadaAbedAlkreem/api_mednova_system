@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\ControlPanel\ProgramDepartment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\program\StoreProgramRequest;
-use App\Http\Requests\api\program\UpdateProgramRequest;
+use App\Http\Requests\Api\Program\StoreProgramRequest;
+use App\Http\Requests\Api\Program\UpdateProgramRequest;
 use App\Http\Resources\Api\ControlPanel\Programs\ProgramResource;
 use App\Models\Program;
 use App\Repositories\IProgramRepositories;

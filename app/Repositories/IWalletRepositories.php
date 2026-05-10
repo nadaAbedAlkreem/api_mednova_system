@@ -15,4 +15,5 @@ interface IWalletRepositories
     public function increasePendingBalance(Wallet $wallet, float $amount): Wallet;
 
     public function getPlatformWallet(): Wallet;
+    public function getPlatformWalletReadOnlyInRepo(): Wallet;
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\program\StoreProgramVideosRequest;
-use App\Http\Requests\api\program\UpdateProgramVideosRequest;
+use App\Http\Requests\Api\Program\StoreProgramVideosRequest;
+use App\Http\Requests\Api\Program\UpdateProgramVideosRequest;
 use App\Http\Resources\Api\Program\ProgramResource;
 use App\Http\Resources\Api\Program\VideoResource;
 use App\Models\Program;
