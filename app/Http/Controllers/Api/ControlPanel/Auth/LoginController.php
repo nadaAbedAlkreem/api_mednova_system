@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\ControlPanel\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\controlPanel\Auth\LoginUserRequest;
+use App\Http\Requests\Api\ControlPanel\Auth\LoginUserRequest;
 use App\Http\Resources\Api\Customer\AdminResource;
 use App\Repositories\IAdminRepositories;
 use App\Traits\ResponseTrait;

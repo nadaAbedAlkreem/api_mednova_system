@@ -79,5 +79,11 @@ class WalletRepository extends BaseRepository implements IWalletRepositories
     }
 
 
-
+    public function getPlatformWalletReadOnlyInRepo(): Wallet
+    {
+        return Wallet::where('owner_type', 'platform')
+            ->where('owner_id', 1)
+            ->where('currency', 'OMR')
+            ->firstOrFail();
+    }
 }

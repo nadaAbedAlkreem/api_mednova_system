@@ -16,22 +16,26 @@ enum TransactionType : string
     case SUBSCRIPTION_CHARGE = 'subscription_charge';
     case PLATFORM_FEE = 'platform_fee';
     case REFUND = 'refund';
+    case WITHDRAWAL_REVERSAL = 'withdrawal_reversal';
 
     public static function visibleForConsultant(): array
     {
         return [
-            self::CONSULTATION_CREDIT, // اضافة على محفظة المستشار عند نجاخ العملية
-            self::WITHDRAWAL,// سحب المستشار لمبلغ معين
-         ];
+            self::CONSULTATION_CREDIT,
+            self::WITHDRAWAL,
+            self::WITHDRAWAL_REVERSAL,
+            self::DISPUTE_FREEZE,
+            self::DISPUTE_RELEASE,
+        ];
     }
     public static function visibleForPatient(): array
     {
-
         return [
             self::REFUND,
             self::DISPUTE_FREEZE,
             self::DISPUTE_RELEASE,
-            self::WITHDRAWAL
+            self::WITHDRAWAL,
+            self::WITHDRAWAL_REVERSAL,
         ];
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Consultation;
 
 use App\Events\MessageRead;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\StoreMessageRequest;
+use App\Http\Requests\Api\Consultation\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\Api\Consultation\MessageResource;
 use App\Http\Resources\Api\Consultation\MessengersResource;

@@ -13,7 +13,7 @@ return [
      * Your API domain. By default, app domain is used. This is also a part of the default API routes
      * matcher, so when implementing your own, make sure you use this config if needed.
      */
-    'api_domain' => null,
+    'api_domain' => 'api.mednovacare.com',
 
     /*
      * The path where your OpenAPI specification will be exported.
@@ -29,7 +29,7 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => 'This is my **API** description',
+        'description' => 'Healthcare appointment booking platform API. Supports video/chat consultations, wallet management, financial transactions, and withdrawal processing. All monetary values are in **OMR** (Omani Rial).',
     ],
 
     /*
@@ -89,7 +89,12 @@ return [
      * ],
      * ```
      */
-    'servers' => null,
+    'servers' =>
+    [
+        'Production' => 'https://api.mednovacare.com/api',
+        'Staging'    => 'https://staging.mednovacare.com/api',
+        'Local'      => 'http://127.0.0.1:8000/api',
+    ],
 
     /**
      * Determines how Scramble stores the descriptions of enum cases.

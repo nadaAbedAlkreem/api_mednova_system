@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Consultation;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\StoreScheduleRequest;
-use App\Http\Requests\api\user\UpdateScheduleRequest;
+use App\Http\Requests\Api\User\StoreScheduleRequest;
+use App\Http\Requests\Api\User\UpdateScheduleRequest;
 use App\Http\Resources\Api\Consultation\ScheduleResource;
 use App\Models\Schedule;
 use App\Repositories\IScheduleRepositories;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\consultation;
+namespace App\Http\Requests\Api\Consultation;
 
 use App\Enums\AccountStatus;
 use App\Enums\ConsultationType;

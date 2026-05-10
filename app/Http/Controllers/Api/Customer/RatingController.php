@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\StoreRatingRequest;
+use App\Http\Requests\Api\User\StoreRatingRequest;
 use App\Http\Requests\UpdateRatingRequest;
 use App\Http\Resources\Api\Customer\CustomerResource;
 use App\Http\Resources\Api\Customer\RatingResource;

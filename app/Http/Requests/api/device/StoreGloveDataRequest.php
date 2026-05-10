@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\device;
+namespace App\Http\Requests\Api\Device;
 
 use App\Models\GloveData;
 use App\Models\GloveDevice;

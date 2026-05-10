@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Device;
 
 use App\Events\GloveDataUpdated;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\device\StoreGloveDataRequest;
+use App\Http\Requests\Api\Device\StoreGloveDataRequest;
 use App\Http\Requests\UpdateGloveDataRequest;
 use App\Http\Resources\Api\Consultation\ConsultationResource;
 use App\Http\Resources\Api\Device\GloveDeviceResource;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\device\StoreGloveCommandRequest;
+use App\Http\Requests\Api\Device\StoreGloveCommandRequest;
 use App\Models\GloveCommand;
 use App\Models\GloveError;
 use App\Repositories\IGloveErrorRepositories;

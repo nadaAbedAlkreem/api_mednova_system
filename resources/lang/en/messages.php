@@ -429,4 +429,31 @@ return [
     'SETTLEMENT_REQUIRES_REVIEW_WINDOW'    => 'Settlement requires the consultation to be in review window status.',
     'SETTLEMENT_REVIEW_WINDOW_NOT_EXPIRED' => 'The review window has not expired yet.',
     'SETTLEMENT_ACCOUNTING_MISMATCH'       => 'Accounting validation failed. Settlement aborted.',
+
+    // Withdrawal
+    'WITHDRAWAL_NO_VERIFIED_BANK_ACCOUNT' => 'A verified bank account is required before requesting a withdrawal.',
+    'WITHDRAWAL_PENDING_EXISTS'           => 'You already have a withdrawal request under review. Please wait for it to be processed or cancel it first.',
+    'WITHDRAWAL_INSUFFICIENT_BALANCE'     => 'Insufficient available balance to complete the withdrawal request.',
+    'WITHDRAWAL_NOT_FOUND'                => 'Withdrawal request not found.',
+    'WITHDRAWAL_NOT_OWNED'                => 'You do not have permission to access this request.',
+    'WITHDRAWAL_CANNOT_CANCEL'            => 'This withdrawal request cannot be cancelled in its current status.',
+    'WITHDRAWAL_REQUESTED_SUCCESSFULLY'   => 'Withdrawal request submitted successfully and is under review.',
+    'WITHDRAWAL_CANCELLED_SUCCESSFULLY'   => 'Withdrawal request cancelled and the amount has been returned to your balance.',
+    'WITHDRAWAL_REQUESTED_USER'           => 'Your withdrawal request of :amount :currency has been received and is under review.',
+    'WITHDRAWAL_REQUESTED_ADMIN'          => 'A new withdrawal request requires review.',
+    'WITHDRAWAL_CANCELLED_USER'           => 'Your withdrawal request of :amount :currency has been cancelled and the amount returned to your balance.',
+    'WITHDRAWAL_REJECTED_USER'            => 'Your withdrawal request of :amount :currency was rejected and the amount has been returned to your balance.',
+    'WITHDRAWAL_APPROVED_USER'            => 'Your withdrawal request of :amount :currency has been approved and the transfer is in progress.',
+
+    // Bank account
+    'BANK_ACCOUNT_ALREADY_EXISTS'      => 'You already have a registered bank account. You can update it from account settings.',
+    'BANK_ACCOUNT_NOT_FOUND'           => 'No bank account found. Please add a bank account first.',
+    'BANK_ACCOUNT_NOT_OWNED'           => 'You do not have permission to access this bank account.',
+    'BANK_ACCOUNT_CREATED_SUCCESSFULLY' => 'Bank account details saved. Please enter the verification code sent to your email.',
+    'BANK_ACCOUNT_UPDATED_SUCCESSFULLY' => 'Bank account updated. Please enter the new verification code sent to your email.',
+    'BANK_ACCOUNT_VERIFIED_SUCCESSFULLY' => 'Bank account verified successfully and is now ready for withdrawals.',
+    'OTP_SENT_SUCCESSFULLY'            => 'Verification code sent to your email. Valid for 10 minutes.',
+    'OTP_EXPIRED'                      => 'The verification code has expired. Please request a new one.',
+    'OTP_INVALID'                      => 'The verification code is incorrect. Please try again.',
+    'OTP_MAX_ATTEMPTS'                 => 'Maximum verification attempts exceeded. Please request a new code.',
 ];

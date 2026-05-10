@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\user\StoreReportRequest;
+use App\Http\Requests\Api\User\StoreReportRequest;
 use App\Repositories\IReportRepositories;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;

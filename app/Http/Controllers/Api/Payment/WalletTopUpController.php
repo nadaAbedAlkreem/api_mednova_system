@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\payment\PaymentIntentRequest;
+use App\Http\Requests\Api\Payment\PaymentIntentRequest;
 use App\Repositories\IGatewayPaymentRepositories;
 use App\Repositories\IWalletRepositories;
 use App\Services\Api\Payment\AmwalPayService;

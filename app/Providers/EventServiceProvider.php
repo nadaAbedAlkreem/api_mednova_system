@@ -6,10 +6,12 @@ use App\Events\ConsultationVideoApproval;
 use App\Events\CustomerApprovalStatusChanged;
 use App\Events\MessageRead;
 use App\Events\TemporaryPackageAssigned;
+use App\Events\WithdrawalStatusChanged;
 use App\Listeners\SendApprovalStatusMail;
 use App\Listeners\SendApprovalStatusNotification;
 use App\Listeners\SendConsultationVideoApprovalApiRequest;
 use App\Listeners\SendSubscriptionEmail;
+use App\Listeners\SendWithdrawalNotificationListener;
 use App\Listeners\StoreApprovalStatusLog;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\ConsultationRequested;
@@ -29,6 +31,10 @@ class EventServiceProvider extends ServiceProvider
             SendSubscriptionEmail::class,
         ],
         MessageRead::class => [],
+
+        WithdrawalStatusChanged::class => [
+            SendWithdrawalNotificationListener::class,
+        ],
 //        CustomerApprovalStatusChanged::class => [
 //            SendApprovalStatusMail::class,
 //            SendApprovalStatusNotification::class,

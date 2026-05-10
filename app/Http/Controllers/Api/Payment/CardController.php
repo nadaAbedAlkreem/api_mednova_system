@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\payment\StoreCardRequest;
-use App\Http\Requests\api\payment\UpdateCardRequest;
+use App\Http\Requests\Api\Payment\StoreCardRequest;
+use App\Http\Requests\Api\Payment\UpdateCardRequest;
 use App\Models\Card;
 
 class CardController extends Controller

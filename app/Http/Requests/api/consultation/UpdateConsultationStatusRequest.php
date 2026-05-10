@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\consultation;
+namespace App\Http\Requests\Api\Consultation;
 
 use App\Models\ConsultationChatRequest;
 use App\Models\ConsultationVideoRequest;

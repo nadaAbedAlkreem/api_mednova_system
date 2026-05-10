@@ -529,4 +529,31 @@ return [
     'SETTLEMENT_REQUIRES_REVIEW_WINDOW'    => 'التسوية تتطلب أن تكون الاستشارة في مرحلة نافذة المراجعة.',
     'SETTLEMENT_REVIEW_WINDOW_NOT_EXPIRED' => 'لم تنتهِ مدة نافذة المراجعة بعد.',
     'SETTLEMENT_ACCOUNTING_MISMATCH'       => 'خطأ في التحقق المحاسبي. تم إلغاء التسوية.',
+
+    // Withdrawal
+    'WITHDRAWAL_NO_VERIFIED_BANK_ACCOUNT' => 'يجب إضافة حساب بنكي موثق قبل طلب السحب.',
+    'WITHDRAWAL_PENDING_EXISTS'           => 'لديك طلب سحب قيد المراجعة. يرجى انتظار معالجته أو إلغاؤه أولاً.',
+    'WITHDRAWAL_INSUFFICIENT_BALANCE'     => 'الرصيد المتاح غير كافٍ لإتمام طلب السحب.',
+    'WITHDRAWAL_NOT_FOUND'                => 'طلب السحب غير موجود.',
+    'WITHDRAWAL_NOT_OWNED'                => 'ليس لديك صلاحية الوصول إلى هذا الطلب.',
+    'WITHDRAWAL_CANNOT_CANCEL'            => 'لا يمكن إلغاء هذا الطلب في وضعه الحالي.',
+    'WITHDRAWAL_REQUESTED_SUCCESSFULLY'   => 'تم تقديم طلب السحب بنجاح وهو قيد المراجعة.',
+    'WITHDRAWAL_CANCELLED_SUCCESSFULLY'   => 'تم إلغاء طلب السحب وإعادة المبلغ إلى رصيدك.',
+    'WITHDRAWAL_REQUESTED_USER'           => 'تم استلام طلب سحب بمبلغ :amount :currency وهو قيد المراجعة.',
+    'WITHDRAWAL_REQUESTED_ADMIN'          => 'طلب سحب جديد يحتاج مراجعة.',
+    'WITHDRAWAL_CANCELLED_USER'           => 'تم إلغاء طلب السحب بمبلغ :amount :currency وأُعيد إلى رصيدك.',
+    'WITHDRAWAL_REJECTED_USER'            => 'تم رفض طلب السحب بمبلغ :amount :currency وأُعيد المبلغ إلى رصيدك.',
+    'WITHDRAWAL_APPROVED_USER'            => 'تمت الموافقة على طلب السحب بمبلغ :amount :currency وجارٍ التحويل.',
+
+    // Bank account
+    'BANK_ACCOUNT_ALREADY_EXISTS'     => 'لديك حساب بنكي مسجل بالفعل. يمكنك تحديثه من خلال إعدادات الحساب.',
+    'BANK_ACCOUNT_NOT_FOUND'          => 'لا يوجد حساب بنكي مسجل. يرجى إضافة حساب بنكي أولاً.',
+    'BANK_ACCOUNT_NOT_OWNED'          => 'لا تملك صلاحية الوصول إلى هذا الحساب البنكي.',
+    'BANK_ACCOUNT_CREATED_SUCCESSFULLY' => 'تم تسجيل بيانات الحساب البنكي بنجاح. يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني.',
+    'BANK_ACCOUNT_UPDATED_SUCCESSFULLY' => 'تم تحديث بيانات الحساب البنكي. يرجى إدخال رمز التحقق الجديد المرسل إلى بريدك الإلكتروني.',
+    'BANK_ACCOUNT_VERIFIED_SUCCESSFULLY' => 'تم التحقق من الحساب البنكي بنجاح وأصبح جاهزاً للسحب.',
+    'OTP_SENT_SUCCESSFULLY'           => 'تم إرسال رمز التحقق إلى بريدك الإلكتروني. صالح لمدة 10 دقائق.',
+    'OTP_EXPIRED'                     => 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.',
+    'OTP_INVALID'                     => 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
+    'OTP_MAX_ATTEMPTS'                => 'لقد تجاوزت الحد الأقصى للمحاولات. يرجى طلب رمز تحقق جديد.',
 ];

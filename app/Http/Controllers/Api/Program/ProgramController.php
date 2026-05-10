@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Program;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\program\StoreProgramRequest;
-use App\Http\Requests\api\program\UpdateProgramRequest;
+use App\Http\Requests\Api\Program\StoreProgramRequest;
+use App\Http\Requests\Api\Program\UpdateProgramRequest;
 use App\Http\Resources\Api\Program\ProgramResource;
 use App\Models\Customer;
 use App\Models\Program;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\program;
+namespace App\Http\Requests\Api\Program;
 
 use App\Services\Api\Customer\UploadService;
 use Illuminate\Foundation\Http\FormRequest;

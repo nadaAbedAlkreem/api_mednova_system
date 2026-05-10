@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\consultation\StoreDisputeRequest;
+use App\Http\Requests\Api\Consultation\StoreDisputeRequest;
 use App\Repositories\IConsultationChatRequestRepositories;
 use App\Repositories\IConsultationVideoRequestRepositories;
 use App\Services\Api\Financial\Dispute\DisputeService;

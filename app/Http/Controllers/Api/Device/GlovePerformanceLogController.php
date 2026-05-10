@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\device\StoreGlovePerformanceLogRequest;
+use App\Http\Requests\Api\Device\StoreGlovePerformanceLogRequest;
 use App\Http\Requests\UpdateGlovePerformanceLogRequest;
 use App\Models\GlovePerformanceLog;
 
