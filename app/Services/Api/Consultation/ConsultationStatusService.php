@@ -28,7 +28,7 @@ class ConsultationStatusService
                     if($consultation->appointmentRequest != null){
                         event(new ConsultationVideoApproval($consultation->appointmentRequest->requested_time, 60 ,$consultation));
                         $consultation->appointmentRequest->update(['status' => 'approved']);}}
-                event(new ConsultationRequested($consultation, __('messages.ACCEPTED_REQUEST' ,['name' => $consultation->consultant->full_name]), 'requested'));
+                event(new ConsultationRequested($consultation, __('messages.ACCEPTED_REQUEST' ,['name' => $consultation->consultant->full_name]), 'accepted'));
                 $message = __('messages.STATUS_UPDATED');
                 break;
 
