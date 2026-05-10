@@ -151,10 +151,15 @@ readonly class ConsultationWebhookService
         $consultation->update([
             'financial_status' => FinancialStatus::HELD->value,
         ]);
-        $message = __('messages.ACCEPTED_REQUEST', [
-            'name' => $consultation->consultant->full_name,
+        $message = __('messages.new_consultation_notify', [
+            'name' => $consultation->patient->full_name
         ]);
-        event(new ConsultationRequested($consultation, $message, 'accepted'));
+        event(new ConsultationRequested($consultation, $message, 'requested'));
+
+//        $message = __('messages.ACCEPTED_REQUEST', [
+//            'name' => $consultation->consultant->full_name,
+//        ]);
+//        event(new ConsultationRequested($consultation, $message, 'accepted'));
 
 //        try {
 //
