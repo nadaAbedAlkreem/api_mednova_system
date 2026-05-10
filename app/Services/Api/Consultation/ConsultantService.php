@@ -113,11 +113,6 @@ class ConsultantService
             } else {
                 throw new Exception('Invalid consultation type');
             }
-
-            $message = __('messages.new_consultation_notify', [
-                'name' => $consultation->patient->full_name
-            ]);
-            event(new ConsultationRequested($consultation, $message, 'requested'));
             return $consultation;
         });
     }
