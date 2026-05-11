@@ -31,6 +31,7 @@ class UpdateChattingRequest extends FormRequest
             'first_consultant_message_at' => 'nullable|date',
             'patient_message_count' => 'integer|min:1|required_without:consultant_message_count',
             'consultant_message_count' => 'integer|min:1|required_without:patient_message_count',
+            'started_at' => 'nullable|date',
             'status'=> '',
         ];
     }
