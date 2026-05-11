@@ -222,6 +222,7 @@ class ConsultantService
         $data['status'] = 'active';
         $data['started_at'] = now();
 
+
         return $this->prepareNotificationData($consultation, $data);
     }
 
