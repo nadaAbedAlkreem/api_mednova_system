@@ -215,8 +215,7 @@ class ConsultantService
 
     public function handleChatActivation(ConsultationChatRequest $consultation, array $data): ?array
     {
-        dd($this->canActivateChat($consultation, $data));
-        if (!$this->canActivateChat($consultation, $data)) {
+         if (!$this->canActivateChat($consultation, $data)) {
             return null;
         }
         $data['status'] = 'active';
