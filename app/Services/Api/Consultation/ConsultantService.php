@@ -213,15 +213,14 @@ class ConsultantService
         return $paginated;
     }
 
-    public function handleChatActivation(ConsultationChatRequest $consultation, array &$data): ?array
+    public function handleChatActivation(ConsultationChatRequest $consultation, array $data): ?array
     {
+        dd($this->canActivateChat($consultation, $data));
         if (!$this->canActivateChat($consultation, $data)) {
             return null;
         }
         $data['status'] = 'active';
         $data['started_at'] = now();
-        $consultation->update($data);
-
         return $this->prepareNotificationData($consultation, $data);
     }
 
