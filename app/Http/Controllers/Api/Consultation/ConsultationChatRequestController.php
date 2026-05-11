@@ -86,17 +86,13 @@ class ConsultationChatRequestController extends Controller
         try{
             $data = $request->getData();
             $consultation = $this->consultationChatRequestRepositories->findOrFail($data['chat_request_id']);
-            $notificationData = $this->consultantService->handleChatActivation($consultation, $data);
+            $activationResult = $this->consultantService->handleChatActivation($consultation, $data);
+            $data = $activationResult['data'];
+            $notificationData = $activationResult['notification'];
             $consultation->update($data);
-
             if ($notificationData) {
-                event(new ConsultationRequested(
-                    $consultation,
-                    $notificationData['message'],
-                    $notificationData['event_type']
-                ));
+                event(new ConsultationRequested($consultation->fresh(), $notificationData['message'], $notificationData['event_type']));
             }
-
             return $this->successResponse(__('messages.UPDATE_CHATTING_INFO'));
         }catch (Exception $exception){
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()]);

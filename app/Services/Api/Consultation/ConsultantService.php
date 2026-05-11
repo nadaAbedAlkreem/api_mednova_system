@@ -215,12 +215,21 @@ class ConsultantService
 
     public function handleChatActivation(ConsultationChatRequest $consultation, array $data): ?array
     {
-         if (!$this->canActivateChat($consultation, $data)) {
-            return null;
+        if (!$this->canActivateChat($consultation, $data)) {
+            return [
+                'data' => $data,
+                'notification' => null,
+            ];
         }
+
         $data['status'] = 'active';
         $data['started_at'] = now();
-        return $this->prepareNotificationData($consultation, $data);
+
+        return [
+            'data' => $data,
+            'notification' => $this->prepareNotificationData($consultation, $data),
+        ];
+
     }
 
     private function canActivateChat(ConsultationChatRequest $consultation, array $data): bool
