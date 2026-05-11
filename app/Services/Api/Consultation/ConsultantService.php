@@ -218,10 +218,9 @@ class ConsultantService
         if (!$this->canActivateChat($consultation, $data)) {
             return null;
         }
-
         $data['status'] = 'active';
         $data['started_at'] = now();
-
+        $consultation->update($data);
 
         return $this->prepareNotificationData($consultation, $data);
     }
