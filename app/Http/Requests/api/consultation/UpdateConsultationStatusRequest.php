@@ -38,6 +38,10 @@ class UpdateConsultationStatusRequest extends FormRequest
             return false;
         }
 
+        // 1. تحقق من الملكية
+        if (!$policy->accept($user, $consultation)) {
+            return false;
+        }
         if ($this->input('status') === 'accepted') {
             return $policy->accept($user, $consultation)->allowed();
         }

@@ -103,25 +103,12 @@ class ConsultationController extends Controller
     {
         try {
             $consultantNature = $request->input('consultant_nature');
-            $consultation = match ($consultantNature)
-            {
-                'chat' => $this->consultationChatRequestRepositories->updateAndReturn($request->getData(), $request['id']),
+
+            $consultation = match ($consultantNature) {
+                'chat'  => $this->consultationChatRequestRepositories->updateAndReturn($request->getData(), $request['id']),
                 'video' => $this->consultationVideoRequestRepositories->updateAndReturn($request->getData(), $request['id']),
-                default => throw new \Exception('Invalid consultation nature')
+                default => throw new \Exception('Invalid consultation nature'),
             };
-            if (($consultantNature === ConsultationType::VIDEO->value) && ($request->status === ConsultationStatus::ACCEPTED->value))
-            {
-                $consultation->load('appointmentRequest');
-                $appointmentDateTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
-                if ($appointmentDateTime->isPast()) {return $this->errorResponse(__('messages.NO_CONSULTATION_ALLOWED'), [], 422);}
-            }
-            if ($consultantNature === ConsultationType::VIDEO->value)
-            {
-                $consultation->load('appointmentRequest');
-                if ($request['status'] ==  ConsultationStatus::CANCELLED->value || $consultation->status == ConsultationStatus::COMPLETED->value || $consultation->status == ConsultationStatus::APPROVED->value) {
-                    $consultation->appointmentRequest->update(['status' => $request->status]);
-                }
-            }
             $message = $this->statusService->handleStatusChange(
                 $consultation,
                 $request->status,
@@ -129,13 +116,13 @@ class ConsultationController extends Controller
                 $request->action_by
             );
             return $this->successResponse($message, [], 200);
+
         } catch (\Exception $exception) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
-                'error' => $exception->getMessage()
+                'error' => $exception->getMessage(),
             ], 500);
         }
     }
-
     public function approvedConsultationBetweenCustomer(CheckDependenciesDataRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
