@@ -92,17 +92,16 @@ class ConsultationPolicy
         if ($consultation->financial_status === FinancialStatus::UNPAID->value) {
             return Response::deny(__('policies.consultation.accept.not_paid'));
         }
-        if ($consultation instanceof ConsultationVideoRequest) {
-            $consultation->loadMissing('appointmentRequest');
-
-            if ($consultation->appointmentRequest) {
-                $appointmentTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
-                dd($appointmentTime->isPast());
-                if ($appointmentTime->isPast()) {
-                    return Response::deny(__('policies.consultation.accept.appointment_passed'));
-                }
-            }
-        }
+//        if ($consultation instanceof ConsultationVideoRequest) {
+//            $consultation->loadMissing('appointmentRequest');
+//
+//            if ($consultation->appointmentRequest) {
+//                $appointmentTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
+//                 if ($appointmentTime->isPast()) {
+//                    return Response::deny(__('policies.consultation.accept.appointment_passed'));
+//                }
+//            }
+//        }
 
         return Response::allow();
     }
