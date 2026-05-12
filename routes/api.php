@@ -159,7 +159,7 @@ use Illuminate\Support\Facades\Route;
                 Route::post('/update-status-request', [ConsultationController::class, 'updateStatusRequest']);
                 Route::prefix('chat')->group(function ()
                 {
-                    Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
+//                    Route::post('/update-chatting', [ConsultationChatRequestController::class, 'updateChatting']);
                 });
                 Route::middleware(['account_type:patient', 'throttle:api'])->prefix('financial/patient')->group(function () {
                     Route::post('{id}/dispute', [DisputeController::class, 'openDispute']);
@@ -171,6 +171,7 @@ use Illuminate\Support\Facades\Route;
                 Route::post('program/update', [ProgramController::class, 'update']);
                 Route::delete('{id}', [ProgramController::class, 'destroy']);  //done delete one program
                 Route::get('{id}/publish', [ProgramController::class, 'publish']);        // نشر البرنامج done
+
 
             });
 

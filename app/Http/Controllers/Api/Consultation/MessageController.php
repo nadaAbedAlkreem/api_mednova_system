@@ -82,7 +82,7 @@ class MessageController extends Controller
                         $chat->first_consultant_message_at = now();
                     }
                   }
-               if($chat->status != 'active'){$chat->status = 'active';}
+               if($chat->status != 'active'){$chat->status = 'active'; $chat->started_at = now();}
                $chat->save();
             BroadcastMessageJob::dispatch($message);
             DB::commit();
