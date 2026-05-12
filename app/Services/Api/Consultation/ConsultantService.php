@@ -57,6 +57,7 @@ class ConsultantService
             'patient:id,full_name,email,phone,image',
             'consultant:id,full_name,email,phone,image',
             'activities' => fn ($q) => $q->latest()->limit(20),
+            'appointmentRequest',
             'reports',
         ])
             ->findOrFail($id);
