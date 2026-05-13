@@ -162,7 +162,6 @@ class UpdateConsultationStatusRequest extends FormRequest
 
     protected function failedAuthorization(): never
     {
-        dd($this->denyReason);
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             response()->json([
                 'success' => false,
