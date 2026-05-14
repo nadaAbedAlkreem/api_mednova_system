@@ -11,16 +11,19 @@ use Illuminate\Validation\Rule;
 class UpdateConsultationStatusRequest extends FormRequest
 {
     protected $table;
+    protected string $denyReason = '';
 
     /**
      * Determine if the user is authorized to make this request.
      */
+
     public function authorize(): bool
     {
         $id     = $this->input('id');
         $nature = $this->input('consultant_nature');
 
         if (!$id || !$nature) {
+            $this->denyReason = __('messages.MISSING_CONSULTATION_DATA');
             return false;
         }
 
@@ -33,23 +36,24 @@ class UpdateConsultationStatusRequest extends FormRequest
         $user   = $this->user();
         $policy = new ConsultationPolicy();
 
-        // 1. تحقق من الملكية
         if (!$policy->updateStatus($user, $consultation)) {
+            $this->denyReason = __('policies.consultation.update_status.not_owner');
             return false;
         }
 
-//        // 1. تحقق من الملكية
-//        if (!$policy->accept($user, $consultation)) {
-//            return false;
-//        }
         if ($this->input('status') === 'accepted') {
-            return $policy->accept($user, $consultation)->allowed();
+            $result = $policy->accept($user, $consultation);
+            if ($result->denied()) {
+                $this->denyReason = $result->message();
+                return false;
+            }
+            return true;
         }
 
-        // 2. إذا كانت العملية إلغاء، تحقق من أن action_by يطابق دور المستخدم
         if ($this->input('status') === 'cancelled') {
             $actionBy = $this->input('action_by');
             if ($actionBy && !$policy->cancelAs($user, $consultation, $actionBy)) {
+                $this->denyReason = __('policies.consultation.cancel.wrong_role');
                 return false;
             }
         }
@@ -155,12 +159,13 @@ class UpdateConsultationStatusRequest extends FormRequest
     // Error Formatting
     // -------------------------------------------------------------------------
 
+
     protected function failedAuthorization(): never
     {
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => __('messages.UNAUTHORIZED_CONSULTATION_ACTION'),
+                'message' => $this->denyReason ?: __('messages.UNAUTHORIZED_CONSULTATION_ACTION'),
                 'data'    => [],
                 'status'  => 'Forbidden',
             ], 403)

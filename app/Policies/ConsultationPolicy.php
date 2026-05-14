@@ -97,8 +97,7 @@ class ConsultationPolicy
 
             if ($consultation->appointmentRequest) {
                 $appointmentTime = \Carbon\Carbon::parse($consultation->appointmentRequest->requested_time);
-                dd($appointmentTime->isPast());
-                if ($appointmentTime->isPast()) {
+                 if ($appointmentTime->isPast()) {
                     return Response::deny(__('policies.consultation.accept.appointment_passed'));
                 }
             }
