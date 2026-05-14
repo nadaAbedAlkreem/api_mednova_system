@@ -24,7 +24,7 @@ class ConsultationResource extends JsonResource
         return [
             'id'               => $this->id,
             'type'             => $type,
-//            'status'           => $this->status,
+            'status'           => $this->status,
 //            'financial_status' => $this->financial_status,
 //            'review_deadline'  => $this->review_deadline,
 //            'released_at'      => $this->released_at,
