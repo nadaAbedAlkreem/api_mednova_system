@@ -19,12 +19,13 @@ class ConsultationChatRequestResource extends JsonResource
             return
             [
                 'id' => $this->id ,
-                //يجب عرض تخصص المستشار
                 'patient' => new CustomerResource($this->whenLoaded('patient')),
                 'consultant' => new CustomerResource($this->whenLoaded('consultant')) ,
                 'consultant_type' => $this->consultant_type ,
                 'max_messages_for_patient' => $this->max_messages_for_patient ,
                 'patient_message_count' => $this->patient_message_count ?? 0  ,
+                'status' => $this->status ,
+                'financial_status' => $this->financial_status ,
                 'consultant_message_count' => $this->consultant_message_count ?? 0,
                 'first_patient_message_at' => $this->first_patient_message_at  ,
                 'first_consultant_reply_at' => $this->first_consultant_reply_at ,
