@@ -106,26 +106,27 @@ use Illuminate\Support\Facades\Route;
                       Route::prefix('consultant')->middleware(['account_type:therapist,rehabilitation_center', 'throttle:api'])->group(function () {
                               Route::get('wallet', [WalletController::class, 'walletConsultant'])->name('wallet');
                               Route::get('transactions', [TransactionController::class, 'consultantTransactions']);
-
-                              Route::prefix('bank-account')->group(function () {
-                                  Route::post('', [BankAccountController::class, 'store']);
-                                  Route::get('', [BankAccountController::class, 'show']);
-                                  Route::put('', [BankAccountController::class, 'update']);
-                                  Route::post('verify-otp', [BankAccountController::class, 'verifyOtp']);
-                              });
-
-                              Route::prefix('withdrawals')->group(function () {
-                                  Route::get('', [WithdrawalController::class, 'index']);
-                                  Route::post('', [WithdrawalController::class, 'store']);
-                                  Route::post('{id}/cancel', [WithdrawalController::class, 'cancel']);
-                              });
                           });
+
                       Route::prefix('patient')->middleware(['account_type:patient', 'throttle:api'])->group(function () {
                           Route::get('wallet', [WalletController::class, 'walletPatient']);
                           Route::get('payments', [GatewayPaymentController::class, 'patientPayments']);
                           Route::get('transactions', [TransactionController::class, 'patientTransactions']);
+                      });
 
+                      Route::middleware(['throttle:api'])->group(function () {
+                          Route::prefix('bank-account')->group(function () {
+                              Route::post('', [BankAccountController::class, 'store']);
+                              Route::get('', [BankAccountController::class, 'show']);
+                              Route::put('', [BankAccountController::class, 'update']);
+                              Route::post('verify-otp', [BankAccountController::class, 'verifyOtp']);
+                          });
 
+                          Route::prefix('withdrawals')->group(function () {
+                              Route::get('', [WithdrawalController::class, 'index']);
+                              Route::post('', [WithdrawalController::class, 'store']);
+                              Route::post('{id}/cancel', [WithdrawalController::class, 'cancel']);
+                          });
                       });
 
                  });

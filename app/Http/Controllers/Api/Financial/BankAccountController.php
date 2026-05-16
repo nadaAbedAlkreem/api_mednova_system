@@ -28,7 +28,7 @@ class BankAccountController extends Controller
      * A 6-digit OTP will be sent to the account email for verification.
      * Only one bank account is allowed per consultant — call update to change it.
      *
-     * @tags Consultant — Bank Account
+     * @tags Financial — Bank Account
      * @response 201 scenario="Created" {"success":true,"message":"تم إضافة الحساب البنكي بنجاح","data":{"id":1,"bank_name":"Bank Muscat","account_holder_name":"Ahmed Al-Balushi","account_number":"****5678","iban":"****123456","swift_code":"BMUSOMRX","bank_country":"OM","status":"pending","status_label":"قيد التحقق","is_default":true,"verified_at":null,"created_at":"2026-05-09T10:00:00+00:00"}}
      * @response 422 scenario="Validation Error" {"success":false,"message":"حدث خطأ","data":{"bank_name":"اسم البنك مطلوب."}}
      */
@@ -58,7 +58,7 @@ class BankAccountController extends Controller
      * Retrieve the authenticated consultant's registered bank account details.
      * Account number and IBAN are masked for security (only last 4/6 digits shown).
      *
-     * @tags Consultant — Bank Account
+     * @tags Financial — Bank Account
      * @response 200 scenario="Success" {"success":true,"message":"تم جلب البيانات بنجاح","data":{"id":1,"bank_name":"Bank Muscat","account_holder_name":"Ahmed Al-Balushi","account_number":"****5678","iban":"****123456","swift_code":"BMUSOMRX","bank_country":"OM","status":"verified","status_label":"تم التحقق","is_default":true,"verified_at":"2026-05-09T11:00:00+00:00","created_at":"2026-05-09T10:00:00+00:00"}}
      * @response 404 scenario="Not Found" {"success":false,"message":"الحساب البنكي غير موجود","data":[]}
      */
@@ -88,7 +88,7 @@ class BankAccountController extends Controller
      * Updating resets verification status to **pending** and sends a new OTP to the account email.
      * Only include fields that need to change (partial update supported).
      *
-     * @tags Consultant — Bank Account
+     * @tags Financial — Bank Account
      * @response 200 scenario="Updated" {"success":true,"message":"تم تحديث الحساب البنكي بنجاح","data":{"id":1,"bank_name":"Bank Dhofar","account_holder_name":"Ahmed Al-Balushi","account_number":"****9012","iban":"****789012","swift_code":"BDHOOMRX","bank_country":"OM","status":"pending","status_label":"قيد التحقق","is_default":true,"verified_at":null,"created_at":"2026-05-09T10:00:00+00:00"}}
      * @response 422 scenario="Validation Error" {"success":false,"message":"حدث خطأ","data":{"account_number":"رقم الحساب يجب أن يكون 8 أحرف على الأقل."}}
      */
@@ -119,7 +119,7 @@ class BankAccountController extends Controller
      * OTP expires after the configured TTL (default: 10 minutes).
      * After successful verification, the account status changes from **pending** to **verified**.
      *
-     * @tags Consultant — Bank Account
+     * @tags Financial — Bank Account
      * @response 200 scenario="Verified" {"success":true,"message":"تم التحقق من الحساب البنكي بنجاح","data":{"id":1,"bank_name":"Bank Muscat","account_holder_name":"Ahmed Al-Balushi","account_number":"****5678","iban":"****123456","swift_code":"BMUSOMRX","bank_country":"OM","status":"verified","status_label":"تم التحقق","is_default":true,"verified_at":"2026-05-09T11:05:00+00:00","created_at":"2026-05-09T10:00:00+00:00"}}
      * @response 422 scenario="Invalid or Expired OTP" {"success":false,"message":"رمز التحقق غير صحيح أو منتهي الصلاحية","data":[]}
      */

@@ -27,7 +27,7 @@ class WithdrawalController extends Controller
      * to their registered bank account. Requires a verified bank account.
      * Minimum and maximum amounts are configured in `config/financial.php`.
      *
-     * @tags Consultant — Withdrawals
+     * @tags Financial — Withdrawals
      * @response 201 scenario="Requested" {"success":true,"message":"تم تقديم طلب السحب بنجاح","data":{"id":1,"amount":"10.000","currency":"OMR","status":"pending","status_label":"قيد المراجعة","bank_account":{"bank_name":"Bank Muscat","account_holder_name":"Ahmed Al-Balushi","account_number":"****5678","iban":"****123456"},"admin_note":null,"processed_at":null,"created_at":"2026-05-09T12:00:00+00:00"}}
      * @response 422 scenario="Insufficient Balance / No Bank Account" {"success":false,"message":"رصيدك غير كافٍ لإتمام السحب","data":[]}
      */
@@ -57,7 +57,7 @@ class WithdrawalController extends Controller
      * Retrieve a paginated list of the authenticated consultant's withdrawal requests,
      * ordered from newest to oldest.
      *
-     * @tags Consultant — Withdrawals
+     * @tags Financial — Withdrawals
      * @queryParam per_page integer Number of results per page (max 50, default 15). Example: 15
      * @queryParam page integer Page number. Example: 1
      * @response 200 scenario="Success" {"success":true,"message":"تم جلب البيانات بنجاح","data":[{"id":1,"amount":"10.000","currency":"OMR","status":"pending","status_label":"قيد المراجعة","bank_account":{"bank_name":"Bank Muscat","account_holder_name":"Ahmed Al-Balushi","account_number":"****5678","iban":"****123456"},"admin_note":null,"processed_at":null,"created_at":"2026-05-09T12:00:00+00:00"}],"pagination":{"current_page":1,"per_page":15,"total":1,"last_page":1,"has_more_pages":false}}
@@ -94,7 +94,7 @@ class WithdrawalController extends Controller
      * Cancel a pending withdrawal request. Only withdrawals with status **pending** can be cancelled.
      * The amount is returned to the consultant's available balance immediately.
      *
-     * @tags Consultant — Withdrawals
+     * @tags Financial — Withdrawals
      * @response 200 scenario="Cancelled" {"success":true,"message":"تم إلغاء طلب السحب بنجاح","data":[]}
      * @response 422 scenario="Cannot Cancel" {"success":false,"message":"لا يمكن إلغاء هذا الطلب","data":[]}
      * @response 404 scenario="Not Found" {"success":false,"message":"الطلب غير موجود","data":[]}
