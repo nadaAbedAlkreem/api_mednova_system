@@ -545,6 +545,14 @@ return [
     'WITHDRAWAL_REJECTED_USER'            => 'تم رفض طلب السحب بمبلغ :amount :currency وأُعيد المبلغ إلى رصيدك.',
     'WITHDRAWAL_APPROVED_USER'            => 'تمت الموافقة على طلب السحب بمبلغ :amount :currency وجارٍ التحويل.',
 
+    // Admin withdrawal processing
+    'WITHDRAWAL_APPROVED_SUCCESSFULLY'    => 'تم اعتماد طلب السحب بنجاح',
+    'WITHDRAWAL_REJECTED_SUCCESSFULLY'    => 'تم رفض طلب السحب',
+    'WITHDRAWAL_ALREADY_PROCESSED'        => 'هذا الطلب تم معالجته مسبقاً',
+    'TRANSFER_PROOF_NOT_FOUND'            => 'إثبات التحويل غير موجود',
+    'withdrawal_transferred_user'         => 'تم تحويل :amount :currency إلى حسابك البنكي بنجاح',
+    'withdrawal_rejected_user'            => 'تم رفض طلب السحب: :reason',
+
     // Bank account
     'BANK_ACCOUNT_ALREADY_EXISTS'     => 'لديك حساب بنكي مسجل بالفعل. يمكنك تحديثه من خلال إعدادات الحساب.',
     'BANK_ACCOUNT_NOT_FOUND'          => 'لا يوجد حساب بنكي مسجل. يرجى إضافة حساب بنكي أولاً.',

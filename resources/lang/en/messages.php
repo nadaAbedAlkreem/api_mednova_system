@@ -445,6 +445,14 @@ return [
     'WITHDRAWAL_REJECTED_USER'            => 'Your withdrawal request of :amount :currency was rejected and the amount has been returned to your balance.',
     'WITHDRAWAL_APPROVED_USER'            => 'Your withdrawal request of :amount :currency has been approved and the transfer is in progress.',
 
+    // Admin withdrawal processing
+    'WITHDRAWAL_APPROVED_SUCCESSFULLY'    => 'Withdrawal approved successfully',
+    'WITHDRAWAL_REJECTED_SUCCESSFULLY'    => 'Withdrawal rejected',
+    'WITHDRAWAL_ALREADY_PROCESSED'        => 'This request has already been processed',
+    'TRANSFER_PROOF_NOT_FOUND'            => 'Transfer proof not found',
+    'withdrawal_transferred_user'         => ':amount :currency has been transferred to your bank account',
+    'withdrawal_rejected_user'            => 'Withdrawal rejected: :reason',
+
     // Bank account
     'BANK_ACCOUNT_ALREADY_EXISTS'      => 'You already have a registered bank account. You can update it from account settings.',
     'BANK_ACCOUNT_NOT_FOUND'           => 'No bank account found. Please add a bank account first.',
