@@ -27,6 +27,9 @@ return [
             'not_paid' => 'Unpaid consultations cannot be accepted.',
             'appointment_passed' => 'The consultation cannot be accepted because the appointment has passed.',
         ],
+        'cancel' => [
+            'wrong_role' =>  "You are not authorized to cancel this consultation."
+        ]
 
 
     ],
