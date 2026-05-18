@@ -9,6 +9,7 @@ use App\Exceptions\InvalidRefundAmountException;
 use App\Repositories\IWalletRepositories;
 use App\Services\Api\Financial\ConsultationRefundService;
 use Illuminate\Support\Facades\DB;
+use Sentry\Logs\Log;
 
 
 class ConsultationStatusService
@@ -80,6 +81,7 @@ class ConsultationStatusService
 
     private function processCancellation($consultation, ?string $actionBy): string
     {
+        \Illuminate\Support\Facades\Log::channel('financial')->info('$actionBy' . $actionBy);
         return match ($actionBy) {
             'patient'     => $this->handleCancellation($consultation, 'patient'),
             'consultable' => $this->handleCancellation($consultation, 'consultant'),
@@ -93,6 +95,7 @@ class ConsultationStatusService
      */
     private function handleCancellation($consultation, string $type): string
     {
+        \Illuminate\Support\Facades\Log::channel('financial')->info('type' . $type);
         $consultation = $consultation->newQuery()->whereKey($consultation->id)->lockForUpdate()->firstOrFail();
         $actor = $type === 'patient' ? $consultation->patient : $consultation->consultant;
         $messageKey = $type === 'patient' ? 'messages.CANCEL_REQUEST_PATIENT' : 'messages.CANCEL_REQUEST_CONSULTANT';
