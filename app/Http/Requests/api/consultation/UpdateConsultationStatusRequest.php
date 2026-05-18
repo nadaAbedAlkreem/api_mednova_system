@@ -82,7 +82,7 @@ class UpdateConsultationStatusRequest extends FormRequest
             'id'                 => $idRules,
             'status'             => 'required|in:accepted,cancelled,active,completed',
             'consultant_nature'  => 'required|in:video,chat',
-            'action_by'          => 'required_if:status,cancelled|nullable|in:patient,consultant',
+            'action_by'          => 'required_if:status,cancelled|nullable|in:patient,consultable',
             'action_reason'      => 'required_if:status,cancelled|nullable|string|max:500',
         ];
     }
@@ -124,11 +124,15 @@ class UpdateConsultationStatusRequest extends FormRequest
     {
         $data = $this->validated();
 
+
         if ($data['status'] === 'cancelled') {
+            // توحيد المسمى
+            if (($data['action_by'] ?? null) === 'consultable') {
+                $data['action_by'] = 'consultant';
+            }
             $data['action_by']     = $data['action_by']     ?? null;
             $data['action_reason'] = $data['action_reason'] ?? null;
         }
-
         if ($data['status'] === 'accepted') {
             $data['response_at'] = now();
         }
