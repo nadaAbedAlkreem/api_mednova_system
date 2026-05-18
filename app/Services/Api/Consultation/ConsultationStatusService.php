@@ -85,7 +85,7 @@ class ConsultationStatusService
         return match ($actionBy) {
             'patient'     => $this->handleCancellation($consultation, 'patient'),
             'consultable' => $this->handleCancellation($consultation, 'consultant'),
-            default       => __('messages.CANCEL_REQUEST'),
+            default => throw new \InvalidArgumentException("Unknown actionBy: {$actionBy}"),
         };
     }
 
@@ -102,7 +102,13 @@ class ConsultationStatusService
         $eventType = $type === 'patient' ? 'cancelled_by_patient' : 'cancelled_by_consultant';
         $message = __($messageKey, ['name' => $actor->full_name]);
         $this->refundService->processInternalRefund($consultation);
+        $amountFormatted = number_format($consultation->consultation_price, 3);
+        $patientMessage    = __('messages.dispute_resolved_refund_patient', [
+                'amount'   => $amountFormatted,
+                'currency' => config('amwal.currency_en') ?? 'OMR',
+            ]);
         event(new ConsultationRequested($consultation, $message, $eventType));
+        event(new ConsultationRequested($consultation, $patientMessage,    'refund_issued'));
 
         return $message;
     }

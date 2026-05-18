@@ -51,7 +51,9 @@ class SendConsultationNotification
                 'cancelled_by_consultant',
                 'review_window_expiring_patient',
                 'settlement_completed_patient',
-                'active_by_consultant' => [['id' => $consultation->patient_id, 'type' => get_class($consultation->patient)]],
+                'refund_issued' ,
+                'active_by_consultant' =>
+                [['id' => $consultation->patient_id, 'type' => get_class($consultation->patient)]],
                 'reminder_for_all',
                 'cancelled_by_system',
                 'completed' => [

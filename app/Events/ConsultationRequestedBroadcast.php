@@ -40,7 +40,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
                 ]);
                 return new PrivateChannel('consultant.' . $this->consultation->consultant_id);
             }
-            if ($this->eventType === 'dispute_opened_patient' || $this->eventType === 'dispute_resolved_patient' || $this->eventType === 'active_by_consultant' || $this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant' || $this->eventType === 'review_window_opened' || $this->eventType === 'settlement_completed_patient' || $this->eventType === 'review_window_expiring_patient') {
+            if ($this->eventType === 'refund_issued' || $this->eventType === 'dispute_opened_patient' || $this->eventType === 'dispute_resolved_patient' || $this->eventType === 'active_by_consultant' || $this->eventType === 'accepted' || $this->eventType === 'cancelled_by_consultant' || $this->eventType === 'review_window_opened' || $this->eventType === 'settlement_completed_patient' || $this->eventType === 'review_window_expiring_patient') {
                 Log::info(' for cancelled', [
                     'consultant' => $this->consultation->consultant_id,
                 ]);

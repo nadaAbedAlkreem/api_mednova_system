@@ -75,13 +75,22 @@ class ConsultationPolicy
             || (int) $user->id === (int) $consultation->consultant_id;
     }
 
-    public function cancelAs(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation, string $actionBy): bool
+    public function cancelAs(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation, string $actionBy) :Response
     {
-        return match ($actionBy) {
-            'patient'     => (int) $user->id === (int) $consultation->patient_id,
+        $isOwner = match ($actionBy) {
+            'patient'    => (int) $user->id === (int) $consultation->patient_id,
             'consultable' => (int) $user->id === (int) $consultation->consultant_id,
-            default       => false,
+            default      => false,
         };
+
+        if (!$isOwner) {
+            return Response::deny(__('policies.consultation.cancel.wrong_role'));
+        }
+        if ($actionBy === 'patient' && $consultation->financial_status !== FinancialStatus::UNPAID->value) {
+            return Response::deny(__('policies.consultation.cancel.already_paid'));
+        }
+
+        return Response::allow();
     }
     public function accept(Customer $user, ConsultationChatRequest|ConsultationVideoRequest $consultation): Response
     {

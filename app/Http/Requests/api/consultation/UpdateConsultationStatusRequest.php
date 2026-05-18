@@ -52,9 +52,12 @@ class UpdateConsultationStatusRequest extends FormRequest
 
         if ($this->input('status') === 'cancelled') {
             $actionBy = $this->input('action_by');
-            if ($actionBy && !$policy->cancelAs($user, $consultation, $actionBy)) {
-                $this->denyReason = __('policies.consultation.cancel.wrong_role');
-                return false;
+            if ($actionBy) {
+                $result = $policy->cancelAs($user, $consultation, $actionBy);
+                if ($result->denied()) {
+                    $this->denyReason = $result->message();
+                    return false;
+                }
             }
         }
 
