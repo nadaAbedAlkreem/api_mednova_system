@@ -3,13 +3,9 @@ namespace App\Services\Api\Consultation;
 
 use App\Events\ConsultationRequested;
 use App\Events\ConsultationVideoApproval;
-use App\Exceptions\ConsultantWalletNotFoundException;
-use App\Exceptions\InsufficientWalletBalanceException;
 use App\Exceptions\InvalidRefundAmountException;
-use App\Repositories\IWalletRepositories;
 use App\Services\Api\Financial\ConsultationRefundService;
 use Illuminate\Support\Facades\DB;
-use Sentry\Logs\Log;
 
 
 class ConsultationStatusService
@@ -103,7 +99,7 @@ class ConsultationStatusService
         $message = __($messageKey, ['name' => $actor->full_name]);
         $this->refundService->processInternalRefund($consultation);
         $amountFormatted = number_format($consultation->consultation_price, 3);
-        $patientMessage    = __('messages.dispute_resolved_refund_patient', [
+        $patientMessage    = __('messages.refund_issued', [
                 'amount'   => $amountFormatted,
                 'currency' => config('amwal.currency_en') ?? 'OMR',
             ]);

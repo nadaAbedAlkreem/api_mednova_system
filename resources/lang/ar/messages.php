@@ -20,6 +20,7 @@ return [
     'rejected_notification' => '⚠️ نأسف لإبلاغك أن طلبك لم يتم قبوله في منصة ميدنوفا في الوقت الحالي. يمكنك مراجعة سبب الرفض والتواصل معنا لمزيد من المعلومات. نشكرك على اهتمامك ونتمنى لك التوفيق.',
     'approval_status' => 'حالة الاعتماد ',
     'reason' => 'السبب',
+    'refund_issued' => 'تم إرجاع مبلغ :amount :currency إلى محفظتك بنجاح.',
     'UNAUTHORIZED_CONSULTATION_ACTION' => 'ليس لديك صلاحية تعديل هذه الاستشارة.',
     'payment_link_created_successfully' => 'تم انشاء رابط بوابة الدفع بنجاح ',
     'Successful_Subscriber' => 'نجاح عملية تعين المستشار كمشترك ',
