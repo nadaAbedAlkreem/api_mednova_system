@@ -213,6 +213,10 @@ return [
         'country' => 'country',
         'district' => 'neighborhood',
         'postal_code' => 'postal code',
-        'location_type' => 'location type',
+        'location_type'      => 'location type',
+        'action'             => 'Action',
+        'admin_note'         => 'Admin Note',
+        'transfer_reference' => 'Transfer Reference',
+        'transfer_proof'     => 'Transfer Proof',
     ],
 ];
