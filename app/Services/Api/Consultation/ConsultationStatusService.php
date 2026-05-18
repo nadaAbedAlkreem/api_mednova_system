@@ -82,7 +82,7 @@ class ConsultationStatusService
     {
         return match ($actionBy) {
             'patient'     => $this->handleCancellation($consultation, 'patient'),
-            'consultant' => $this->handleCancellation($consultation, 'consultant'),
+            'consultable' => $this->handleCancellation($consultation, 'consultant'),
             default       => __('messages.CANCEL_REQUEST'),
         };
     }

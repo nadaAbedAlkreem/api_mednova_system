@@ -126,10 +126,6 @@ class UpdateConsultationStatusRequest extends FormRequest
 
 
         if ($data['status'] === 'cancelled') {
-            // توحيد المسمى
-            if (($data['action_by'] ?? null) === 'consultable') {
-                $data['action_by'] = 'consultant';
-            }
             $data['action_by']     = $data['action_by']     ?? null;
             $data['action_reason'] = $data['action_reason'] ?? null;
         }
