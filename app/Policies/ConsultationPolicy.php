@@ -79,7 +79,7 @@ class ConsultationPolicy
     {
         return match ($actionBy) {
             'patient'     => (int) $user->id === (int) $consultation->patient_id,
-            'consultable' => (int) $user->id === (int) $consultation->consultant_id,
+            'consultant' => (int) $user->id === (int) $consultation->consultant_id,
             default       => false,
         };
     }
