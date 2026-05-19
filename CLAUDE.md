@@ -286,6 +286,7 @@ If header starts with 'en' → English, otherwise → Arabic.
 
 ---
 
+
 ## Pagination Defaults
 
 - Default per_page: 15

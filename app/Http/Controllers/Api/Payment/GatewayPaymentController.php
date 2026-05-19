@@ -36,7 +36,7 @@ class GatewayPaymentController extends Controller
 
 
     public function __construct(private readonly PatientFinancialService $financialService
-        , WalletTopUpService  $financialTransactionService, IGatewayPaymentRepositories $gatewayPaymentRepositories,  IWalletRepositories  $walletRepository, AmwalPayService $amwalPayService, ConsultationPaymentIntentService $consultationPaymentIntentService)
+        , WalletTopUpService                                             $financialTransactionService, IGatewayPaymentRepositories $gatewayPaymentRepositories, IWalletRepositories $walletRepository, AmwalPayService $amwalPayService, ConsultationPaymentIntentService $consultationPaymentIntentService)
     {
         $this->amwalPayService = $amwalPayService;
         $this->consultationPaymentIntentService = $consultationPaymentIntentService;
@@ -63,6 +63,7 @@ class GatewayPaymentController extends Controller
             $this->authorize('pay', $consultation);
             $result = $this->consultationPaymentIntentService->create(
                 consultation: $consultation,
+                type: $type,
                 patient: $request->user(),
                 purpose: 'payment_consultation',
 //                cardType:      $request->input('card_type', 'domestic')
@@ -112,7 +113,7 @@ class GatewayPaymentController extends Controller
                 'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
             ]);
             $patient = $request->user('api');
-            $perPage = (int) $request->query('per_page', 15);
+            $perPage = (int)$request->query('per_page', 15);
             $payments = $this->financialService->getPaymentHistory($patient, $perPage);
             return $this->successResponse(
                 __('messages.DATA_RETRIEVED_SUCCESSFULLY'),

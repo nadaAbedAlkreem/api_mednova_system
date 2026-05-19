@@ -40,6 +40,7 @@ class AmwalPayService
     public function createPaymentLink($data): object
     {
         try {
+            $redirectUrl     = $data['redirect_url'];
             $billerRef     = $data['biller_ref'];
             $amount        = number_format($data['amount'], 3, '.', '');
             $currency      = config('amwal.currency.OMR'); // 512
@@ -62,7 +63,7 @@ class AmwalPayService
                 'expireDateTime'         => '',
                 'maxNumberOfPayment'     => 1,
                 'paymentViewType'        => 1,
-                'redirectUrl'            => config('amwal.redirectUrl') . 'profile/consultations',
+                'redirectUrl'            => $redirectUrl,
             ];
 
             // ✅ نفس طريقة الكود القديم: hash على كل الـ payload
