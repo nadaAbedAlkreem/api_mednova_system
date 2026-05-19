@@ -86,8 +86,8 @@ class ConsultationPaymentIntentService
             'status' => GatewayPaymentStatus::INITIATED->value ?? 'initiated',
             'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
         ]);
-
-
+         $url = config('amwal.redirect_url') . app()->getLocale() . '/profile/consultations/' . $type . '/' . $consultation->id ;
+          Log::channel('financial')->warning('payment_intent.initiated', ['url' => $url]);
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
         try {
             $response = $this->gateway->createPaymentLink([
