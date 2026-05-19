@@ -40,9 +40,9 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
-        Gate::define('viewApiDocs', function (?Customer $user) {
-            return $user && in_array($user->email, ['elkahloutnada@gmail.com']);
-        });
+//        Gate::define('viewApiDocs', function (?Customer $user) {
+//            return $user && in_array($user->email, ['elkahloutnada@gmail.com']);
+//        });
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
                 \App\Models\ConsultationChatRequest::class,
