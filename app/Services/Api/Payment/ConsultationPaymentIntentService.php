@@ -23,7 +23,7 @@ class ConsultationPaymentIntentService
     {
     }
 
-    public function create(object $consultation, Customer $patient, string $purpose)
+    public function create(object $consultation,string $type ,  Customer $patient, string $purpose)
     {
         if (!in_array($consultation->status, [StatusType::PENDING->value])) {
             throw new HttpException(422, 'Invalid consultation state');
@@ -96,7 +96,7 @@ class ConsultationPaymentIntentService
                 'amount' => $consultation->gross_amount,
                 'currency' => 512, // OMR code
                 'email' => $patient->email,
-                'redirect_url' => config('amwal.redirect_url') ?? 'https://mednovacare.com/',
+                'redirect_url' => config('amwal.redirect_url') . app()->getLocale() . '/profile/consultations/' . $type . '/' . $consultation->id,
                 'payment_method' => 0,
             ]);
 
