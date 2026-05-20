@@ -54,7 +54,7 @@ class WithdrawalController extends Controller
     /**
      * List withdrawals
      *
-     * Retrieve a paginated list of the authenticated consultant's withdrawal requests,
+     * Retrieve a paginated list of the authenticated patient and consultant's withdrawal requests,
      * ordered from newest to oldest.
      *
      * @tags Financial — Withdrawals

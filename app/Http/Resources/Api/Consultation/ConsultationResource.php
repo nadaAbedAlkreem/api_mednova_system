@@ -7,6 +7,30 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConsultationResource extends JsonResource
 {
+    private const PATIENT_FINANCIAL_LABELS = [
+        'unpaid'            => ['ar' => 'غير مدفوعة',     'en' => 'Unpaid'],
+        'held'              => ['ar' => 'تم الدفع',        'en' => 'Paid'],
+        'review_window'     => ['ar' => 'فترة المراجعة',   'en' => 'Review Period'],
+        'withdrawable'      => ['ar' => 'مكتملة',          'en' => 'Completed'],
+        'withdrawn'         => ['ar' => 'مكتملة',          'en' => 'Completed'],
+        'refunded'          => ['ar' => 'تم الاسترداد',    'en' => 'Refunded'],
+        'refunded_internal' => ['ar' => 'تم الاسترداد',    'en' => 'Refunded'],
+        'frozen'            => ['ar' => 'قيد المراجعة',    'en' => 'Under Review'],
+        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً',   'en' => 'Temporarily Suspended'],
+    ];
+
+    private const CONSULTANT_FINANCIAL_LABELS = [
+        'unpaid'            => ['ar' => 'بانتظار الدفع',        'en' => 'Awaiting Payment'],
+        'held'              => ['ar' => 'بانتظار تقديم الخدمة', 'en' => 'Awaiting Service'],
+        'review_window'     => ['ar' => 'بانتظار التسوية',      'en' => 'Awaiting Settlement'],
+        'withdrawable'      => ['ar' => 'قابل للسحب',           'en' => 'Withdrawable'],
+        'withdrawn'         => ['ar' => 'تم السحب',             'en' => 'Withdrawn'],
+        'refunded'          => ['ar' => 'تم إلغاء الاستشارة',  'en' => 'Consultation Cancelled'],
+        'refunded_internal' => ['ar' => 'تم إلغاء الاستشارة',  'en' => 'Consultation Cancelled'],
+        'frozen'            => ['ar' => 'قيد المراجعة',         'en' => 'Under Review'],
+        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً',        'en' => 'Temporarily Suspended'],
+    ];
+
     public function toArray($request)
     {
         $type = match (true) {
@@ -24,8 +48,9 @@ class ConsultationResource extends JsonResource
         return [
             'id'               => $this->id,
             'type'             => $type,
-            'status'           => $this->status,
-//            'financial_status' => $this->financial_status,
+//            'status'                 => $this->status,
+            'financial_status_label' => $this->resolveFinancialStatusLabel($request),
+            'financial_status' => $this->financial_status,
 //            'review_deadline'  => $this->review_deadline,
 //            'released_at'      => $this->released_at,
             'data'             => $data,
@@ -58,6 +83,30 @@ class ConsultationResource extends JsonResource
             ConsultantType::THERAPIST->value,
             ConsultantType::REHABILITATION_CENTER->value,
         ], true);
+    }
+
+    private function resolveFinancialStatusLabel($request): string
+    {
+        $locale = $this->resolveLocale($request);
+        $status = $this->financial_status;
+        $user   = $request->user('api');
+
+        if (! $user) {
+            return ucwords(str_replace('_', ' ', $status));
+        }
+
+        $labels = $this->isConsultant($user)
+            ? self::CONSULTANT_FINANCIAL_LABELS
+            : self::PATIENT_FINANCIAL_LABELS;
+
+        return $labels[$status][$locale]
+            ?? ucwords(str_replace('_', ' ', $status));
+    }
+
+    private function resolveLocale($request): string
+    {
+        return str_starts_with($request->header('Accept-Language', ''), 'en')
+            ? 'en' : 'ar';
     }
 
     /**
