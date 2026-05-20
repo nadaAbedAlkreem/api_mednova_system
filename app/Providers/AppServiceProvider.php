@@ -43,7 +43,8 @@ class AppServiceProvider extends ServiceProvider
                 return Str::startsWith($route->uri, 'api/');
             });
         Gate::define('viewApiDocs', function (?Admin $admin) {
-            \Illuminate\Support\Facades\Log::info('محاولة دخول للديكومنتشن: ' . json_encode(request()->all()));
+            $admin = \Laravel\Sanctum\PersonalAccessToken::findToken(request()->query('token'))?->tokenable;
+            \Illuminate\Support\Facades\Log::info('محاولة دخول للديكومنتشن: ' . json_encode($admin));
 
             if (! $admin && request()->has('token')) {
                 $admin = auth()->guard('sanctum')->user();
