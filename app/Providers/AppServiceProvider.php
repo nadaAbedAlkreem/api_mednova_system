@@ -42,17 +42,15 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
-        $admin = auth()->guard('admin')->user();
-
-        Log::info('test scramble admin data: ' . json_encode($admin));
-
-        Gate::define('viewApiDocs', function () {
+        Gate::define('viewApiDocs', function (Admin $admin) {
             $admin = auth()->guard('admin')->user();
 
-            Log::info('test scramble admin data: ' . json_encode($admin));
+            Log::info('login' . $admin && in_array($admin['email'], ['super_admin@gmail.com']));
 
-            return $admin && in_array($admin['email'], ['super]_admin@gmail.com']);
+
+            return $admin && in_array($admin['email'], ['super_admin@gmail.com']);
         });
+
         // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
 
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
