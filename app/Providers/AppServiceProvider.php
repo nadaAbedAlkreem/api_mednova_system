@@ -42,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
+        $admin = auth()->guard('admin')->user();
+
+        Log::info('test scramble admin data: ' . json_encode($admin));
+
         Gate::define('viewApiDocs', function () {
             $admin = auth()->guard('admin')->user();
 
