@@ -43,10 +43,11 @@ class AppServiceProvider extends ServiceProvider
                 return Str::startsWith($route->uri, 'api/');
             });
         Gate::define('viewApiDocs', function (?Admin $admin) {
-            $admin=auth()->guard('admin')->user();
-            Log::info('login' . auth()->guard('admin')->user());
+            if (! $admin && request()->has('token')) {
+                $admin = auth()->guard('sanctum')->user();
+            }
 
-
+            \Illuminate\Support\Facades\Log::info('محاولة دخول للديكومنتشن: ' . json_encode($admin));
             return $admin && in_array($admin['email'], ['super_admin@gmail.com']);
         });
 
