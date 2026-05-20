@@ -18,9 +18,9 @@ Broadcast::channel('consultant.{consultantId}', function ($user, $consultantId) 
 Broadcast::channel('patient.{patientId}', function ($user, $patientId) {
     return (int) $user->id === (int) $patientId;
 }, ['guards' => ['sanctum']]);
-Broadcast::channel('patient.{patientId}', function ($user, $patientId) {
-    return (int) $user->id === (int) $patientId;
-}, ['guards' => ['admin.notifications']]);
+Broadcast::channel('admin.notifications', function ($user) {
+    return (int) $user->id === (int) 1;
+}, ['guards' => ['admin']]);
 
 Broadcast::channel('messages.{senderId}', function ($user, $senderId) {
     return (int) $user->id === (int) $senderId;
