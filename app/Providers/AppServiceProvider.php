@@ -44,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
             });
         Gate::define('viewApiDocs', function (?Admin $admin) {
             Log::info('login' . auth()->guard('admin')->user());
+            Log::info('login' . $admin && in_array($admin->email, ['super_admin@gmail.com']));
+
 
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
