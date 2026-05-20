@@ -8,57 +8,57 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ConsultationResource extends JsonResource
 {
     private const PATIENT_FINANCIAL_LABELS = [
-        'unpaid'            => ['ar' => 'غير مدفوعة',     'en' => 'Unpaid'],
-        'held'              => ['ar' => 'تم الدفع',        'en' => 'Paid'],
-        'review_window'     => ['ar' => 'فترة المراجعة',   'en' => 'Review Period'],
-        'withdrawable'      => ['ar' => 'مكتملة',          'en' => 'Completed'],
-        'withdrawn'         => ['ar' => 'مكتملة',          'en' => 'Completed'],
-        'refunded'          => ['ar' => 'تم الاسترداد',    'en' => 'Refunded'],
-        'refunded_internal' => ['ar' => 'تم الاسترداد',    'en' => 'Refunded'],
-        'frozen'            => ['ar' => 'قيد المراجعة',    'en' => 'Under Review'],
-        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً',   'en' => 'Temporarily Suspended'],
+        'unpaid' => ['ar' => 'غير مدفوعة', 'en' => 'Unpaid'],
+        'held' => ['ar' => 'تم الدفع', 'en' => 'Paid'],
+        'review_window' => ['ar' => 'فترة المراجعة', 'en' => 'Review Period'],
+        'withdrawable' => ['ar' => 'مكتملة', 'en' => 'Completed'],
+        'withdrawn' => ['ar' => 'مكتملة', 'en' => 'Completed'],
+        'refunded' => ['ar' => 'تم الاسترداد', 'en' => 'Refunded'],
+        'refunded_internal' => ['ar' => 'تم الاسترداد', 'en' => 'Refunded'],
+        'frozen' => ['ar' => 'قيد المراجعة', 'en' => 'Under Review'],
+        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً', 'en' => 'Temporarily Suspended'],
     ];
 
     private const CONSULTANT_FINANCIAL_LABELS = [
-        'unpaid'            => ['ar' => 'بانتظار الدفع',        'en' => 'Awaiting Payment'],
-        'held'              => ['ar' => 'بانتظار تقديم الخدمة', 'en' => 'Awaiting Service'],
-        'review_window'     => ['ar' => 'بانتظار التسوية',      'en' => 'Awaiting Settlement'],
-        'withdrawable'      => ['ar' => 'قابل للسحب',           'en' => 'Withdrawable'],
-        'withdrawn'         => ['ar' => 'تم السحب',             'en' => 'Withdrawn'],
-        'refunded'          => ['ar' => 'تم إلغاء الاستشارة',  'en' => 'Consultation Cancelled'],
-        'refunded_internal' => ['ar' => 'تم إلغاء الاستشارة',  'en' => 'Consultation Cancelled'],
-        'frozen'            => ['ar' => 'قيد المراجعة',         'en' => 'Under Review'],
-        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً',        'en' => 'Temporarily Suspended'],
+        'unpaid' => ['ar' => 'بانتظار الدفع', 'en' => 'Awaiting Payment'],
+        'held' => ['ar' => 'بانتظار تقديم الخدمة', 'en' => 'Awaiting Service'],
+        'review_window' => ['ar' => 'بانتظار التسوية', 'en' => 'Awaiting Settlement'],
+        'withdrawable' => ['ar' => 'قابل للسحب', 'en' => 'Withdrawable'],
+        'withdrawn' => ['ar' => 'تم السحب', 'en' => 'Withdrawn'],
+        'refunded' => ['ar' => 'تم إلغاء الاستشارة', 'en' => 'Consultation Cancelled'],
+        'refunded_internal' => ['ar' => 'تم إلغاء الاستشارة', 'en' => 'Consultation Cancelled'],
+        'frozen' => ['ar' => 'قيد المراجعة', 'en' => 'Under Review'],
+        'payment_suspended' => ['ar' => 'معلّقة مؤقتاً', 'en' => 'Temporarily Suspended'],
     ];
 
     public function toArray($request)
     {
         $type = match (true) {
-            $this->resource instanceof \App\Models\ConsultationChatRequest  => 'chat',
+            $this->resource instanceof \App\Models\ConsultationChatRequest => 'chat',
             $this->resource instanceof \App\Models\ConsultationVideoRequest => 'video',
             default => 'unknown',
         };
 
         $data = match ($type) {
-            'chat'  => new ConsultationChatRequestResource($this->resource),
+            'chat' => new ConsultationChatRequestResource($this->resource),
             'video' => new ConsultationVideoRequestResource($this->resource),
             default => null,
         };
 
         return [
-            'id'               => $this->id,
-            'type'             => $type,
-            'status'                 => $this->status,
+            'id' => $this->id,
+            'type' => $type,
+            'status' => $this->status,
             'financial_status_label' => $this->resolveFinancialStatusLabel($request),
             'financial_status' => $this->financial_status,
-            'review_deadline'  => $this->review_deadline,
-            'released_at'      => $this->released_at,
-            'data'             => $data,
-            'suspended_until'  => $this->suspended_until,
+            'review_deadline' => $this->review_deadline,
+            'released_at' => $this->released_at,
+            'data' => $data,
+            'suspended_until' => $this->suspended_until,
             'suspension_count' => $this->suspension_count,
-            'financial'        => $this->buildFinancialPayload($request),
-            'created_at'       => $this->created_at->format('Y-m-d H:i'),
-            'updated_at'       => $this->updated_at->format('Y-m-d H:i'),
+            'financial' => $this->buildFinancialPayload($request),
+            'created_at' => $this->created_at->format('Y-m-d H:i'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i'),
         ];
     }
 
@@ -68,7 +68,7 @@ class ConsultationResource extends JsonResource
     {
         $user = $request->user('api');
 
-        if (! $user) {
+        if (!$user) {
             return [];
         }
 
@@ -89,9 +89,11 @@ class ConsultationResource extends JsonResource
     {
         $locale = $this->resolveLocale($request);
         $status = $this->financial_status;
-        $user   = $request->user('api');
+        $status = $status instanceof \BackedEnum ? $status->value : (string) $status;
 
-        if (! $user) {
+        $user = $request->user('api');
+
+        if (!$user) {
             return ucwords(str_replace('_', ' ', $status));
         }
 
@@ -119,10 +121,10 @@ class ConsultationResource extends JsonResource
     private function financialForConsultant(): array
     {
         return [
-            'consultation_price'         => $this->consultation_price,
-            'platform_commission_rate'   => $this->platform_commission_rate,
+            'consultation_price' => $this->consultation_price,
+            'platform_commission_rate' => $this->platform_commission_rate,
             'platform_commission_amount' => $this->platform_commission_amount,
-            'your_earning'               => $this->consultant_earning_amount,
+            'your_earning' => $this->consultant_earning_amount,
         ];
     }
 
@@ -137,10 +139,10 @@ class ConsultationResource extends JsonResource
     private function financialForPatient(): array
     {
         return [
-            'consultation_price'        => $this->consultation_price,
-            'gateway_commission_rate'   => $this->gateway_commission_rate,
+            'consultation_price' => $this->consultation_price,
+            'gateway_commission_rate' => $this->gateway_commission_rate,
             'gateway_commission_amount' => $this->gateway_commission_amount,
-            'gross_amount'              => $this->gross_amount,
+            'gross_amount' => $this->gross_amount,
         ];
     }
 }

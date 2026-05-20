@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>رمز التحقق من الحساب البنكي</title>
+    <title>Bank Account Verification Code</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
         .container { max-width: 480px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
@@ -12,13 +12,13 @@
 </head>
 <body>
 <div class="container">
-    <h2>مرحباً {{ $user->full_name }}</h2>
-    <p>استخدم رمز التحقق أدناه لتأكيد حسابك البنكي على منصة Mednova.</p>
+    <h2>Hello {{ $user->full_name }},</h2>
+    <p>Use the verification code below to confirm your bank account on the Mednova platform.</p>
     <div class="otp">{{ $otp }}</div>
-    <p>هذا الرمز صالح لمدة <strong>10 دقائق</strong> فقط.</p>
-    <p>إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد والتواصل مع الدعم الفني.</p>
+    <p>This code is only valid for <strong>10 minutes</strong>.</p>
+    <p>If you did not request this code, please ignore this email and contact technical support.</p>
     <div class="footer">
-        <p>فريق Mednova — لا تشارك هذا الرمز مع أي شخص.</p>
+        <p>Mednova Team — Do not share this code with anyone.</p>
     </div>
 </div>
 </body>
