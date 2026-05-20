@@ -10,6 +10,7 @@ use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -42,8 +43,11 @@ class AppServiceProvider extends ServiceProvider
                 return Str::startsWith($route->uri, 'api/');
             });
         Gate::define('viewApiDocs', function (?Admin $admin) {
+            Log::info('login' .$admin);
+
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
+
         // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
 
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
