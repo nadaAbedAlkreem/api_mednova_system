@@ -42,17 +42,11 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
-        $admin = auth()->guard('admin')->user();
-
-        Log::info('login' . $admin && in_array($admin['email'], ['super_admin@gmail.com']));
-
-        Gate::define('viewApiDocs', function (Admin $admin) {
-            $admin = auth()->guard('admin')->user();
-
-            Log::info('login' . $admin && in_array($admin['email'], ['super_admin@gmail.com']));
+        Gate::define('viewApiDocs', function (?Admin $admin) {
+            Log::info('login' . auth()->guard('admin')->user());
 
 
-            return $admin && in_array($admin['email'], ['super_admin@gmail.com']);
+            return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
 
         // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
