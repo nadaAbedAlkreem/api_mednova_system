@@ -37,36 +37,26 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        // تعريف الـ Gate للتحقق من الـ Admin عبر الـ guard الخاص به
         Gate::define('viewApiDocs', function () {
             $admin = auth()->guard('admin')->user();
-
             \Illuminate\Support\Facades\Log::info('بيانات الآدمن المحاول للدخول: ' . json_encode($admin));
-
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
-
-        // التعديل هنا: دمج التحقق الصلاحيات بالطريقة الحديثة للحزمة
         Scramble::configure()
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
-            })
-            ->authorize(function () {
-                // هنا نطلب من Scramble فحص الـ Gate الذي عرفناه في الأعلى
-                return Gate::allows('viewApiDocs');
             });
 
+        // كود الـ guessPolicyNamesUsing الخاص بك...
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
                 \App\Models\ConsultationChatRequest::class,
                 \App\Models\ConsultationVideoRequest::class,
                 \App\Models\Customer::class,
-
             ])) {
                 return \App\Policies\ConsultationPolicy::class;
             }
-
-            return null; // Laravel سيستخدم التسجيل العادي أو يتجاهل
+            return null;
         });
     }
 }
