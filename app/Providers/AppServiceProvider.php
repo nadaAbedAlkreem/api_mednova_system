@@ -45,9 +45,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewApiDocs', function () {
             $admin = auth()->guard('admin')->user();
 
-            Log::info('test scramble admin data: ' . json_encode($admin));
-
-            return $admin && in_array($admin['email'], ['super]_admin@gmail.com']);
+//            Log::info('test scramble admin data: ' . json_encode($admin));
+             return true ;
+//            return $admin && in_array($admin['email'], ['super]_admin@gmail.com']);
         });
         // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
 
