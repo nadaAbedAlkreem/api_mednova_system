@@ -28,10 +28,10 @@ class StoreWithdrawalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'amount.required' => 'مبلغ السحب مطلوب.',
-            'amount.numeric'  => 'مبلغ السحب يجب أن يكون رقماً.',
-            'amount.min'      => 'الحد الأدنى للسحب هو :min ريال عماني.',
-            'amount.max'      => 'الحد الأقصى للسحب هو :max ريال عماني.',
+            'amount.required' => __('validation.required', ['attribute' => __('validation.attributes.amount')]),
+            'amount.numeric' => __('validation.numeric', ['attribute' => __('validation.attributes.amount')]),
+            'amount.min' => __('validation.min', ['attribute' => __('validation.attributes.amount')]),
+            'amount.max' => __('validation.max', ['attribute' => __('validation.attributes.amount')]),
         ];
     }
 
@@ -47,8 +47,8 @@ class StoreWithdrawalRequest extends FormRequest
         throw new ValidationException($validator, response()->json([
             'success' => false,
             'message' => __('messages.ERROR_OCCURRED'),
-            'data'    => $formattedErrors,
-            'status'  => 'Internal Server Error',
+            'data' => $formattedErrors,
+            'status' => 'Internal Server Error',
         ], 422));
     }
 }
