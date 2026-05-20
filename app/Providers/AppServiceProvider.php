@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
                 return Str::startsWith($route->uri, 'api/');
             });
         Gate::define('viewApiDocs', function (?Admin $admin) {
-            $admin=auth()->guard('admin')->user());
+            $admin=auth()->guard('admin')->user();
             Log::info('login' . auth()->guard('admin')->user());
 
 
