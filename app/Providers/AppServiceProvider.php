@@ -42,11 +42,11 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
+        \Illuminate\Support\Facades\Log::info('test scramble  : ' );
+
         \Illuminate\Support\Facades\Gate::define('viewApiDocs', function () {
             $admin = auth()->guard('admin')->user();
-
-            \Illuminate\Support\Facades\Log::info('الآدمن المحاول للدخول: ' . json_encode($admin));
-
+            \Illuminate\Support\Facades\Log::info('test scramble ' . json_encode($admin));
             // تأكد من الإيميل الصحيح هنا
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
