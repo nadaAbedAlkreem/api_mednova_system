@@ -37,18 +37,21 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        Gate::define('viewApiDocs', function () {
-            $admin = auth()->guard('admin')->user();
-            \Illuminate\Support\Facades\Log::info('بيانات الآدمن المحاول للدخول: ' . json_encode($admin));
-            return $admin && in_array($admin->email, ['super_admin@gmail.com']);
-        });
+        // التكوين البسيط الرسمي للحزمة
         Scramble::configure()
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
+        \Illuminate\Support\Facades\Gate::define('viewApiDocs', function () {
+            $admin = auth()->guard('admin')->user();
 
-        // كود الـ guessPolicyNamesUsing الخاص بك...
-        Gate::guessPolicyNamesUsing(function (string $modelClass) {
+            \Illuminate\Support\Facades\Log::info('الآدمن المحاول للدخول: ' . json_encode($admin));
+
+            // تأكد من الإيميل الصحيح هنا
+            return $admin && in_array($admin->email, ['super_admin@gmail.com']);
+        });
+
+        \Illuminate\Support\Facades\Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
                 \App\Models\ConsultationChatRequest::class,
                 \App\Models\ConsultationVideoRequest::class,
