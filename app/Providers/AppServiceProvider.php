@@ -32,23 +32,29 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
-
             $openApi->secure(
                 SecurityScheme::http('bearer', 'JWT')
             );
         });
 
-        Scramble::configure()
-            ->routes(function (Route $route) {
-                return Str::startsWith($route->uri, 'api/');
-            });
-        Gate::define('viewApiDocs', function (?Admin $admin) {
-            Log::info('login' .$admin);
+        // تعريف الـ Gate للتحقق من الـ Admin عبر الـ guard الخاص به
+        Gate::define('viewApiDocs', function () {
+            $admin = auth()->guard('admin')->user();
+
+            \Illuminate\Support\Facades\Log::info('بيانات الآدمن المحاول للدخول: ' . json_encode($admin));
 
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
 
-        // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
+        // التعديل هنا: دمج التحقق الصلاحيات بالطريقة الحديثة للحزمة
+        Scramble::configure()
+            ->routes(function (Route $route) {
+                return Str::startsWith($route->uri, 'api/');
+            })
+            ->authorize(function () {
+                // هنا نطلب من Scramble فحص الـ Gate الذي عرفناه في الأعلى
+                return Gate::allows('viewApiDocs');
+            });
 
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
