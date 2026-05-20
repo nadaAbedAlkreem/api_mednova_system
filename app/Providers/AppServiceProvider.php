@@ -32,34 +32,35 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
+
             $openApi->secure(
                 SecurityScheme::http('bearer', 'JWT')
             );
         });
 
-        // التكوين البسيط الرسمي للحزمة
         Scramble::configure()
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
-        \Illuminate\Support\Facades\Log::info('test scramble  : ' );
+        Gate::define('viewApiDocs', function (?Admin $admin) {
+            Log::info('login' .$admin);
 
-        \Illuminate\Support\Facades\Gate::define('viewApiDocs', function () {
-            $admin = auth()->guard('admin')->user();
-            \Illuminate\Support\Facades\Log::info('test scramble ' . json_encode($admin));
-            // تأكد من الإيميل الصحيح هنا
             return $admin && in_array($admin->email, ['super_admin@gmail.com']);
         });
 
-        \Illuminate\Support\Facades\Gate::guessPolicyNamesUsing(function (string $modelClass) {
+        // أضف هذا الجزء هنا للسماح بالوصول في بيئة الـ staging دون قيود
+
+        Gate::guessPolicyNamesUsing(function (string $modelClass) {
             if (in_array($modelClass, [
                 \App\Models\ConsultationChatRequest::class,
                 \App\Models\ConsultationVideoRequest::class,
                 \App\Models\Customer::class,
+
             ])) {
                 return \App\Policies\ConsultationPolicy::class;
             }
-            return null;
+
+            return null; // Laravel سيستخدم التسجيل العادي أو يتجاهل
         });
     }
 }
