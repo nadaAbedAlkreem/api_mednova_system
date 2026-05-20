@@ -42,8 +42,8 @@ class AppServiceProvider extends ServiceProvider
             ->routes(function (Route $route) {
                 return Str::startsWith($route->uri, 'api/');
             });
-        Gate::define('viewApiDocs', function (?Admin $admin) {
-            Log::info('login' . auth()->guard('admin')->user());
+        $admin = auth()->guard('admin')->user();
+        Gate::define('viewApiDocs', function (Admin $admin) use ($admin) {
             Log::info('login' . $admin && in_array($admin->email, ['super_admin@gmail.com']));
 
 
