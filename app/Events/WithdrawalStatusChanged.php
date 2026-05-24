@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\WithdrawalRequest;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class WithdrawalStatusChanged
 {
@@ -12,9 +13,8 @@ class WithdrawalStatusChanged
 
     public function __construct(
         public WithdrawalRequest $withdrawal,
-        public string $message,
-        public string $eventType,
-        public int $targetId,
-        public string $targetType,
-    ) {}
+        public string $actionType // مثل: withdrawal_requested, withdrawal_cancelled, withdrawal_approved
+    ) {
+
+    }
 }

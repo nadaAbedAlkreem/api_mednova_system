@@ -32,9 +32,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         MessageRead::class => [],
 
-        WithdrawalStatusChanged::class => [
-            SendWithdrawalNotificationListener::class,
-        ],
+//        WithdrawalStatusChanged::class => [
+//            SendWithdrawalNotificationListener::class,
+//        ],
 //        CustomerApprovalStatusChanged::class => [
 //            SendApprovalStatusMail::class,
 //            SendApprovalStatusNotification::class,
