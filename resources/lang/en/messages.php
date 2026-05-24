@@ -10,6 +10,7 @@ return [
     'UNAUTHORISED_ACCOUNT_TYPE' => 'Account type not authorized to access',
     'ACCOUNT_NOT_ACTIVE' => 'Account not activated',
     'ACCOUNT_PENDING_APPROVAL' => 'Account under review and not yet approved',
+    'BANK_ACCOUNT_ALREADY_REGISTERED' => 'This bank account or IBAN number is registered to another user in the system.',
     'name_game' => [
         'required' => 'The game name field is required.',
         'max' => 'The name must be less than 255 characters'

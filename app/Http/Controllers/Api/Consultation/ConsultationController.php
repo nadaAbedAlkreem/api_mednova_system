@@ -55,8 +55,7 @@ class ConsultationController extends Controller
             $consultant = \App\Models\Customer::with($relation)->find($request['consultant_id']);
             $breakdown = PaymentFeeCalculator::calculateTotal(
                 consultationPrice: $consultant->$relation->$price, cardType: CardType::DOMESTIC->value);
-             $this->authorize('createRequest', $consultant);
-             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
+            $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
             DB::commit();
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201);
         } catch (AuthorizationException $e) {

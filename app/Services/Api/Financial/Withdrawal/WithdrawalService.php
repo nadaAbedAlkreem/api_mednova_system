@@ -15,6 +15,7 @@ use App\Repositories\IWalletRepositories;
 use App\Repositories\IWithdrawalRepositories;
 use App\Services\Api\Financial\FinancialTransactionService;
 use DomainException;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -79,25 +80,30 @@ class WithdrawalService
 
             DB::afterCommit(function () use ($user, $withdrawal) {
                 $formatted = number_format((float) $withdrawal->amount, 3, '.', '');
+                \Illuminate\Support\Facades\Log::info(' service  ');
 
                 event(new WithdrawalStatusChanged(
                     $withdrawal,
-                    __('messages.WITHDRAWAL_REQUESTED_USER', [
-                        'amount'   => $formatted,
-                        'currency' => $withdrawal->currency,
-                    ]),
-                    'withdrawal_requested_user',
-                    $user->id,
-                    get_class($user),
+                    'withdrawal_requested' // كود موحد للحدث
                 ));
-
-                event(new WithdrawalStatusChanged(
-                    $withdrawal,
-                    __('messages.WITHDRAWAL_REQUESTED_ADMIN'),
-                    'withdrawal_requested_admin',
-                    1,
-                    Admin::class,
-                ));
+//                event(new WithdrawalStatusChanged(
+//                    $withdrawal,
+//                    __('messages.WITHDRAWAL_REQUESTED_USER', [
+//                        'amount'   => $formatted,
+//                        'currency' => $withdrawal->currency,
+//                    ]),
+//                    'withdrawal_requested_user',
+//                    $user->id,
+//                    get_class($user),
+//                ));
+//
+//                event(new WithdrawalStatusChanged(
+//                    $withdrawal,
+//                    __('messages.WITHDRAWAL_REQUESTED_ADMIN'),
+//                    'withdrawal_requested_admin',
+//                    1,
+//                    Admin::class,
+//                ));
             });
 
             return $withdrawal;
@@ -149,16 +155,9 @@ class WithdrawalService
 
             DB::afterCommit(function () use ($user, $withdrawal) {
                 $formatted = number_format((float) $withdrawal->amount, 3, '.', '');
-
                 event(new WithdrawalStatusChanged(
                     $withdrawal,
-                    __('messages.WITHDRAWAL_CANCELLED_USER', [
-                        'amount'   => $formatted,
-                        'currency' => $withdrawal->currency,
-                    ]),
-                    'withdrawal_cancelled_user',
-                    $user->id,
-                    get_class($user),
+                   'withdrawal_cancelled'
                 ));
             });
         });

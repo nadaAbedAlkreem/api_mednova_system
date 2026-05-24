@@ -25,6 +25,7 @@ class BankAccountService
         if ($existing) {
             throw new DomainException(__('messages.BANK_ACCOUNT_ALREADY_EXISTS'));
         }
+        $this->validateUniqueness($data['account_number'], $data['iban'] ?? null, $user->id);
 
         $bankAccount = $this->bankAccounts->createManual([
             'owner_type'          => get_class($user),
@@ -53,6 +54,11 @@ class BankAccountService
             throw new DomainException(__('messages.BANK_ACCOUNT_NOT_FOUND'));
         }
 
+        $accountNumberForCheck = $data['account_number'] ?? $bankAccount->account_number;
+        $ibanForCheck = $data['iban'] ?? $bankAccount->iban;
+        if (($accountNumberForCheck !== $bankAccount->account_number) || ($ibanForCheck !== $bankAccount->iban)) {
+            $this->validateUniqueness($accountNumberForCheck, $ibanForCheck, $user->id);
+        }
         $bankAccount = $this->bankAccounts->updateAccount($bankAccount, array_merge(
             array_filter($data, fn ($v) => $v !== null),
             ['status' => 'pending', 'verified_at' => null]
@@ -61,6 +67,26 @@ class BankAccountService
         $this->dispatchOtp($user);
 
         return $bankAccount;
+    }
+
+    private function validateUniqueness(string $accountNumber, ?string $iban, int $currentUserId): void
+    {
+        $duplicateExists = BankAccount::query()
+            ->where(function ($q) use ($accountNumber, $iban) {
+                // استخدام النطاق السحري لـ CipherSweet للبحث في النصوص المشفرة
+                $q->whereBlind('account_number', 'account_number_index', $accountNumber);
+
+                if ($iban) {
+                    $q->orWhereBlind('iban', 'iban_index', $iban);
+                }
+            })
+            ->where('owner_id', '!=', $currentUserId) // استثناء المستخدم الحالي
+            ->whereNull('deleted_at') // مراعاة الحذف الناعم (Soft Delete)
+            ->exists();
+
+        if ($duplicateExists) {
+            throw new DomainException(__('messages.BANK_ACCOUNT_ALREADY_REGISTERED'));
+        }
     }
 
     public function verifyOtp(Customer $user, string $otp): BankAccount

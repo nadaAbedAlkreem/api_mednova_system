@@ -32,7 +32,7 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
     public function broadcastOn()
     {
         try {
-            $this->notification->update(['status' => 'sent']);
+//            $this->notification->update(['status' => 'sent']);
             $this->notification->save();
             if ($this->eventType === 'dispute_opened_consultant' || $this->eventType === 'dispute_resolved_consultant' || $this->eventType === 'active_by_patient' || $this->eventType === 'requested' || $this->eventType === 'cancelled_by_patient' || $this->eventType === 'settlement_completed_consultant') {
                 Log::info(' for nada', [
@@ -60,8 +60,8 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
             return throw new \Exception("Unknown eventType: " . $this->eventType);
 
         } catch (\Exception $e) {
-            $this->notification->update(['status' => 'failed']);
-            $this->notification->save();
+//            $this->notification->update(['status' => 'failed']);
+//            $this->notification->save();
 
             throw $e;
         }
@@ -71,7 +71,6 @@ class ConsultationRequestedBroadcast implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        Log::info('cons video ' . $this->consultation);
         return [
             'id' => $this->consultation->id,
             'patient_id' => $this->consultation->patient_id,

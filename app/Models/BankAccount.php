@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use ParagonIE\CipherSweet\BlindIndex;
+use ParagonIE\CipherSweet\EncryptedRow;
+use Spatie\LaravelCipherSweet\Concerns\UsesCipherSweet;
+use Spatie\LaravelCipherSweet\Contracts\CipherSweetEncrypted;
 
-class BankAccount extends Model
+class BankAccount extends Model implements CipherSweetEncrypted
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes , UsesCipherSweet;
 
     protected $fillable = [
         'owner_type',
@@ -30,8 +34,8 @@ class BankAccount extends Model
         'is_default'  => 'boolean',
         'verified_at' => 'datetime',
         'meta'        => 'array',
-        'account_number'      => 'encrypted',
-        'iban'                => 'encrypted',
+//        'account_number'      => 'encrypted',
+//        'iban'                => 'encrypted',
         'swift_code'          => 'encrypted',
         'account_holder_name' => 'encrypted',
     ];
@@ -58,5 +62,14 @@ class BankAccount extends Model
     public function isVerified(): bool
     {
         return $this->status === 'verified';
+    }
+
+    public static function configureCipherSweet(EncryptedRow $encryptedRow): void
+    {
+        $encryptedRow
+            ->addField('account_number')
+            ->addBlindIndex('account_number', new BlindIndex('account_number_index'))
+            ->addField('iban')
+            ->addBlindIndex('iban', new BlindIndex('iban_index'));
     }
 }
