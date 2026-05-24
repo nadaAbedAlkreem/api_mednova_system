@@ -154,11 +154,7 @@ class WithdrawalService
             );
 
             DB::afterCommit(function () use ($user, $withdrawal) {
-
-
-
                 $formatted = number_format((float) $withdrawal->amount, 3, '.', '');
-
                 event(new WithdrawalStatusChanged(
                     $withdrawal,
                    'withdrawal_cancelled'
