@@ -39,7 +39,6 @@ class BankAccountController extends Controller
                 $request->user('api'),
                 $request->validated()
             );
-
             return $this->successResponse(
                 __('messages.BANK_ACCOUNT_CREATED_SUCCESSFULLY'),
                 new BankAccountResource($bankAccount),

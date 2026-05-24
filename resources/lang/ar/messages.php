@@ -11,7 +11,7 @@ return [
     'ACCOUNT_NOT_ACTIVE' => 'الحساب غير مفعل',
     'ACCOUNT_PENDING_APPROVAL' => 'الحساب قيد المراجعة ولم يتم اعتماده بعد',
     'ending_consultation_session_dispute' => 'تم إنهاء الجلسة. لديك مهلة 48 ساعة لفتح نزاع في حال لم يتم تقديم الخدمة بالشكل المطلوب.',
-
+    'BANK_ACCOUNT_ALREADY_REGISTERED' => 'هذا الحساب البنكي أو رقم الآيبان مسجّل لمستخدم آخر في النظام.',
     'dispute_opened_patient' => 'تم تسجيل النزاع بنجاح على الاستشارة رقم :consultation_id مع :consultant. سيتم مراجعة النزاع من قبل إدارة المنصة. للمتابعة تواصل مع الإدارة على الرقم '.config('app.support_phone'),
     'dispute_opened_consultant' => 'تم فتح نزاع على الاستشارة رقم :consultation_id من قبل المريض :patient. يرجى التواصل مع إدارة المنصة على الرقم '.config('app.support_phone').'لمتابعة الإجراءات.',
     'dispute_opened_admin' => 'نزاع جديد يحتاج مراجعة: الاستشارة رقم :consultation_id بين المريض :patient والمستشار :consultant.',
