@@ -19,6 +19,9 @@ return [
         'required' =>'The type game field is required.' ,
         'in' => 'The nature of the challenge must be determined, whether individual enter (I) or enter (T) team.',
     ],
+
+    'OTP_RESEND_LOCKED' => 'You have exceeded the resend limit. Please wait :minutes minutes before trying again.',
+    'OTP_RESENT_SUCCESSFULLY' => 'The OTP code has been resent successfully to your email.',
     'refund_issued' => 'A refund of :amount :currency has been credited to your wallet.',
     'DISPUTE_OPENED_SUCCESSFULLY' => 'The dispute has been successfully opened and will be reviewed by management.',
     'DISPUTE_RESOLVED_SUCCESSFULLY' => 'The dispute has been resolved successfully.',

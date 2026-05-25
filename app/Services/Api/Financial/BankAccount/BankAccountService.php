@@ -10,6 +10,7 @@ use App\Repositories\IWalletRepositories;
 use DomainException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 
 class BankAccountService
 {
@@ -40,7 +41,7 @@ class BankAccountService
             'status'              => 'pending',
             'is_default'          => true,
         ]);
-
+        RateLimiter::clear($this->otpResendLimiterKey($user->id));
         $this->dispatchOtp($user);
 
         return $bankAccount;
@@ -63,12 +64,38 @@ class BankAccountService
             array_filter($data, fn ($v) => $v !== null),
             ['status' => 'pending', 'verified_at' => null]
         ));
-
+        RateLimiter::clear($this->otpResendLimiterKey($user->id));
         $this->dispatchOtp($user);
 
         return $bankAccount;
     }
+    public function resendOtp(Customer $user): void
+    {
+        $limiterKey = $this->otpResendLimiterKey($user->id);
+        $maxAttempts = 3;
+        $decaySeconds = 300; // 5 دقائق
 
+        // 1. التحقق مما إذا كان المستخدم قد تجاوز الحد المسموح
+        if (RateLimiter::tooManyAttempts($limiterKey, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($limiterKey);
+            $minutes = ceil($seconds / 60);
+
+            // يمكنك تمرير عدد الدقائق المتبقية لرسالة الخطأ إذا أردت
+            throw new DomainException(__('messages.OTP_RESEND_LOCKED', ['minutes' => $minutes]));
+        }
+
+        // 2. تسجيل محاولة جديدة (سيتم حظره لمدة 5 دقائق بعد المحاولة الثالثة)
+        RateLimiter::hit($limiterKey, $decaySeconds);
+
+        // 3. التحقق من وجود حساب بنكي معلق (اختياري ولكن محبذ)
+        $bankAccount = $this->bankAccounts->findByOwner($user->id, get_class($user));
+        if (!$bankAccount || $bankAccount->status === 'verified') {
+            throw new DomainException(__('messages.BANK_ACCOUNT_ALREADY_VERIFIED_OR_NOT_FOUND'));
+        }
+
+        // 4. إرسال الكود
+        $this->dispatchOtp($user);
+    }
     private function validateUniqueness(string $accountNumber, ?string $iban, int $currentUserId): void
     {
         $duplicateExists = BankAccount::query()
@@ -153,5 +180,9 @@ class BankAccountService
     private function otpCacheKey(int $userId): string
     {
         return "bank_account_otp:{$userId}";
+    }
+    private function otpResendLimiterKey(int $userId): string
+    {
+        return "resend_bank_account_otp_limit:{$userId}";
     }
 }

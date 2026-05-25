@@ -141,4 +141,23 @@ class BankAccountController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
+    public function resendOtp(Request $request): JsonResponse
+    {
+        try {
+            /** @var \App\Models\Customer $user */
+            $user = $request->user();
+            $this->bankAccountService->resendOtp($user);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.OTP_RESENT_SUCCESSFULLY'),
+            ], 200);
+
+        } catch (DomainException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }
