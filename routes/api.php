@@ -113,6 +113,7 @@ Route::middleware(['auth:api'])->group(function () {
                 Route::get('', [BankAccountController::class, 'show']);
                 Route::put('', [BankAccountController::class, 'update']);
                 Route::post('verify-otp', [BankAccountController::class, 'verifyOtp']);
+                Route::post('resend-otp', [BankAccountController::class, 'resendOtp']);
             });
 
             Route::prefix('withdrawals')->group(function () {
