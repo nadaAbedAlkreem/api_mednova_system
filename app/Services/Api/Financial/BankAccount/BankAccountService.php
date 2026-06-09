@@ -79,7 +79,7 @@ class BankAccountService
         if (RateLimiter::tooManyAttempts($limiterKey, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($limiterKey);
             $minutes = ceil($seconds / 60);
-
+ 
             // يمكنك تمرير عدد الدقائق المتبقية لرسالة الخطأ إذا أردت
             throw new DomainException(__('messages.OTP_RESEND_LOCKED', ['minutes' => $minutes]));
         }

@@ -39,17 +39,17 @@ class ZoomWebhookController extends Controller
         Log::warning('Zoom webhook: ');
 
         // Handle Zoom URL validation challenge
-//        if ($request->input('event') === 'endpoint.url_validation') {
-//            $plainToken = $request->input('payload.plainToken');
-//            $encryptedToken = hash_hmac('sha256', $plainToken, config('services.zoom.secret_token_webhook'));
-//
-//            Log::info('Zoom webhook URL validation', ['plainToken' => $plainToken]);
-//
-//            return response()->json([
-//                'plainToken'     => $plainToken,
-//                'encryptedToken' => $encryptedToken,
-//            ]);
-//        }
+        if ($request->input('event') === 'endpoint.url_validation') {
+            $plainToken = $request->input('payload.plainToken');
+            $encryptedToken = hash_hmac('sha256', $plainToken, config('services.zoom.secret_token_webhook'));
+
+            Log::info('Zoom webhook URL validation', ['plainToken' => $plainToken]);
+
+            return response()->json([
+                'plainToken'     => $plainToken,
+                'encryptedToken' => $encryptedToken,
+            ]);
+        }
 
         // Verify Zoom signature for all other events
         $signature = $request->header('x-zm-signature');
