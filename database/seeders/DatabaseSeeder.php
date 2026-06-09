@@ -22,10 +22,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
        $this->call([
-//                AdminSeeder::class,
+                AdminSeeder::class,
 //           MedicalSpecialtieSeeder::class,
 //           DeviceSeeder::class,
-         PackageSeeder::class,
+//         PackageSeeder::class,
 
        ]);
         // جلب التخصصات التي تم إنشاؤها

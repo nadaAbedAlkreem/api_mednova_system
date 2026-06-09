@@ -52,7 +52,6 @@ class RehabilitationCenterController extends Controller
         $customer = $this->rehabilitationCenterService->store($data, $request['customer_id'], $request['specialty_id']);
         if(!$customer instanceof Customer ){
             throw new \Exception('Create Customer Failed');
-
         }
         return $this->successResponse(__('messages.CREATE_SUCCESS'),new CustomerResource($customer), 201,);
         }catch (\Exception $e) {
