@@ -26,6 +26,7 @@ class UserPackageResource extends JsonResource
                  'package' => new  PackageResource($this->whenLoaded('package')),
                  'starts_at' => $this->starts_at ,
                  'ends_at' => $this->ends_at ,
+                 'is_active' => $this->is_active ,
 
         ];
     }
