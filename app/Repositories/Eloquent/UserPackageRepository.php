@@ -23,10 +23,10 @@ class UserPackageRepository extends BaseRepository implements IUserPackageReposi
 
     public function getFilteredSubscribedUsers($today , array $filters = [], int $limit = 10 )
     {
-        $query = $this->model->with(['customer', 'package'])
-            ->where('is_active', 1)
-            ->where('starts_at', '<=', $today)
-            ->where('ends_at', '>=', $today);
+        $query = $this->model->with(['customer', 'package']);
+//            ->where('is_active', 1)
+//            ->where('starts_at', '<=', $today)
+//            ->where('ends_at', '>=', $today);
 
         // فلترة حسب اسم العميل
         if (!empty($filters['search'])) {

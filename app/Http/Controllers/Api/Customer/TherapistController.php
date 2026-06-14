@@ -43,15 +43,8 @@ class TherapistController extends Controller
     {
         DB::beginTransaction();
         try {
-//            $data = $request->getData();
             $data = $this->therapistService->prepare($request->validated(),null);
             $therapist = $this->therapistService->store($data ,$request['customer_id'] );
-//            $this->customerRepositories->update($data['customer'],$request['customer_id'] );
-//            $this->locationRepositories->create($data['location']);
-//            $therapist = $this->therapistRepositories->create($data['therapist']);
-//            $this->scheduleRepositories->create($data['schedule']);
-//            $therapist->load('customer');
-//            $therapist->customer->load(['location' ,'schedules','therapist' ,'therapist.specialty']);
         DB::commit();
                 return $this->successResponse(__('messages.CREATE_SUCCESS'), new CustomerResource($therapist->customer), 201,);
             } catch (\Exception $e) {
