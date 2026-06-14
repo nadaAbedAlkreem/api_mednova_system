@@ -50,15 +50,20 @@ class DisputeController extends Controller
                     'reference.patient:id,full_name',
                     'reference.consultant:id,full_name',
                     'openedBy:id,full_name',
+                    'reference' => function ($morphTo) {
+                        $morphTo->morphWith([
+                            ConsultationVideoRequest::class => ['activities'],
+                        ]);
+                    },
                 ])
                 ->orderByDesc('opened_at')
                 ->paginate($perPage);
-
-            $disputes->each(function ($dispute) {
-                if ($dispute->reference instanceof ConsultationVideoRequest) {
-                    $dispute->reference->loadMissing('activities');
-                }
-            });
+//
+//            $disputes->each(function ($dispute) {
+//                if ($dispute->reference instanceof ConsultationVideoRequest) {
+//                    $dispute->reference->loadMissing('activities');
+//                }
+//            });
 
             $summary = [
                 'total_frozen_amount' => number_format(

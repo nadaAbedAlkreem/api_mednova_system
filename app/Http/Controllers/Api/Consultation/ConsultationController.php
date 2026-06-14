@@ -53,8 +53,7 @@ class ConsultationController extends Controller
             $relation = ($request['consultant_type'] == ConsultantType::THERAPIST->value ) ? 'therapist' : 'rehabilitationCenter'  ;
             $price    = ($request['consultant_nature'] == ConsultationType::CHAT->value ) ? 'chat_consultation_price'  : 'video_consultation_price' ;
             $consultant = \App\Models\Customer::with($relation)->find($request['consultant_id']);
-            $breakdown = PaymentFeeCalculator::calculateTotal(
-                consultationPrice: $consultant->$relation->$price, cardType: CardType::DOMESTIC->value);
+            $breakdown = PaymentFeeCalculator::calculateTotal(consultationPrice: $consultant->$relation->$price, cardType: CardType::DOMESTIC->value);
             $consultation = $this->consultantService->createConsultationByType($request->getData(), $type,$breakdown);
             DB::commit();
             return $this->successResponse(__('messages.CREATE_SUCCESS'), new ConsultationResource($consultation), 201);
