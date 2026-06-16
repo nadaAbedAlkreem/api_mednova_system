@@ -96,7 +96,14 @@ class ConsultationPaymentIntentService
                 'amount' => $consultation->gross_amount,
                 'currency' => 512, // OMR code
                 'email' => $patient->email,
-                'redirect_url' => config('amwal.redirectUrl') . app()->getLocale() . '/payment?consultation_id=' . $consultation->id . '&type' . $type .'&payment_return=1',
+                'redirect_url' => config('amwal.redirectUrl')
+                    . app()->getLocale()
+                    . '/payment?'
+                    . http_build_query([
+                        'consultation_id' => $consultation->id,
+                        'type'            => $type,
+                        'payment_return'  => 1,
+                    ]),
                 'payment_method' => 0,
             ]);
 
