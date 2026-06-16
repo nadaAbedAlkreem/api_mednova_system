@@ -93,8 +93,8 @@ class StoreTherapistRequest extends FormRequest
                     }
                 }
             ],
-            'video_consultation_price' => ['required', 'numeric', 'min:0' , 'max:9999.999' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0'  , 'max:9999.999' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'video_consultation_price' => ['required', 'numeric', 'min:5' , 'max:9999.999' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:5'  , 'max:9999.999' ,'regex:/^\d{1,12}(\.\d{1,3})?$/'],
             'currency' => ['required', 'string', 'size:3'],
            ];
     }
