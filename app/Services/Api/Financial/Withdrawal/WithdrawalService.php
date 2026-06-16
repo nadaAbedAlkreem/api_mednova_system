@@ -36,14 +36,32 @@ class WithdrawalService
             throw new DomainException(__('messages.WITHDRAWAL_NO_VERIFIED_BANK_ACCOUNT'));
         }
 
-        $existing = $this->withdrawals->findPendingByOwner($user->id, get_class($user));
-
-        if ($existing) {
-            throw new DomainException(__('messages.WITHDRAWAL_PENDING_EXISTS'));
+        $minAmount = config('financial.withdrawal.min_amount', 5.000);
+        if ($amount < $minAmount) {
+            throw new DomainException(
+                __('messages.WITHDRAWAL_AMOUNT_TOO_LOW', [
+                    'min' => number_format($minAmount, 3, '.', ''),
+                ])
+            );
         }
+
+//        $existing = $this->withdrawals->findPendingByOwner($user->id, get_class($user));
+//
+//        if ($existing) {
+//            throw new DomainException(__('messages.WITHDRAWAL_PENDING_EXISTS'));
+//        }
 
         return DB::transaction(function () use ($user, $amount, $bankAccount) {
             $wallet = $this->wallets->getOrCreateByOwnerForUpdate($user->id);
+
+            $existingPending = $this->withdrawals->findPendingByOwner(
+                $user->id,
+                get_class($user)
+            );
+
+            if ($existingPending) {
+                throw new DomainException(__('messages.WITHDRAWAL_PENDING_EXISTS'));
+            }
 
             if ((float) $wallet->available_balance < $amount) {
                 throw new DomainException(__('messages.WITHDRAWAL_INSUFFICIENT_BALANCE'));

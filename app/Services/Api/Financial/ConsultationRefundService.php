@@ -10,6 +10,7 @@ use App\Enums\TransactionType;
 use App\Exceptions\InvalidRefundAmountException;
 use App\Models\Transaction;
 use App\Repositories\IWalletRepositories;
+use DomainException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -105,19 +106,36 @@ class ConsultationRefundService
 //        }
 
         // ---------------------------------------------------------------
-        // 6. التحقق من كفاية الرصيد
+        // 6. التحقق من كفاية الرصيد (الحارس يتطابق مع الرصيد المُخصَّم فعلياً)
         // ---------------------------------------------------------------
-        if ((float) $platformWallet->pending_balance < $refundAmount) {
-            Log::channel('financial')->critical('consultation.internal_refund_failed', [
-                'reason' => 'insufficient_platform_pending_balance',
-                'consultation_id' => $consultation->id,
-                'refund_amount' => $refundAmount,
-                'platform_pending_balance' => $platformWallet->pending_balance,
-                'platform_wallet_id' => $platformWallet->id,
-                'trace_id' => request()->header('X-Trace-ID'),
-            ]);
+        $fsValue = $consultation->financial_status instanceof \BackedEnum
+            ? $consultation->financial_status->value
+            : (string) $consultation->financial_status;
 
-            throw new HttpException(409, 'Insufficient platform pending balance for refund.');
+        if ($fsValue === FinancialStatus::FROZEN->value) {
+            if ((float) $platformWallet->frozen_balance < $refundAmount) {
+                Log::channel('financial')->critical('consultation.internal_refund_failed', [
+                    'reason'             => 'insufficient_platform_frozen_balance',
+                    'consultation_id'    => $consultation->id,
+                    'refund_amount'      => $refundAmount,
+                    'frozen_balance'     => $platformWallet->frozen_balance,
+                    'platform_wallet_id' => $platformWallet->id,
+                    'trace_id'           => request()->header('X-Trace-ID'),
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_FROZEN_BALANCE'));
+            }
+        } else {
+            if ((float) $platformWallet->pending_balance < $refundAmount) {
+                Log::channel('financial')->critical('consultation.internal_refund_failed', [
+                    'reason'             => 'insufficient_platform_pending_balance',
+                    'consultation_id'    => $consultation->id,
+                    'refund_amount'      => $refundAmount,
+                    'pending_balance'    => $platformWallet->pending_balance,
+                    'platform_wallet_id' => $platformWallet->id,
+                    'trace_id'           => request()->header('X-Trace-ID'),
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_PENDING_BALANCE'));
+            }
         }
 
 

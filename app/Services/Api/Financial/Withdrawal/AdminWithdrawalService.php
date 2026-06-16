@@ -54,6 +54,24 @@ class AdminWithdrawalService
 
             $wallet->decrement('pending_balance', (float) $withdrawal->amount);
 
+            $this->financialTransactionService->createWalletEntry(
+                reference:          $withdrawal,
+                gatewayPaymentId:   null,
+                transactionType:    TransactionType::WITHDRAWAL->value,
+                entryType:          EntryType::ENTRY_DEBIT->value,
+                walletId:           $wallet->id,
+                grossAmount:        (float) $withdrawal->amount,
+                netAmount:          (float) $withdrawal->amount,
+                currency:           $wallet->currency ?? 'OMR',
+                status:             AmountStatus::STATUS_AVAILABLE->value,
+                meta:               [
+                    'operation'          => 'withdrawal_transferred',
+                    'transfer_reference' => $data['transfer_reference'] ?? null,
+                    'admin_id'           => $admin->id,
+                    'processed_at'       => now()->toIso8601String(),
+                ],
+            );
+
             $storedPath = null;
             $fileHash   = null;
 

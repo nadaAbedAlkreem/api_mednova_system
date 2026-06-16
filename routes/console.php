@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
-Schedule::command('consultations:update-status')->everySecond();
+Schedule::command('consultations:update-status')->everyMinute()->withoutOverlapping();
 Schedule::command('app:update-video-consultation-status')->everyFiveSeconds();
 //Schedule::command('app:check-pairing-of-smart-glove')->everyFiveSeconds();
 //Schedule::command('app:check-pending-glove-commands')->everyFiveSeconds();
@@ -19,5 +19,13 @@ Schedule::job(new ReleaseSuspendedConsultationsJob)->everyFiveMinutes();
 Schedule::command('consultations:process-review-expiry')
          ->everyTenMinutes()
          ->withoutOverlapping()
+         ->runInBackground();
+
+Schedule::command('financial:audit')
+         ->dailyAt('03:00')
+         ->runInBackground();
+
+Schedule::command('monitor:failed-jobs')
+         ->dailyAt('03:15')
          ->runInBackground();
 

@@ -83,7 +83,7 @@ class UpdateConsultationStatusRequest extends FormRequest
 
         return [
             'id'                 => $idRules,
-            'status'             => 'required|in:accepted,cancelled,active,completed',
+            'status'             => 'required|in:accepted,cancelled',
             'consultant_nature'  => 'required|in:video,chat',
             'action_by'          => 'required_if:status,cancelled|nullable|in:patient,consultable',
             'action_reason'      => 'required_if:status,cancelled|nullable|string|max:500',
