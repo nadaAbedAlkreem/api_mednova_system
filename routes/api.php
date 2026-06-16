@@ -237,7 +237,6 @@ Route::prefix('control-panel')->group(function () {
         Route::prefix('subscription')->group(function () {
             Route::get('/subscribing-users', [UserPackageController::class, 'subscribedUsers']); // done
             Route::patch('/subscribing-users/{subscriberId}', [UserPackageController::class, 'accountDeactivation']); // حذف فيديوdone
-
         });
         Route::prefix('financial')->group(function () {
             Route::get('dashboard', [AdminFinancialController::class, 'dashboard']);

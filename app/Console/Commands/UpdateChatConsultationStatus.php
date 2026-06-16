@@ -7,6 +7,7 @@ use App\Events\ConsultationRequested;
 use App\Models\ConsultationChatRequest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UpdateChatConsultationStatus extends Command
 {
@@ -50,31 +51,38 @@ class UpdateChatConsultationStatus extends Command
             ->where($timeField, '<', now()->subHours(6))
             ->chunkById(100, function ($consultations) use ($now, $shouldRemind, $status, $timeField) {
                 foreach ($consultations as $consultation) {
-                    $timeValue = $consultation->$timeField;
-                    if (!($timeValue instanceof Carbon)) {
-                        $timeValue = Carbon::parse($timeValue);
-                    }
+                    try {
+                        $timeValue = $consultation->$timeField;
+                        if (!($timeValue instanceof Carbon)) {
+                            $timeValue = Carbon::parse($timeValue);
+                        }
 //                    $hoursSince = $timeValue->diffInSeconds($now);
-                    if ($timeValue) {
+                        if ($timeValue) {
 //                        $secondsSince = $now->getTimestamp() - $timeValue->getTimestamp();
-                        $hoursSince = $timeValue->diffInHours($now);
+                            $hoursSince = $timeValue->diffInHours($now);
 //                        $hoursSince = $now->getTimestamp() - $timeValue->getTimestamp();
 
-                    } else {
-                        continue;
-                    }
-                    $noMessages = $shouldRemind($consultation, $hoursSince);
-
-                    if ($noMessages) {
-                        $this->handleReminders($consultation, $hoursSince, $status);
-                    } else {
-                        // إذا كانت الجلسة نشطة يتم إنهاؤها بعد مدة معينة
-                        if ($status === 'active' && $hoursSince >= 24) { // يتم انهائها بعد مرور 24 ساعة
-                            $this->completeConsultation($consultation);
+                        } else {
+                            continue;
                         }
-                    }
-                    if ($consultation->isDirty()) {
-                        $consultation->save();
+                        $noMessages = $shouldRemind($consultation, $hoursSince);
+
+                        if ($noMessages) {
+                            $this->handleReminders($consultation, $hoursSince, $status);
+                        } else {
+                            // إذا كانت الجلسة نشطة يتم إنهاؤها بعد مدة معينة
+                            if ($status === 'active' && $hoursSince >= 24) { // يتم انهائها بعد مرور 24 ساعة
+                                $this->completeConsultation($consultation);
+                            }
+                        }
+                        if ($consultation->isDirty()) {
+                            $consultation->save();
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('chat.status.update.failed', [
+                            'consultation_id' => $consultation->id,
+                            'error'           => $e->getMessage(),
+                        ]);
                     }
                 }
             });
@@ -110,6 +118,24 @@ class UpdateChatConsultationStatus extends Command
 
     private function cancelConsultation($consultation, $reason)
     {
+        $fsValue = $consultation->financial_status instanceof \BackedEnum
+            ? $consultation->financial_status->value
+            : (string) $consultation->financial_status;
+
+        if (in_array($fsValue, [
+            FinancialStatus::HELD->value,
+            FinancialStatus::FROZEN->value,
+        ])) {
+            DB::transaction(function () use ($consultation) {
+                $locked = $consultation->newQuery()
+                    ->whereKey($consultation->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                app(\App\Services\Api\Financial\ConsultationRefundService::class)
+                    ->processInternalRefund($locked, 'auto_cancel_no_acceptance');
+            });
+        }
+
         $consultation->update([
             'status' => 'cancelled',
             'ended_at' => now(),
@@ -134,6 +160,19 @@ class UpdateChatConsultationStatus extends Command
         if ($consultation->status === 'completed') {
             return;
         }
+
+        $fsValue = $consultation->financial_status instanceof \BackedEnum
+            ? $consultation->financial_status->value
+            : (string) $consultation->financial_status;
+
+        if ($fsValue !== FinancialStatus::HELD->value) {
+            \Illuminate\Support\Facades\Log::warning('audit.review_window.skipped_not_held', [
+                'consultation_id'  => $consultation->id,
+                'financial_status' => $fsValue,
+            ]);
+            return;
+        }
+
         $endedAt = now();
         $consultation->update([
             'status' => 'completed',

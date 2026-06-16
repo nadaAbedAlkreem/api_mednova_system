@@ -431,6 +431,7 @@ return [
 
     // Withdrawal
     'WITHDRAWAL_NO_VERIFIED_BANK_ACCOUNT' => 'A verified bank account is required before requesting a withdrawal.',
+    'WITHDRAWAL_AMOUNT_TOO_LOW'           => 'Minimum withdrawal amount is :min OMR.',
     'WITHDRAWAL_PENDING_EXISTS' => 'You already have a withdrawal request under review. Please wait for it to be processed or cancel it first.',
     'WITHDRAWAL_INSUFFICIENT_BALANCE' => 'Insufficient available balance to complete the withdrawal request.',
     'WITHDRAWAL_NOT_FOUND' => 'Withdrawal request not found.',
@@ -463,4 +464,6 @@ return [
     'OTP_EXPIRED' => 'The verification code has expired. Please request a new one.',
     'OTP_INVALID' => 'The verification code is incorrect. Please try again.',
     'OTP_MAX_ATTEMPTS' => 'Maximum verification attempts exceeded. Please request a new code.',
+    'slot_already_booked' => 'This time slot is already booked. Please choose another time.',
+    'patient_id_mismatch' => 'The patient ID does not match the authenticated account.',
 ];

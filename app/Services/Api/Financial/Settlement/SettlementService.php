@@ -59,7 +59,26 @@ class SettlementService
         DB::transaction(function () use ($consultation, $price, $earning, $platform) {
 
             // Lock platform wallet FIRST, then consultant (deadlock prevention)
-            $platformWallet   = $this->wallets->getPlatformWallet();
+            $platformWallet = $this->wallets->getPlatformWallet();
+
+            // Re-fetch + lock consultation AFTER platform lock to prevent double-settlement
+            $consultation = $consultation->newQuery()
+                ->whereKey($consultation->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($consultation->financial_status instanceof \BackedEnum) {
+                $fsValue = $consultation->financial_status->value;
+            } else {
+                $fsValue = (string) $consultation->financial_status;
+            }
+
+            if ($fsValue !== FinancialStatus::REVIEW_WINDOW->value) {
+                throw new DomainException(
+                    __('messages.SETTLEMENT_REQUIRES_REVIEW_WINDOW')
+                );
+            }
+
             $consultantWallet = $this->wallets->getOrCreateByOwnerForUpdate(
                 $consultation->consultant_id
             );

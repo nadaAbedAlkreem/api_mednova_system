@@ -72,6 +72,10 @@ class StoreConsultationRequest extends FormRequest
 
                 $validator->errors()->add('consultant_id', __('messages.consultant_account'));
             }
+
+            if ((int) $this->input('patient_id') !== (int) $this->user('api')->id) {
+                $validator->errors()->add('patient_id', __('messages.patient_id_mismatch'));
+            }
 //           if ($consultant && $consultant->account_status !== AccountStatus::ACTIVE->value) {
 //                    $validator->errors()->add(
 //                        'consultant_id',
@@ -107,6 +111,21 @@ class StoreConsultationRequest extends FormRequest
                         ->whereIn('status', array_keys($statuses))
                         ->first();
                     if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
+
+                    \Illuminate\Support\Facades\DB::transaction(function () use ($validator, $requestedTimeUtc) {
+                        $slotTaken = \App\Models\AppointmentRequest::where('consultant_id', $this->consultant_id)
+                            ->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i:s'))
+                            ->whereNotIn('status', ['cancelled'])
+                            ->lockForUpdate()
+                            ->exists();
+
+                        if ($slotTaken) {
+                            $validator->errors()->add(
+                                'requested_time',
+                                __('messages.slot_already_booked')
+                            );
+                        }
+                    });
                     $nowPatientTime = Carbon::now($patientTimezone);
                     try {$requestedAt = Carbon::parse($this['requested_time']);} catch (\Exception $e) {
                         $validator->errors()->add(

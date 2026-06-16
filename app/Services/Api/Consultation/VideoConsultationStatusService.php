@@ -163,6 +163,18 @@ class VideoConsultationStatusService
             return;
         }
 
+        $fsValue = $consultation->financial_status instanceof \BackedEnum
+            ? $consultation->financial_status->value
+            : (string) $consultation->financial_status;
+
+        if ($fsValue !== FinancialStatus::HELD->value) {
+            Log::warning('audit.review_window.skipped_not_held', [
+                'consultation_id'  => $consultation->id,
+                'financial_status' => $fsValue,
+            ]);
+            return;
+        }
+
         $endedAt = now();
 
         DB::transaction(function () use ($consultation, $endedAt) {
@@ -224,6 +236,24 @@ class VideoConsultationStatusService
 
     public function cancel($consultation, string $reason): void
     {
+        $fsValue = $consultation->financial_status instanceof \BackedEnum
+            ? $consultation->financial_status->value
+            : (string) $consultation->financial_status;
+
+        if (in_array($fsValue, [
+            FinancialStatus::HELD->value,
+            FinancialStatus::FROZEN->value,
+        ])) {
+            DB::transaction(function () use ($consultation) {
+                $locked = $consultation->newQuery()
+                    ->whereKey($consultation->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                app(\App\Services\Api\Financial\ConsultationRefundService::class)
+                    ->processInternalRefund($locked, 'auto_cancel_no_acceptance');
+            });
+        }
+
         $consultation->appointmentRequest->update([
             'status' => 'cancelled',
             'is_finished' =>true,

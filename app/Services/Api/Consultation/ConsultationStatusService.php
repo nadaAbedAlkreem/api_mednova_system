@@ -91,21 +91,49 @@ class ConsultationStatusService
      */
     private function handleCancellation($consultation, string $type): string
     {
-        \Illuminate\Support\Facades\Log::channel('financial')->info('type' . $type);
-        $consultation = $consultation->newQuery()->whereKey($consultation->id)->lockForUpdate()->firstOrFail();
+//        \Illuminate\Support\Facades\Log::channel('financial')->info('type' . $type);
+//        $consultation = $consultation->newQuery()->whereKey($consultation->id)->lockForUpdate()->firstOrFail();
+//        $actor = $type === 'patient' ? $consultation->patient : $consultation->consultant;
+//        $messageKey = $type === 'patient' ? 'messages.CANCEL_REQUEST_PATIENT' : 'messages.CANCEL_REQUEST_CONSULTANT';
+//        $eventType = $type === 'patient' ? 'cancelled_by_patient' : 'cancelled_by_consultant';
+//        $message = __($messageKey, ['name' => $actor->full_name]);
+//        $this->refundService->processInternalRefund($consultation);
+//        $amountFormatted = number_format($consultation->consultation_price, 3);
+//        $patientMessage    = __('messages.refund_issued', [
+//                'amount'   => $amountFormatted,
+//                'currency' => config('amwal.currency_en') ?? 'OMR',
+//            ]);
+//        event(new ConsultationRequested($consultation, $message, $eventType));
+//        event(new ConsultationRequested($consultation, $patientMessage,    'refund_issued'));
+        $consultation = $consultation->newQuery()
+            ->whereKey($consultation->id)
+            ->lockForUpdate()
+            ->firstOrFail();
+
         $actor = $type === 'patient' ? $consultation->patient : $consultation->consultant;
+
         $messageKey = $type === 'patient' ? 'messages.CANCEL_REQUEST_PATIENT' : 'messages.CANCEL_REQUEST_CONSULTANT';
-        $eventType = $type === 'patient' ? 'cancelled_by_patient' : 'cancelled_by_consultant';
+        $eventType  = $type === 'patient' ? 'cancelled_by_patient' : 'cancelled_by_consultant';
         $message = __($messageKey, ['name' => $actor->full_name]);
-        $this->refundService->processInternalRefund($consultation);
-        $amountFormatted = number_format($consultation->consultation_price, 3);
-        $patientMessage    = __('messages.refund_issued', [
-                'amount'   => $amountFormatted,
+
+        // ── هل الاستشارة مدفوعة؟ ─────────────────────────────
+        $fsValue = $consultation->financial_status instanceof \BackedEnum ? $consultation->financial_status->value : (string) $consultation->financial_status;
+        $isPaid = in_array($fsValue, [
+            \App\Enums\FinancialStatus::HELD->value,
+            \App\Enums\FinancialStatus::FROZEN->value,
+        ]);
+
+        // ── استرداد فقط إذا كانت مدفوعة ─────────────────────
+        if ($isPaid) {
+            $this->refundService->processInternalRefund($consultation);
+            $patientMessage = __('messages.refund_issued', [
+                'amount'   => number_format($consultation->consultation_price, 3),
                 'currency' => config('amwal.currency_en') ?? 'OMR',
             ]);
+            event(new ConsultationRequested($consultation, $patientMessage, 'refund_issued'));
+        }
+        // ── إشعار الإلغاء دائماً ────────────────────────────
         event(new ConsultationRequested($consultation, $message, $eventType));
-        event(new ConsultationRequested($consultation, $patientMessage,    'refund_issued'));
-
         return $message;
     }
 

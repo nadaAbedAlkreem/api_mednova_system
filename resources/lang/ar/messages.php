@@ -533,6 +533,7 @@ return [
 
     // Withdrawal
     'WITHDRAWAL_NO_VERIFIED_BANK_ACCOUNT' => 'يجب إضافة حساب بنكي موثق قبل طلب السحب.',
+    'WITHDRAWAL_AMOUNT_TOO_LOW'           => 'الحد الأدنى للسحب هو :min ريال عماني.',
     'WITHDRAWAL_PENDING_EXISTS'           => 'لديك طلب سحب قيد المراجعة. يرجى انتظار معالجته أو إلغاؤه أولاً.',
     'WITHDRAWAL_INSUFFICIENT_BALANCE'     => 'الرصيد المتاح غير كافٍ لإتمام طلب السحب.',
     'WITHDRAWAL_NOT_FOUND'                => 'طلب السحب غير موجود.',
@@ -569,4 +570,6 @@ return [
 
     'OTP_RESEND_LOCKED' => 'لقد تجاوزت حد إعادة الإرسال المسموح به. يرجى الانتظار :minutes دقائق قبل المحاولة مرة أخرى.',
     'OTP_RESENT_SUCCESSFULLY' => 'تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني.',
+    'slot_already_booked' => 'هذا الموعد محجوز بالفعل، يرجى اختيار وقت آخر.',
+    'patient_id_mismatch' => 'معرف المريض لا يطابق الحساب الحالي.',
 ];
