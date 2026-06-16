@@ -57,8 +57,8 @@ class StoreRehabilitationCenterRequest extends FormRequest
 //            ///schedule
             'day_of_week' => 'required|array',
             'day_of_week.*' => 'string|in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'video_consultation_price' => ['required', 'numeric', 'min:0'  , 'max:9999.999','regex:/^\d{1,12}(\.\d{1,3})?$/'],
-            'chat_consultation_price' => ['required', 'numeric', 'min:0'  , 'max:9999.999','regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'video_consultation_price' => ['required', 'numeric', 'min:5'  , 'max:9999.999','regex:/^\d{1,12}(\.\d{1,3})?$/'],
+            'chat_consultation_price' => ['required', 'numeric', 'min:5'  , 'max:9999.999','regex:/^\d{1,12}(\.\d{1,3})?$/'],
             'currency' => ['required', 'string', 'size:3'],
 
             'start_time_morning' => [
