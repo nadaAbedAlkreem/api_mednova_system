@@ -82,8 +82,11 @@ class AmwalPayService
             $body = $response->json();
 
             if (!($body['success'] ?? false)) {
+                Log::channel('financial')->warning('payment_intent.Amwal Pay ', ['$payload' => $body['message']]);
+
                 throw new \Exception('Amwal Pay error: ' . ($body['message'] ?? 'Unknown'));
             }
+
 
             return (object)[
                 'success'     => true,
