@@ -130,15 +130,28 @@ class ConsultationPaymentIntentService
                 'initiated_lock' => null,
             ], $gatewayPayment->id);
 
+            $responseBody = null;
+            $statusCode = null;
+            $requestPayload = null;
+
+            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $responseBody = json_decode($response->getBody()->getContents(), true)
+                    ?? $response->getBody()->getContents();
+            }
+
             Log::channel('financial')->error('payment_intent.failed', [
                 'gateway_payment_id' => $gatewayPayment->id,
-                'consultation_id' => $consultation->id,
-                'consultation_type' => get_class($consultation),
-                'patient_id' => $patient->id,
-                'error' => $e->getMessage(),
-            ]);
-            Log::channel('financial')->error('amwal.request_payload', [
-                'response_body' => $e->getResponse()?->getBody()?->getContents(), // رسالة الخطأ من Amwal
+                'consultation_id'    => $consultation->id,
+                'consultation_type'  => get_class($consultation),
+                'patient_id'         => $patient->id,
+                'error'              => $e->getMessage(),
+                // ── إضافات جديدة ──────────────────────────
+                'http_status'        => $statusCode,
+                'gateway_response'   => $responseBody,   // ← رسالة Amwal الدقيقة
+                'exception_class'    => get_class($e),
+                'trace'              => $e->getTraceAsString(), // اختياري في production
             ]);
 
             // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
