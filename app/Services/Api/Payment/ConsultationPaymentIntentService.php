@@ -129,33 +129,47 @@ class ConsultationPaymentIntentService
                 'status' => 'failed',
                 'initiated_lock' => null,
             ], $gatewayPayment->id);
-            $gatewayResponse = null;
-            $statusCode = null;
-
-            if ($e instanceof \App\Exceptions\GatewayException) {
-                $gatewayResponse = $e->getResponseBody(); // أو getResponse() حسب الكلاس
-                $statusCode = $e->getStatusCode();
-            } elseif ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
-                $statusCode = $e->getResponse()->getStatusCode();
-                $gatewayResponse = json_decode(
-                    $e->getResponse()->getBody()->getContents(), true
-                );
-            }
 
             Log::channel('financial')->error('payment_intent.failed', [
                 'gateway_payment_id' => $gatewayPayment->id,
-                'consultation_id'    => $consultation->id,
-                'error'              => $e->getMessage(),
-                'http_status'        => $statusCode,
-                'gateway_response'   => $gatewayResponse, // ← هنا رسالة Amwal الحقيقية
-                'exception_class'    => get_class($e),
+                'consultation_id' => $consultation->id,
+                'consultation_type' => get_class($consultation),
+                'patient_id' => $patient->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(), // مهم للتشخيص
             ]);
 
+            // 👇 تحويل الخطأ لرسالة مفهومة
+            throw new \Exception(
+                $this->mapGatewayError($e),
+                $e->getCode()
+            );
             // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
-            throw $e;
         }
     }
+    private function mapGatewayError(\Exception $e): string
+    {
+        $message = strtolower($e->getMessage());
 
+        return match (true) {
+
+            str_contains($message, 'timeout') =>
+            'بوابة الدفع لم تستجب في الوقت المناسب، حاول مرة أخرى.',
+
+            str_contains($message, 'connection') =>
+            'تعذر الاتصال ببوابة الدفع، تحقق من الاتصال بالخدمة.',
+
+            str_contains($message, 'unauthorized') ||
+            str_contains($message, '401') =>
+            'فشل في التحقق من بيانات بوابة الدفع.',
+
+            str_contains($message, 'invalid') =>
+            'بيانات الدفع غير صحيحة.',
+
+            default =>
+            'حدث خطأ أثناء إنشاء رابط الدفع. يرجى المحاولة لاحقًا.'
+        };
+    }
     private function generateBillerRef(object $consultation): string
     {
         $type = str_contains(get_class($consultation), 'Chat') ? 'CHAT' : 'VIDEO';
