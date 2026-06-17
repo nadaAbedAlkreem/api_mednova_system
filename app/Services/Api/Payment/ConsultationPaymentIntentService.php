@@ -86,7 +86,7 @@ class ConsultationPaymentIntentService
             'status' => GatewayPaymentStatus::INITIATED->value ?? 'initiated',
             'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
         ]);
-        $url = config('amwal.redirectUrl') . app()->getLocale() . '/profile/consultations/' . $type . '/' . $consultation->id ;
+        $url = config('amwal.redirectUrl') . app()->getLocale() . '/payment?consultation_id=' . $consultation->id . '&type=' . $type . '&payment_return=1' ;
         Log::channel('financial')->warning('payment_intent.initiated', ['url' => $url]);
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
         try {
@@ -96,7 +96,7 @@ class ConsultationPaymentIntentService
                 'amount' => $consultation->gross_amount,
                 'currency' => 512, // OMR code
                 'email' => $patient->email,
-                'redirect_url' => config('amwal.redirectUrl') . app()->getLocale() . '/profile/consultations/' . $type . '/' . $consultation->id,
+                'redirect_url' =>config('amwal.redirectUrl') . app()->getLocale() . '/payment?consultation_id=' . $consultation->id . '&type=' . $type . '&payment_return=1',
                 'payment_method' => 0,
             ]);
 
