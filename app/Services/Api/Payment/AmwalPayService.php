@@ -65,6 +65,8 @@ class AmwalPayService
                 'paymentViewType'        => 1,
                 'redirectUrl'            => $redirectUrl,
             ];
+            Log::channel('financial')->warning('payment_intent.$payload', ['$payload' => $payload]);
+
 
             // ✅ نفس طريقة الكود القديم: hash على كل الـ payload
             $payload['secureHashValue'] = $this->generateSecureHash($payload);
