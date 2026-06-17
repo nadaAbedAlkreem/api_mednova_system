@@ -137,6 +137,9 @@ class ConsultationPaymentIntentService
                 'patient_id' => $patient->id,
                 'error' => $e->getMessage(),
             ]);
+            Log::channel('financial')->error('amwal.request_payload', [
+                'response_body' => $e->getResponse()?->getBody()?->getContents(), // رسالة الخطأ من Amwal
+            ]);
 
             // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
             throw $e;
