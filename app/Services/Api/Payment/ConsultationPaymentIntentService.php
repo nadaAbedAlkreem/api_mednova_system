@@ -129,29 +129,26 @@ class ConsultationPaymentIntentService
                 'status' => 'failed',
                 'initiated_lock' => null,
             ], $gatewayPayment->id);
-
-            $responseBody = null;
+            $gatewayResponse = null;
             $statusCode = null;
-            $requestPayload = null;
 
-            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
-                $response = $e->getResponse();
-                $statusCode = $response->getStatusCode();
-                $responseBody = json_decode($response->getBody()->getContents(), true)
-                    ?? $response->getBody()->getContents();
+            if ($e instanceof \App\Exceptions\GatewayException) {
+                $gatewayResponse = $e->getResponseBody(); // أو getResponse() حسب الكلاس
+                $statusCode = $e->getStatusCode();
+            } elseif ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $gatewayResponse = json_decode(
+                    $e->getResponse()->getBody()->getContents(), true
+                );
             }
 
             Log::channel('financial')->error('payment_intent.failed', [
                 'gateway_payment_id' => $gatewayPayment->id,
                 'consultation_id'    => $consultation->id,
-                'consultation_type'  => get_class($consultation),
-                'patient_id'         => $patient->id,
                 'error'              => $e->getMessage(),
-                // ── إضافات جديدة ──────────────────────────
                 'http_status'        => $statusCode,
-                'gateway_response'   => $responseBody,   // ← رسالة Amwal الدقيقة
+                'gateway_response'   => $gatewayResponse, // ← هنا رسالة Amwal الحقيقية
                 'exception_class'    => get_class($e),
-                'trace'              => $e->getTraceAsString(), // اختياري في production
             ]);
 
             // إعادة رمي الاستثناء للتعامل معه في الطبقة العليا
