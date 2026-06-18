@@ -87,12 +87,18 @@ class ConsultationPaymentIntentService
             'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
         ]);
 //        $url = config('amwal.redirectUrl') . app()->getLocale() . '/payment?consultation_id=' . $consultation->id . '&type=' . $type . '&payment_return=1' ;
-        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment', [
-            'consultation_id' => $consultation->id,
-            'type' => $type,
-            'payment_return' => 1,
-        ]);
-        Log::channel('financial')->warning('payment_intent.initiated', ['url' => $url]);
+//        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment', [
+//            'consultation_id' => $consultation->id,
+//            'type' => $type,
+//            'payment_return' => 1,
+//        ]);
+        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment')
+            . '?' . http_build_query([
+                'consultation_id' => $consultation->id,
+                'type' => $type,
+                'payment_return' => 1,
+            ]);
+        Log::channel('financial')->warning('payment_intent.initiated_url', ['url' => $url]);
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
         try {
             $response = $this->gateway->createPaymentLink([
