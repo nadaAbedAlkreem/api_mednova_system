@@ -92,12 +92,7 @@ class ConsultationPaymentIntentService
 //            'type' => $type,
 //            'payment_return' => 1,
 //        ]);
-        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment')
-            . '?' . http_build_query([
-                'consultation_id' => $consultation->id,
-                'type' => $type,
-                'payment_return' => 1,
-            ]);
+        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment');
         Log::channel('financial')->warning('payment_intent.initiated_url', ['url' => $url]);
         // ── Step 3: استدعاء Amwal Pay ────────────────────────────────────────
         try {
