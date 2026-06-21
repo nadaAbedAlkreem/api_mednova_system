@@ -10,6 +10,7 @@ use App\Exceptions\ConsultationNotPayableException;
 use App\Models\Customer;
 use App\Repositories\IGatewayPaymentRepositories;
 use HttpException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ConsultationPaymentIntentService
@@ -45,47 +46,58 @@ class ConsultationPaymentIntentService
                 "Consultation {$consultation->id} status is '{$consultation->financial_status}', expected 'unpaid'"
             );
         }
-
-        // ✅ Logging
-        $existing = $this->gatewayPayments->findInitiatedForReference(
-            get_class($consultation),
-            $consultation->id
-        );
-
-        if ($existing) {
-            if ($existing->created_at->diffInMinutes(now()) < 30) {
-                return [
-                    'checkout_url' => $existing->payload['checkout_url'],
-                    'gateway_payment_id' => $existing->id,
-                    'biller_ref' => $existing->gateway_reference,
-                ];
-            }
-            $this->gatewayPayments->update([
-                'status' => 'expired',
-                'initiated_lock' => null,
-            ], $existing->id);
+        if (empty($consultation->gross_amount) || $consultation->gross_amount <= 0) {
+            throw new \Exception("Consultation {$consultation->id} has invalid amount: {$consultation->gross_amount}");
         }
 
-        // ── Step 1: توليد biller_ref فريد ───────────────────────────────────
-        // Format: CONS-{TYPE}-{id}-{timestamp}
-        // مثال:   CONS-CHAT-42-1737123456
-        $billerRef = $this->generateBillerRef($consultation);
+        // ── Steps 1 & 2: serialized inside a transaction so concurrent requests
+        //   block on lockForUpdate and only one proceeds to create a gateway_payment.
+        $intentResult = DB::transaction(function () use ($consultation, $purpose) {
+            $existing = $this->gatewayPayments->findInitiatedForReference(
+                get_class($consultation),
+                $consultation->id
+            );
 
-        // ── Step 2: إنشاء gateway_payment بـ status = initiated ─────────────
-        // مهم: يُنشأ قبل استدعاء البوابة — إذا فشلت البوابة يبقى سجل للـ audit
-        $gatewayPayment = $this->gatewayPayments->create([
-            'reference_type' => get_class($consultation),
-            'reference_id' => $consultation->id,
-            'gateway' => 'amwal',
-            'gateway_reference' => $billerRef,
-            'payment_method' => PaymentMethodType::METHOD_CARD->value ?? 'card',
-            'purpose' => $purpose,
-            'amount' => $consultation->gross_amount,
-            'net_received_amount' => $consultation->consultation_price,
-            'currency' => config('amwal.currency_en') ?? 'OMR',
-            'status' => GatewayPaymentStatus::INITIATED->value ?? 'initiated',
-            'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
-        ]);
+            if ($existing) {
+                if ($existing->created_at->diffInMinutes(now()) < 30) {
+                    return ['existing' => $existing];
+                }
+                $this->gatewayPayments->update([
+                    'status' => 'expired',
+                    'initiated_lock' => null,
+                ], $existing->id);
+            }
+
+            $billerRef = $this->generateBillerRef($consultation);
+
+            $gatewayPayment = $this->gatewayPayments->create([
+                'reference_type' => get_class($consultation),
+                'reference_id' => $consultation->id,
+                'gateway' => 'amwal',
+                'gateway_reference' => $billerRef,
+                'payment_method' => PaymentMethodType::METHOD_CARD->value ?? 'card',
+                'purpose' => $purpose,
+                'amount' => $consultation->gross_amount,
+                'net_received_amount' => $consultation->consultation_price,
+                'currency' => config('amwal.currency_en') ?? 'OMR',
+                'status' => GatewayPaymentStatus::INITIATED->value ?? 'initiated',
+                'initiated_lock' => get_class($consultation) . '-' . $consultation->id,
+            ]);
+
+            return ['new' => $gatewayPayment, 'biller_ref' => $billerRef];
+        });
+
+        if (isset($intentResult['existing'])) {
+            $existing = $intentResult['existing'];
+            return [
+                'checkout_url' => $existing->payload['checkout_url'],
+                'gateway_payment_id' => $existing->id,
+                'biller_ref' => $existing->gateway_reference,
+            ];
+        }
+
+        $gatewayPayment = $intentResult['new'];
+        $billerRef = $intentResult['biller_ref'];
 //        $url = config('amwal.redirectUrl') . app()->getLocale() . '/payment?consultation_id=' . $consultation->id . '&type=' . $type . '&payment_return=1' ;
 //        $url = url(config('amwal.redirectUrl') . app()->getLocale() . '/payment', [
 //            'consultation_id' => $consultation->id,
@@ -142,7 +154,6 @@ class ConsultationPaymentIntentService
                 'trace' => $e->getTraceAsString(), // مهم للتشخيص
             ]);
 
-            // 👇 تحويل الخطأ لرسالة مفهومة
             throw new \Exception(
                 $this->mapGatewayError($e),
                 $e->getCode()

@@ -88,6 +88,12 @@ class GatewayPaymentController extends Controller
 
         } catch (ConsultationNotPayableException) {
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => 'This consultation cannot be paid at this time'], 422);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            Log::channel('financial')->warning('payment_intent.duplicate_initiated', [
+                'consultation_id' => $id,
+                'consultation_type' => $type,
+            ]);
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => 'A payment is already being processed for this consultation.'], 409);
         } catch (GatewayException $e) {
             Log::channel('financial')->error('payment_intent.gateway_error', [
                 'consultation_id' => $id,

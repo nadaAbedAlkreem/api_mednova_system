@@ -71,6 +71,14 @@ readonly class ConsultationWebhookService
             throw new HttpException(422, 'Invalid consultation reference on payment.');
         }
 
+        if ((string)$consultation->financial_status === FinancialStatus::HELD->value) {
+            Log::channel('financial')->info('consultation_webhook.ignored_already_held', [
+                'consultation_id'    => $consultation->id,
+                'gateway_payment_id' => $gatewayPayment->id,
+            ]);
+            return;
+        }
+
         $updated = $this->gatewayPayments->updateWhere([
             'status' => GatewayPaymentStatus::CAPTURED->value,
             'gateway_transaction_id' => (string)$payload['SystemReference'],

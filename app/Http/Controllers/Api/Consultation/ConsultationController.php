@@ -62,7 +62,9 @@ class ConsultationController extends Controller
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), [
                 'error' => $e->getMessage(),
             ], 403);
-
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            DB::rollBack();
+            return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['requested_time' => [__('messages.slot_already_booked')]], 422);
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $exception->getMessage()], 500);

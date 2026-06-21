@@ -56,6 +56,13 @@ class AmwalWebhookController extends Controller
             return response()->json([
                 'message' => $exception->getMessage(),
             ], $exception->getStatusCode());
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $exception) {
+            Log::channel('financial')->warning('webhook_duplicate_constraint', [
+                'message' => $exception->getMessage(),
+            ]);
+            return response()->json([
+                'message' => 'Duplicate webhook rejected.',
+            ], 409);
         } catch (\Throwable $exception) {
             report($exception);
             Log::channel('financial')->warning('webhook_http_exception', [

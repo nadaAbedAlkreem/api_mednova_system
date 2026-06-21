@@ -141,7 +141,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('update', [LocationController::class, 'update']);
     });
     Route::middleware('check.account')->prefix('consultation-request')->group(function () {
-        Route::prefix('payment-gateway')->group(function () {
+        Route::prefix('payment-gateway')->middleware('throttle:5,1')->group(function () {
             Route::post('create-link-payment/{type}/{id}', [GatewayPaymentController::class, '__invoke']);
         });
         Route::get('/consultant/{id}/{type}', [ConsultationController::class, 'show'])->whereNumber('id');
