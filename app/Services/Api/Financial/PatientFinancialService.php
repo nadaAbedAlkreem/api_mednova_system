@@ -119,7 +119,7 @@ class PatientFinancialService
                 GatewayPaymentStatus::AUTHORIZED->value,
             ])
             ->whereNull('deleted_at')
-            ->with(['reference' => MorphTo::constrain([
+            ->with(['reference' => fn (MorphTo $morphTo) => $morphTo->constrain([
                 ConsultationChatRequest::class  => fn ($q) => $q->with('consultant:id,full_name'),
                 ConsultationVideoRequest::class => fn ($q) => $q->with('consultant:id,full_name'),
             ])])
@@ -155,7 +155,7 @@ class PatientFinancialService
             ->where('wallet_id', $wallet->id)
             ->whereIn('transaction_type', array_map(fn ($type) => $type->value, TransactionType::visibleForPatient()))
             ->whereNull('deleted_at')
-            ->with(['reference' => MorphTo::constrain([
+            ->with(['reference' => fn (MorphTo $morphTo) => $morphTo->constrain([
                 ConsultationChatRequest::class  => fn ($q) => $q->with('consultant:id,full_name'),
                 ConsultationVideoRequest::class => fn ($q) => $q->with('consultant:id,full_name'),
                 // WithdrawalRequest intentionally omitted — it has no consultant relation
