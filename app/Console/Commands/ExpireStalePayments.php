@@ -25,10 +25,10 @@ class ExpireStalePayments extends Command
      */
     public function handle()
     {
-        GatewayPayment::where('status', 'pending')
-            ->where('created_at', '<', now()->subMinutes(15))
-            ->update(['status' => 'expired']);
-
-        $this->info('Stale payments expired successfully.');
+//        GatewayPayment::where('status', 'pending')
+//            ->where('created_at', '<', now()->subMinutes(15))
+//            ->update(['status' => 'expired']);
+//
+//        $this->info('Stale payments expired successfully.');
     }
 }

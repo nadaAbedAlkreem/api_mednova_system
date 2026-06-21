@@ -84,6 +84,14 @@ class ConsultantService
             } elseif ($type === 'video') {
                 if (isset($data['requested_time'])) {
                     $data['confirmed_end_time'] = Carbon::parse($data['requested_time'])->addMinutes(60);
+                    $slotTaken = \App\Models\AppointmentRequest::where('consultant_id', $data['consultant_id'])
+                        ->where('requested_time', Carbon::parse($data['requested_time'])->format('Y-m-d H:i:s'))
+                        ->whereNotIn('status', ['cancelled'])
+                        ->lockForUpdate()
+                        ->exists();
+                    if ($slotTaken) {
+                        throw new \Exception(__('messages.slot_already_booked'));
+                    }
                 }
                 $appointment = $this->appointmentRepo->create($data);
                 $data['appointment_request_id'] = $appointment->id;

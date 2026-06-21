@@ -14,6 +14,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -118,7 +119,10 @@ class PatientFinancialService
                 GatewayPaymentStatus::AUTHORIZED->value,
             ])
             ->whereNull('deleted_at')
-            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
+            ->with(['reference' => MorphTo::constrain([
+                ConsultationChatRequest::class  => fn ($q) => $q->with('consultant:id,full_name'),
+                ConsultationVideoRequest::class => fn ($q) => $q->with('consultant:id,full_name'),
+            ])])
             ->orderByDesc('created_at')
             ->paginate($perPage);
 
@@ -151,7 +155,11 @@ class PatientFinancialService
             ->where('wallet_id', $wallet->id)
             ->whereIn('transaction_type', array_map(fn ($type) => $type->value, TransactionType::visibleForPatient()))
             ->whereNull('deleted_at')
-            ->with(['reference' => fn ($q) => $q->with('consultant:id,full_name')])
+            ->with(['reference' => MorphTo::constrain([
+                ConsultationChatRequest::class  => fn ($q) => $q->with('consultant:id,full_name'),
+                ConsultationVideoRequest::class => fn ($q) => $q->with('consultant:id,full_name'),
+                // WithdrawalRequest intentionally omitted — it has no consultant relation
+            ])])
             ->orderByDesc('created_at')
             ->paginate($perPage);
     }

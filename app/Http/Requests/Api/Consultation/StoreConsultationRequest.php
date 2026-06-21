@@ -112,20 +112,14 @@ class StoreConsultationRequest extends FormRequest
                         ->first();
                     if ($exists) {$validator->errors()->add('duplicate_request', $statuses[$exists->status]);}
 
-                    \Illuminate\Support\Facades\DB::transaction(function () use ($validator, $requestedTimeUtc) {
-                        $slotTaken = \App\Models\AppointmentRequest::where('consultant_id', $this->consultant_id)
-                            ->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i:s'))
-                            ->whereNotIn('status', ['cancelled'])
-                            ->lockForUpdate()
-                            ->exists();
+                    $slotTaken = \App\Models\AppointmentRequest::where('consultant_id', $this->consultant_id)
+                        ->where('requested_time', $requestedTimeUtc->format('Y-m-d H:i:s'))
+                        ->whereNotIn('status', ['cancelled'])
+                        ->exists();
 
-                        if ($slotTaken) {
-                            $validator->errors()->add(
-                                'requested_time',
-                                __('messages.slot_already_booked')
-                            );
-                        }
-                    });
+                    if ($slotTaken) {
+                        $validator->errors()->add('requested_time', __('messages.slot_already_booked'));
+                    }
                     $nowPatientTime = Carbon::now($patientTimezone);
                     try {$requestedAt = Carbon::parse($this['requested_time']);} catch (\Exception $e) {
                         $validator->errors()->add(

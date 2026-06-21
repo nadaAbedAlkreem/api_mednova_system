@@ -31,6 +31,7 @@ class GatewayPaymentRepository extends BaseRepository implements  IGatewayPaymen
         return GatewayPayment::where('reference_type', $referenceType)
             ->where('reference_id', $referenceId)
             ->where('status', 'initiated')
+            ->lockForUpdate()
             ->latest()
             ->first();
     }
