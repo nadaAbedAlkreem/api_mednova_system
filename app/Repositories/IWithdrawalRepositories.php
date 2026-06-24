@@ -11,6 +11,8 @@ interface IWithdrawalRepositories
 
     public function findById(int $id): ?WithdrawalRequest;
 
+    public function findByIdForUpdate(int $id): ?WithdrawalRequest;
+
     public function findPendingByOwner(int $ownerId, string $ownerType): ?WithdrawalRequest;
 
     public function getByOwner(int $ownerId, string $ownerType, int $perPage): LengthAwarePaginator;

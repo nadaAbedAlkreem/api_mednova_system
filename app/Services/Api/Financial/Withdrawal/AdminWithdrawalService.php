@@ -57,7 +57,7 @@ class AdminWithdrawalService
             $this->financialTransactionService->createWalletEntry(
                 reference:          $withdrawal,
                 gatewayPaymentId:   null,
-                transactionType:    TransactionType::WITHDRAWAL->value,
+                transactionType:    TransactionType::WITHDRAWAL_TRANSFER->value,
                 entryType:          EntryType::ENTRY_DEBIT->value,
                 walletId:           $wallet->id,
                 grossAmount:        (float) $withdrawal->amount,

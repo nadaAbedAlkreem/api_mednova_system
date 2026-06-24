@@ -15,7 +15,7 @@ use App\Repositories\IWalletRepositories;
 use App\Repositories\IWithdrawalRepositories;
 use App\Services\Api\Financial\FinancialTransactionService;
 use DomainException;
-use Illuminate\Container\Attributes\Log;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -67,7 +67,17 @@ class WithdrawalService
                 throw new DomainException(__('messages.WITHDRAWAL_INSUFFICIENT_BALANCE'));
             }
 
-            $wallet->decrement('available_balance', $amount);
+            // Guarded decrement: SQL WHERE rejects the update if available_balance
+            // dropped between the PHP check above and this statement.
+            $decremented = DB::table($wallet->getTable())
+                ->where('id', $wallet->id)
+                ->where('available_balance', '>=', $amount)
+                ->decrement('available_balance', $amount);
+
+            if ($decremented === 0) {
+                throw new DomainException(__('messages.WITHDRAWAL_INSUFFICIENT_BALANCE'));
+            }
+
             $wallet->increment('pending_balance', $amount);
 
             $withdrawal = $this->withdrawals->createWithdrawal([
@@ -83,7 +93,7 @@ class WithdrawalService
             $this->financialTransactionService->createWalletEntry(
                 reference: $withdrawal,
                 gatewayPaymentId: null,
-                transactionType: TransactionType::WITHDRAWAL->value,
+                transactionType: TransactionType::WITHDRAWAL_REQUEST->value,
                 entryType: EntryType::ENTRY_DEBIT->value,
                 walletId: $wallet->id,
                 grossAmount: $amount,
@@ -98,7 +108,7 @@ class WithdrawalService
 
             DB::afterCommit(function () use ($user, $withdrawal) {
                 $formatted = number_format((float) $withdrawal->amount, 3, '.', '');
-                \Illuminate\Support\Facades\Log::info(' service  ');
+                Log::info('withdrawal_requested', ['withdrawal_id' => $withdrawal->id]);
 
                 event(new WithdrawalStatusChanged(
                     $withdrawal,
@@ -145,18 +155,50 @@ class WithdrawalService
         }
 
         DB::transaction(function () use ($user, $withdrawal) {
-            $wallet = $this->wallets->getOrCreateByOwnerForUpdate($user->id);
-            $amount = (float) $withdrawal->amount;
+            // Re-fetch the withdrawal row with an exclusive lock before any writes.
+            // This prevents two concurrent cancel requests from both passing the
+            // outer status check and then executing the reversal twice.
+            $lockedWithdrawal = $this->withdrawals->findByIdForUpdate($withdrawal->id);
 
-            $wallet->decrement('pending_balance', $amount);
+            if (!$lockedWithdrawal) {
+                throw new DomainException(__('messages.WITHDRAWAL_NOT_FOUND'));
+            }
+
+            // Re-validate status under the lock — the row may have been updated
+            // by another request between the outer check and this point.
+            if (!$lockedWithdrawal->status->isCancellable()) {
+                throw new DomainException(__('messages.WITHDRAWAL_CANNOT_CANCEL'));
+            }
+
+            // Lock the wallet AFTER the withdrawal row (consistent lock ordering).
+            $wallet = $this->wallets->getOrCreateByOwnerForUpdate($user->id);
+            $amount = (float) $lockedWithdrawal->amount;
+
+            // Guarded decrement: pending_balance must cover the withdrawal amount.
+            // This should always hold in a consistent system, but the WHERE guard
+            // prevents a negative balance if state is ever corrupted.
+            $decremented = DB::table($wallet->getTable())
+                ->where('id', $wallet->id)
+                ->where('pending_balance', '>=', $amount)
+                ->decrement('pending_balance', $amount);
+
+            if ($decremented === 0) {
+                Log::channel('financial')->critical('withdrawal.cancel_pending_mismatch', [
+                    'withdrawal_id'   => $lockedWithdrawal->id,
+                    'expected_amount' => $amount,
+                    'wallet_id'       => $wallet->id,
+                ]);
+                throw new DomainException(__('messages.WITHDRAWAL_PENDING_BALANCE_MISMATCH'));
+            }
+
             $wallet->increment('available_balance', $amount);
 
-            $this->withdrawals->updateWithdrawal($withdrawal, [
+            $this->withdrawals->updateWithdrawal($lockedWithdrawal, [
                 'status' => WithdrawalStatus::CANCELLED_BY_USER->value,
             ]);
 
             $this->financialTransactionService->createWalletEntry(
-                reference: $withdrawal,
+                reference: $lockedWithdrawal,
                 gatewayPaymentId: null,
                 transactionType: TransactionType::WITHDRAWAL_REVERSAL->value,
                 entryType: EntryType::ENTRY_CREDIT->value,
@@ -167,15 +209,14 @@ class WithdrawalService
                 status: AmountStatus::STATUS_AVAILABLE->value,
                 meta: [
                     'operation'     => 'withdrawal_cancelled_by_user',
-                    'withdrawal_id' => $withdrawal->id,
+                    'withdrawal_id' => $lockedWithdrawal->id,
                 ],
             );
 
-            DB::afterCommit(function () use ($user, $withdrawal) {
-                $formatted = number_format((float) $withdrawal->amount, 3, '.', '');
+            DB::afterCommit(function () use ($lockedWithdrawal) {
                 event(new WithdrawalStatusChanged(
-                    $withdrawal,
-                   'withdrawal_cancelled'
+                    $lockedWithdrawal,
+                    'withdrawal_cancelled'
                 ));
             });
         });

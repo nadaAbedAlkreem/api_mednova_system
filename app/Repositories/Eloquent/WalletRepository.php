@@ -64,18 +64,16 @@ class WalletRepository extends BaseRepository implements IWalletRepositories
 
     public function increaseAvailableBalance(Wallet $wallet, float $amount): Wallet
     {
-        $wallet->available_balance += $amount;
-        $wallet->save();
+        $wallet->increment('available_balance', $amount);
 
-        return $wallet;
+        return $wallet->refresh();
     }
 
     public function increasePendingBalance(Wallet $wallet, float $amount): Wallet
     {
-        $wallet->pending_balance += $amount;
-        $wallet->save();
+        $wallet->increment('pending_balance', $amount);
 
-        return $wallet;
+        return $wallet->refresh();
     }
 
 

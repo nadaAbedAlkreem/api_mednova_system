@@ -24,6 +24,14 @@ class WithdrawalRepository extends BaseRepository implements IWithdrawalReposito
         return WithdrawalRequest::whereNull('deleted_at')->find($id);
     }
 
+    public function findByIdForUpdate(int $id): ?WithdrawalRequest
+    {
+        return WithdrawalRequest::whereNull('deleted_at')
+            ->where('id', $id)
+            ->lockForUpdate()
+            ->first();
+    }
+
     public function findPendingByOwner(int $ownerId, string $ownerType): ?WithdrawalRequest
     {
         return WithdrawalRequest::where('owner_id', $ownerId)
