@@ -7,6 +7,7 @@ namespace App\Services\Api\Consultation;
 
 use App\Enums\ConsultantType;
 use App\Repositories\IScheduleRepositories;
+use Sentry\Logs\Log;
 
 class SchedulerService
 {
@@ -19,7 +20,7 @@ class SchedulerService
     }
     public function update(int $serviceProviderId, ConsultantType $typeAccount, array $data): void
     {
-     $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount]);
+     $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount->value]);
 
     }
 

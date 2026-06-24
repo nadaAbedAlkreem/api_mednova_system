@@ -17,6 +17,7 @@ use App\Services\Api\Consultation\SchedulerService;
 use App\Services\Api\Customer\TherapistService;
 use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TherapistController extends Controller
 {
@@ -77,17 +78,27 @@ class TherapistController extends Controller
     public function update(UpdateTherapistRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
+            DB::beginTransaction();
 //            $data = $request->getData();
-            $data = $this->therapistService->prepare($request->validated(),null);
+            $authUser = auth('api')->user();
+
+            if (empty($authUser->timezone)) {
+                throw new \RuntimeException("User timezone is required for this operation.");
+            }
+            $authUserTimezone = $authUser->timezone;
+            $data = $this->therapistService->prepare($request->validated(),$authUserTimezone);
 //            $customerData = array_intersect_key($data, array_flip(['full_name', 'email', 'birth_date', 'phone', 'image', 'gender' , 'timezone']));
             $this->customerRepositories->update($data['customer'],$request['customer_id'] );
 //            $therapistData = array_intersect_key($data, array_flip(['medical_specialties_id', 'experience_years', 'university_name', 'countries_certified', 'graduation_year','video_consultation_price' , 'certificate_file', 'license_number', 'license_authority', 'license_file', 'bio', 'video_consultation_price' , 'chat_consultation_price']));
 //            $therapistData = array_filter($therapistData, fn($value) => !is_null($value) && $value !== '');
             $this->therapistRepositories->updateWhere($data['therapist'], ['customer_id' => $request['customer_id']]);
             $this->locationRepositories->updateWhere($data['location'],['customer_id'=>$request['customer_id']] );
+            Log::channel('schedule')->error('settlement.skipped', ['data ' => $data['schedule']]);
             if (!empty($data['schedule'])) {$this->schedulerService->update($request->customer_id, ConsultantType::THERAPIST, $data['schedule']);}
+            DB::commit();
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 201,);
         }catch (\Exception $e) {
+            DB::rollback();
             return $this->errorResponse(__('messages.ERROR_OCCURRED'), ['error' => $e->getMessage()], 500);
         }
     }
