@@ -36,7 +36,10 @@ class WithdrawalRepository extends BaseRepository implements IWithdrawalReposito
     {
         return WithdrawalRequest::where('owner_id', $ownerId)
             ->where('owner_type', $ownerType)
-            ->where('status', WithdrawalStatus::PENDING_REVIEW->value)
+            ->whereIn('status', [
+                WithdrawalStatus::PENDING_REVIEW->value,
+                WithdrawalStatus::PROCESSING->value,
+            ])
             ->whereNull('deleted_at')
             ->first();
     }

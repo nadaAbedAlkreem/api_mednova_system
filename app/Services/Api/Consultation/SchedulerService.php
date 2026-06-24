@@ -7,6 +7,7 @@ namespace App\Services\Api\Consultation;
 
 use App\Enums\ConsultantType;
 use App\Repositories\IScheduleRepositories;
+use Sentry\Logs\Log;
 
 class SchedulerService
 {
