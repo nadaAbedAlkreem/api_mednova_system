@@ -144,16 +144,39 @@ class SettlementService
                 vatAmount:          0,
             );
 
-            // Update wallet balances (atomic SQL)
-            $platformWallet->decrement('pending_balance', $price);
+            // Guarded decrement: SQL rejects the update if pending < price,
+            // catching any gap between the pre-check and this statement.
+            $decremented = DB::table($platformWallet->getTable())
+                ->where('id', $platformWallet->id)
+                ->where('pending_balance', '>=', $price)
+                ->decrement('pending_balance', $price);
+
+            if ($decremented === 0) {
+                Log::channel('financial')->critical('settlement.decrement_guard_failed', [
+                    'consultation_id' => $consultation->id,
+                    'required'        => $price,
+                    'wallet_id'       => $platformWallet->id,
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_PENDING_BALANCE'));
+            }
+
             $platformWallet->increment('available_balance', $platform);
             $consultantWallet->increment('available_balance', $earning);
 
-            // Update consultation
-            $consultation->update([
-                'financial_status' => FinancialStatus::WITHDRAWABLE->value,
-                'settled_at'       => now(),
-            ]);
+            // Atomic status transition: WHERE clause ensures only the process
+            // that truly holds financial_status = review_window can commit.
+            $updated = DB::table($consultation->getTable())
+                ->where('id', $consultation->id)
+                ->where('financial_status', FinancialStatus::REVIEW_WINDOW->value)
+                ->update([
+                    'financial_status' => FinancialStatus::WITHDRAWABLE->value,
+                    'settled_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+
+            if ($updated === 0) {
+                throw new DomainException(__('messages.SETTLEMENT_REQUIRES_REVIEW_WINDOW'));
+            }
 
             // ── Step 4: Post-commit notifications ────────────────────────
             DB::afterCommit(function () use ($consultation, $earning, $consultantCurrency) {

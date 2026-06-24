@@ -539,6 +539,7 @@ return [
     'WITHDRAWAL_NOT_FOUND'                => 'طلب السحب غير موجود.',
     'WITHDRAWAL_NOT_OWNED'                => 'ليس لديك صلاحية الوصول إلى هذا الطلب.',
     'WITHDRAWAL_CANNOT_CANCEL'            => 'لا يمكن إلغاء هذا الطلب في وضعه الحالي.',
+    'WITHDRAWAL_PENDING_BALANCE_MISMATCH' => 'تعذّر إلغاء الطلب بسبب عدم تطابق الرصيد المعلّق. يرجى التواصل مع الدعم.',
     'WITHDRAWAL_REQUESTED_SUCCESSFULLY'   => 'تم تقديم طلب السحب بنجاح وهو قيد المراجعة.',
     'WITHDRAWAL_CANCELLED_SUCCESSFULLY'   => 'تم إلغاء طلب السحب وإعادة المبلغ إلى رصيدك.',
     'WITHDRAWAL_REQUESTED_USER'           => 'تم استلام طلب سحب بمبلغ :amount :currency وهو قيد المراجعة.',

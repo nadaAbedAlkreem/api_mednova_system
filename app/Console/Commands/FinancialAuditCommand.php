@@ -251,8 +251,9 @@ class FinancialAuditCommand extends Command
                 ->whereNull('deleted_at')
                 ->sum('net_amount');
 
+            // 'withdrawal' covers pre-fix records; 'withdrawal_request' covers new records
             $withdrawalDebit = (float) Transaction::where('wallet_id', $wid)
-                ->where('transaction_type', 'withdrawal')
+                ->whereIn('transaction_type', ['withdrawal', 'withdrawal_request'])
                 ->where('entry_type', 'debit')
                 ->whereNull('deleted_at')
                 ->sum('net_amount');
@@ -371,8 +372,9 @@ class FinancialAuditCommand extends Command
                 ->whereNull('deleted_at')
                 ->sum('net_amount');
 
+            // 'withdrawal' covers pre-fix records; 'withdrawal_request' covers new records
             $withdrawalDebit = (float) Transaction::where('wallet_id', $wid)
-                ->where('transaction_type', 'withdrawal')
+                ->whereIn('transaction_type', ['withdrawal', 'withdrawal_request'])
                 ->where('entry_type', 'debit')
                 ->whereNull('deleted_at')
                 ->sum('net_amount');

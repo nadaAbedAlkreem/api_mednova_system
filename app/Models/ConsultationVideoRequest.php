@@ -40,7 +40,6 @@ class ConsultationVideoRequest extends Model
             'gateway_commission_rate',
             'gateway_commission_amount',
             'expires_at',
-
             'gross_amount',
             'platform_commission_rate',
             'platform_commission_amount',

@@ -6,7 +6,9 @@ enum TransactionType : string
 {
     case PAYMENT_RECORD = 'payment_record';
     case CONSULTATION_CREDIT = 'consultation_credit';
-    case WITHDRAWAL = 'withdrawal';
+    case WITHDRAWAL = 'withdrawal';              // kept for backward compat with pre-fix records
+    case WITHDRAWAL_REQUEST = 'withdrawal_request';
+    case WITHDRAWAL_TRANSFER = 'withdrawal_transfer';
     case ADJUSTMENT = 'adjustment';
     case CONSULTATION_HOLD = 'consultation_hold';
     case CONSULTATION_RELEASE = 'consultation_release';
@@ -23,6 +25,8 @@ enum TransactionType : string
         return [
             self::CONSULTATION_CREDIT,
             self::WITHDRAWAL,
+            self::WITHDRAWAL_REQUEST,
+            self::WITHDRAWAL_TRANSFER,
             self::WITHDRAWAL_REVERSAL,
             self::DISPUTE_FREEZE,
             self::DISPUTE_RELEASE,
@@ -35,6 +39,8 @@ enum TransactionType : string
             self::DISPUTE_FREEZE,
             self::DISPUTE_RELEASE,
             self::WITHDRAWAL,
+            self::WITHDRAWAL_REQUEST,
+            self::WITHDRAWAL_TRANSFER,
             self::WITHDRAWAL_REVERSAL,
         ];
     }

@@ -31,6 +31,13 @@ class DisputeService
     {
         DB::transaction(function () use ($consultation, $patient, $reason) {
 
+            // Lock platform wallet FIRST — matches SettlementService lock ordering.
+            // Consistent order (platform wallet → consultation) across all financial
+            // services eliminates the deadlock that occurs when two workers each hold
+            // one of the two locks and wait indefinitely for the other.
+            $platformWallet = $this->wallets->getPlatformWallet();
+
+            // Lock consultation SECOND, after the platform wallet is already held.
             $consultation = $consultation->newQuery()
                 ->whereKey($consultation->id)
                 ->lockForUpdate()
@@ -47,8 +54,6 @@ class DisputeService
             if ($amount <= 0) {
                 throw new DomainException(__('messages.INVALID_CONSULTATION_AMOUNT'));
             }
-
-            $platformWallet = $this->wallets->getPlatformWallet();
 
             if ((float) $platformWallet->pending_balance < $amount) {
                 Log::channel('financial')->critical('dispute.open_failed', [
@@ -101,7 +106,22 @@ class DisputeService
                 vatAmount: 0,
             );
 
-            $platformWallet->decrement('pending_balance', $amount);
+            // Guarded decrement: SQL rejects the update if pending_balance < amount,
+            // catching any gap between the pre-check above and this statement.
+            $decremented = DB::table($platformWallet->getTable())
+                ->where('id', $platformWallet->id)
+                ->where('pending_balance', '>=', $amount)
+                ->decrement('pending_balance', $amount);
+
+            if ($decremented === 0) {
+                Log::channel('financial')->critical('dispute.open_decrement_guard_failed', [
+                    'consultation_id' => $consultation->id,
+                    'required'        => $amount,
+                    'wallet_id'       => $platformWallet->id,
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_PENDING_BALANCE'));
+            }
+
             $platformWallet->increment('frozen_balance', $amount);
 
             $consultation->update([

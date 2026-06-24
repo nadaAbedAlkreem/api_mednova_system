@@ -34,41 +34,41 @@ class DisputeResolutionService
     {
         DB::transaction(function () use ($dispute, $admin, $note) {
 
-            // ── 1. Re-fetch + lock dispute row ────────────────────────────
+            // 1. Re-fetch + lock dispute row
             $dispute = Dispute::whereKey($dispute->id)->lockForUpdate()->firstOrFail();
 
-            // ── 2. Status guard (primary idempotency layer) ───────────────
+            // 2. Status guard (primary idempotency layer)
             $this->guardNotResolved($dispute);
 
-            // ── 3. Load + lock consultation row ───────────────────────────
+            // 3. Load + lock consultation row
             $consultation = ($dispute->reference_type)::whereKey($dispute->reference_id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             $amount = (float) $dispute->amount;
 
-            // ── 4. Transaction idempotency (secondary layer) ──────────────
+            // 4. Transaction idempotency (secondary layer)
             $this->guardNoExistingRelease($consultation);
 
-            // ── 5. Lock wallets (platform first, then patient) ────────────
+            // 5. Lock wallets (platform first, then patient)
             $platformWallet = Wallet::where('id', $dispute->wallet_id)->lockForUpdate()->firstOrFail();
             $patientWallet  = $this->wallets->getOrCreateByOwnerForUpdate($consultation->patient_id);
 
-            // ── 6. Frozen balance guard ───────────────────────────────────
+            // 6. Frozen balance guard
             if ((float) $platformWallet->frozen_balance < $amount) {
                 Log::channel('financial')->critical('dispute.resolution_failed', [
-                    'dispute_id'             => $dispute->id,
-                    'consultation_id'        => $consultation->id,
-                    'reason'                 => 'insufficient_platform_frozen_balance',
-                    'required'               => $amount,
-                    'platform_frozen_balance'=> $platformWallet->frozen_balance,
+                    'dispute_id'              => $dispute->id,
+                    'consultation_id'         => $consultation->id,
+                    'reason'                  => 'insufficient_platform_frozen_balance',
+                    'required'                => $amount,
+                    'platform_frozen_balance' => $platformWallet->frozen_balance,
                 ]);
                 throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_FROZEN_BALANCE'));
             }
 
             $currency = $platformWallet->currency ?? 'OMR';
 
-            // ── 7. Ledger entries ─────────────────────────────────────────
+            // 7. Ledger entries
             $sharedMeta = [
                 'dispute_id'   => $dispute->id,
                 'resolution'   => 'refund',
@@ -109,21 +109,49 @@ class DisputeResolutionService
                 vatAmount:          0,
             );
 
-            // ── 8. Wallet balance updates ─────────────────────────────────
-            $platformWallet->decrement('frozen_balance', $amount);
+            // 8. Wallet balance updates
+            // Guarded decrement: SQL rejects the update if frozen_balance < amount,
+            // catching any gap between the pre-check above and this statement.
+            $decremented = DB::table($platformWallet->getTable())
+                ->where('id', $platformWallet->id)
+                ->where('frozen_balance', '>=', $amount)
+                ->decrement('frozen_balance', $amount);
+
+            if ($decremented === 0) {
+                Log::channel('financial')->critical('dispute.resolution_decrement_guard_failed', [
+                    'dispute_id'      => $dispute->id,
+                    'consultation_id' => $consultation->id,
+                    'required'        => $amount,
+                    'wallet_id'       => $platformWallet->id,
+                    'resolution'      => 'refund',
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_FROZEN_BALANCE'));
+            }
+
             $patientWallet->increment('available_balance', $amount);
 
-            // ── 9. Update dispute ─────────────────────────────────────────
-            $dispute->update([
-                'status'           => 'resolved',
-                'resolution'       => 'refund',
-                'resolved_by_type' => get_class($admin),
-                'resolved_by_id'   => $admin->id,
-                'resolved_at'      => now(),
-                'meta'             => array_merge($dispute->meta ?? [], ['admin_note' => $note]),
-            ]);
+            // 9. Atomic dispute status transition.
+            // WHERE clause mirrors guardNotResolved — ensures only the process
+            // that holds the dispute lock with an actionable status can commit.
+            // $dispute->update() bypasses this SQL-level check; DB::table() does not.
+            $updatedDispute = DB::table($dispute->getTable())
+                ->where('id', $dispute->id)
+                ->whereIn('status', ['opened', 'under_review'])
+                ->update([
+                    'status'           => 'resolved',
+                    'resolution'       => 'refund',
+                    'resolved_by_type' => get_class($admin),
+                    'resolved_by_id'   => $admin->id,
+                    'resolved_at'      => now(),
+                    'updated_at'       => now(),
+                    'meta'             => json_encode(array_merge($dispute->meta ?? [], ['admin_note' => $note])),
+                ]);
 
-            // ── 10. Update consultation financial status ───────────────────
+            if ($updatedDispute === 0) {
+                throw new DomainException(__('messages.DISPUTE_ALREADY_RESOLVED'));
+            }
+
+            // 10. Update consultation financial status
             $consultation->update([
                 'financial_status' => FinancialStatus::REFUNDED_INTERNAL->value,
             ]);
@@ -137,7 +165,7 @@ class DisputeResolutionService
                 'resolved_at'     => now()->toIso8601String(),
             ]);
 
-            // ── 11. Post-commit notifications ─────────────────────────────
+            // 11. Post-commit notifications
             DB::afterCommit(function () use ($consultation, $dispute, $amount, $currency) {
                 $consultation->load(['patient', 'consultant']);
                 $this->fireNotifications($consultation, $dispute, $amount, $currency, 'refund');
@@ -153,13 +181,13 @@ class DisputeResolutionService
     {
         DB::transaction(function () use ($dispute, $admin, $note) {
 
-            // ── 1. Re-fetch + lock dispute row ────────────────────────────
+            // 1. Re-fetch + lock dispute row
             $dispute = Dispute::whereKey($dispute->id)->lockForUpdate()->firstOrFail();
 
-            // ── 2. Status guard ───────────────────────────────────────────
+            // 2. Status guard
             $this->guardNotResolved($dispute);
 
-            // ── 3. Load + lock consultation row ───────────────────────────
+            // 3. Load + lock consultation row
             $consultation = ($dispute->reference_type)::whereKey($dispute->reference_id)
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -168,10 +196,10 @@ class DisputeResolutionService
             $earning  = (float) $consultation->consultant_earning_amount;
             $platform = (float) $consultation->platform_commission_amount;
 
-            // ── 4. Transaction idempotency ────────────────────────────────
+            // 4. Transaction idempotency
             $this->guardNoExistingRelease($consultation);
 
-            // ── 5. Accounting identity check ──────────────────────────────
+            // 5. Accounting identity check
             $sum = (float) bcadd((string) $earning, (string) $platform, 3);
             if (abs($price - $sum) > 0.001) {
                 Log::channel('financial')->critical('dispute.resolution_accounting_mismatch', [
@@ -185,11 +213,11 @@ class DisputeResolutionService
                 throw new DomainException(__('messages.SETTLEMENT_ACCOUNTING_MISMATCH'));
             }
 
-            // ── 6. Lock wallets (platform first, then consultant) ─────────
+            // 6. Lock wallets (platform first, then consultant)
             $platformWallet   = Wallet::where('id', $dispute->wallet_id)->lockForUpdate()->firstOrFail();
             $consultantWallet = $this->wallets->getOrCreateByOwnerForUpdate($consultation->consultant_id);
 
-            // ── 7. Frozen balance guard ───────────────────────────────────
+            // 7. Frozen balance guard
             if ((float) $platformWallet->frozen_balance < $price) {
                 Log::channel('financial')->critical('dispute.resolution_failed', [
                     'dispute_id'              => $dispute->id,
@@ -204,7 +232,7 @@ class DisputeResolutionService
             $currency           = $platformWallet->currency ?? 'OMR';
             $consultantCurrency = $consultantWallet->currency ?? 'OMR';
 
-            // ── 8. Ledger entries ─────────────────────────────────────────
+            // 8. Ledger entries
             $sharedMeta = [
                 'dispute_id'   => $dispute->id,
                 'resolution'   => 'release',
@@ -261,22 +289,50 @@ class DisputeResolutionService
                 vatAmount:          0,
             );
 
-            // ── 9. Wallet balance updates ─────────────────────────────────
-            $platformWallet->decrement('frozen_balance', $price);
+            // 9. Wallet balance updates
+            // Guarded decrement: SQL rejects the update if frozen_balance < price,
+            // catching any gap between the pre-check above and this statement.
+            $decremented = DB::table($platformWallet->getTable())
+                ->where('id', $platformWallet->id)
+                ->where('frozen_balance', '>=', $price)
+                ->decrement('frozen_balance', $price);
+
+            if ($decremented === 0) {
+                Log::channel('financial')->critical('dispute.resolution_decrement_guard_failed', [
+                    'dispute_id'      => $dispute->id,
+                    'consultation_id' => $consultation->id,
+                    'required'        => $price,
+                    'wallet_id'       => $platformWallet->id,
+                    'resolution'      => 'release',
+                ]);
+                throw new DomainException(__('messages.INSUFFICIENT_PLATFORM_FROZEN_BALANCE'));
+            }
+
             $platformWallet->increment('available_balance', $platform);
             $consultantWallet->increment('available_balance', $earning);
 
-            // ── 10. Update dispute ────────────────────────────────────────
-            $dispute->update([
-                'status'           => 'resolved',
-                'resolution'       => 'release',
-                'resolved_by_type' => get_class($admin),
-                'resolved_by_id'   => $admin->id,
-                'resolved_at'      => now(),
-                'meta'             => array_merge($dispute->meta ?? [], ['admin_note' => $note]),
-            ]);
+            // 10. Atomic dispute status transition.
+            // WHERE clause mirrors guardNotResolved — ensures only the process
+            // that holds the dispute lock with an actionable status can commit.
+            // $dispute->update() bypasses this SQL-level check; DB::table() does not.
+            $updatedDispute = DB::table($dispute->getTable())
+                ->where('id', $dispute->id)
+                ->whereIn('status', ['opened', 'under_review'])
+                ->update([
+                    'status'           => 'resolved',
+                    'resolution'       => 'release',
+                    'resolved_by_type' => get_class($admin),
+                    'resolved_by_id'   => $admin->id,
+                    'resolved_at'      => now(),
+                    'updated_at'       => now(),
+                    'meta'             => json_encode(array_merge($dispute->meta ?? [], ['admin_note' => $note])),
+                ]);
 
-            // ── 11. Update consultation ───────────────────────────────────
+            if ($updatedDispute === 0) {
+                throw new DomainException(__('messages.DISPUTE_ALREADY_RESOLVED'));
+            }
+
+            // 11. Update consultation
             $consultation->update([
                 'financial_status' => FinancialStatus::WITHDRAWABLE->value,
                 'settled_at'       => now(),
@@ -293,7 +349,7 @@ class DisputeResolutionService
                 'resolved_at'     => now()->toIso8601String(),
             ]);
 
-            // ── 12. Post-commit notifications ─────────────────────────────
+            // 12. Post-commit notifications
             DB::afterCommit(function () use ($consultation, $dispute, $earning, $consultantCurrency) {
                 $consultation->load(['patient', 'consultant']);
                 $this->fireNotifications($consultation, $dispute, $earning, $consultantCurrency, 'release');
