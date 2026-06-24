@@ -23,7 +23,7 @@ class SchedulerService
         \Illuminate\Support\Facades\Log::error('nada', ['$typeAccount ' => $typeAccount , 'id' =>$serviceProviderId]);
 
 
-        $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount->value]);
+        $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount]);
 
     }
 
