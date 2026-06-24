@@ -20,7 +20,10 @@ class SchedulerService
     }
     public function update(int $serviceProviderId, ConsultantType $typeAccount, array $data): void
     {
-     $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount->value]);
+        \Illuminate\Support\Facades\Log::error('nada', ['$typeAccount ' => $typeAccount , 'id' =>$serviceProviderId]);
+
+
+        $this->scheduleRepositories->updateWhere($data, ['consultant_id' => $serviceProviderId, 'consultant_type' => $typeAccount->value]);
 
     }
 
