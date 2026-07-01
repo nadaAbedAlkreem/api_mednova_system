@@ -93,7 +93,7 @@ class TherapistController extends Controller
 //            $therapistData = array_filter($therapistData, fn($value) => !is_null($value) && $value !== '');
             $this->therapistRepositories->updateWhere($data['therapist'], ['customer_id' => $request['customer_id']]);
             $this->locationRepositories->updateWhere($data['location'],['customer_id'=>$request['customer_id']] );
-            Log::channel('financial')->error('settlement.skipped', ['data ' => $data['schedule']]);
+            Log::error('nada', ['data ' => $data['schedule']]);
             if (!empty($data['schedule'])) {$this->schedulerService->update($request->customer_id, ConsultantType::THERAPIST, $data['schedule']);}
             DB::commit();
             return $this->successResponse(__('messages.UPDATE_SUCCESS'),[], 201,);

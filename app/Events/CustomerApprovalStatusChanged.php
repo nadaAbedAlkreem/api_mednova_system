@@ -34,9 +34,6 @@ class CustomerApprovalStatusChanged
      */
     public function broadcastOn(): array
     {
-        Log::info('Approved 444  changed');
-        Log::info('Approved 444  changed');
-
         return [
             new PrivateChannel('channel-name'),
         ];
