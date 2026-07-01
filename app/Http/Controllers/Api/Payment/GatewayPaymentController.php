@@ -57,10 +57,14 @@ class GatewayPaymentController extends Controller
         try {
             $consultation = match ($type) {
                 'chat' => ConsultationChatRequest::findOrFail($id),
-                'video' => ConsultationVideoRequest::findOrFail($id),
+                'video' => ConsultationVideoRequest::with('appointmentRequest')->findOrFail($id),
                 default => throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('نوع الطلب غير موجود'),
             };
+
             $this->authorize('pay', $consultation);
+            if ($type == 'video' &&  !empty($consultation->appointmentRequest) && $consultation->requested_time->isPast()) {
+                throw new ConsultationNotPayableException(__('messages.appointment_expired'));
+            }
             $result = $this->consultationPaymentIntentService->create(
                 consultation: $consultation,
                 type: $type,
