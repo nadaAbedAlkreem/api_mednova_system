@@ -37,7 +37,7 @@ class StorePatientRequest extends FormRequest
                 'after:1900-01-01'
             ],
             'image' => [
-                'required',
+//                'required',
                 'file',
                 'mimes:jpeg,png,jpg,gif,svg,webp',
               ],
