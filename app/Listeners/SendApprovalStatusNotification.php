@@ -31,12 +31,12 @@ class SendApprovalStatusNotification
             'type' => 'customer_approval_status_changed',
             'notifiable_id' => $event->customer->id,
             'notifiable_type' =>Customer::class,
-            'message' => ($event->status == StatusType::APPROVED)? __('messages.welcome_notification'): __('messages.rejected_notification'),
             'data' => json_encode([
                 'customer' => $event->customer->id,
                 'status' => $event->status,
                 'reason' => $event->reason,
                 'admin_id' => $event->adminId,
+                'message' => ($event->status == StatusType::APPROVED)? __('messages.welcome_notification'): __('messages.rejected_notification'),
             ]),
             'read_at' => null,
             'status' => 'pending',
