@@ -30,7 +30,7 @@ class ConsultationStatusService
                 break;
 
             case 'cancelled':
-                $message = $this->processCancellation($consultation, $actionBy);
+                $this->processCancellation($consultation, $actionBy);
                 if($type == 'video'){
                     $consultation->load('appointmentRequest');
                     if($consultation->appointmentRequest != null){$consultation->appointmentRequest->update(['status' => 'cancelled']);}
@@ -91,20 +91,6 @@ class ConsultationStatusService
      */
     private function handleCancellation($consultation, string $type): string
     {
-//        \Illuminate\Support\Facades\Log::channel('financial')->info('type' . $type);
-//        $consultation = $consultation->newQuery()->whereKey($consultation->id)->lockForUpdate()->firstOrFail();
-//        $actor = $type === 'patient' ? $consultation->patient : $consultation->consultant;
-//        $messageKey = $type === 'patient' ? 'messages.CANCEL_REQUEST_PATIENT' : 'messages.CANCEL_REQUEST_CONSULTANT';
-//        $eventType = $type === 'patient' ? 'cancelled_by_patient' : 'cancelled_by_consultant';
-//        $message = __($messageKey, ['name' => $actor->full_name]);
-//        $this->refundService->processInternalRefund($consultation);
-//        $amountFormatted = number_format($consultation->consultation_price, 3);
-//        $patientMessage    = __('messages.refund_issued', [
-//                'amount'   => $amountFormatted,
-//                'currency' => config('amwal.currency_en') ?? 'OMR',
-//            ]);
-//        event(new ConsultationRequested($consultation, $message, $eventType));
-//        event(new ConsultationRequested($consultation, $patientMessage,    'refund_issued'));
         $consultation = $consultation->newQuery()
             ->whereKey($consultation->id)
             ->lockForUpdate()
@@ -133,7 +119,11 @@ class ConsultationStatusService
             event(new ConsultationRequested($consultation, $patientMessage, 'refund_issued'));
         }
         // ── إشعار الإلغاء دائماً ────────────────────────────
-        event(new ConsultationRequested($consultation, $message, $eventType));
+        if($eventType === 'cancelled_by_consultant')
+        {
+            event(new ConsultationRequested($consultation, $message, $eventType));
+        }
+
         return $message;
     }
 
