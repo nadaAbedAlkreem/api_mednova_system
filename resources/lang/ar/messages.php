@@ -15,7 +15,7 @@ return [
     'dispute_opened_patient' => 'تم تسجيل النزاع بنجاح على الاستشارة رقم :consultation_id مع :consultant. سيتم مراجعة النزاع من قبل إدارة المنصة. للمتابعة تواصل مع الإدارة على الرقم '.config('app.support_phone'),
     'dispute_opened_consultant' => 'تم فتح نزاع على الاستشارة رقم :consultation_id من قبل المريض :patient. يرجى التواصل مع إدارة المنصة على الرقم '.config('app.support_phone').'لمتابعة الإجراءات.',
     'dispute_opened_admin' => 'نزاع جديد يحتاج مراجعة: الاستشارة رقم :consultation_id بين المريض :patient والمستشار :consultant.',
-
+    'appointment_expired' => 'انتهى وقت الموعد المحجوز، الرجاء إعادة الحجز',
     'welcome_notification' => '🎉 تهانينا! تم قبولك رسميًا في منصة ميدنوفا. نرحب بك في مجتمعنا ونتطلع لتجربتك معنا!',
     'rejected_notification' => '⚠️ نأسف لإبلاغك أن طلبك لم يتم قبوله في منصة ميدنوفا في الوقت الحالي. يمكنك مراجعة سبب الرفض والتواصل معنا لمزيد من المعلومات. نشكرك على اهتمامك ونتمنى لك التوفيق.',
     'approval_status' => 'حالة الاعتماد ',
