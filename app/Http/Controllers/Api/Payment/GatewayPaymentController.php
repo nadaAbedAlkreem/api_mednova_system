@@ -62,7 +62,7 @@ class GatewayPaymentController extends Controller
             };
 
             $this->authorize('pay', $consultation);
-            if ($type == 'video' &&  !empty($consultation->appointmentRequest) && $consultation->requested_time->isPast()) {
+            if ($type == 'video' &&  !empty($consultation->appointmentRequest) && $consultation->appointmentRequest->requested_time->isPast()) {
                 throw new ConsultationNotPayableException(__('messages.appointment_expired'));
             }
             $result = $this->consultationPaymentIntentService->create(
